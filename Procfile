@@ -1,1 +1,1 @@
-gunicorn nodenexus.wsgi:application
+gunicorn config.wsgi:application
