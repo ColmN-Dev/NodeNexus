@@ -510,12 +510,8 @@ Development will follow an incremental approach.
 
 ---
 
----
-
 # 17. Database Entity Relationship Diagram
 
 The following ERD represents the planned PostgreSQL database structure for NodeNexus, including table relationships between users, profiles, articles, categories, sources, bookmarks, comments, and messages.
 
 ![NodeNexus ERD](../docs/images/node_nexus_erd.png)
-
----
