@@ -1,0 +1,99 @@
+// NodeNexus Database Schema
+//
+// This DBML file defines the PostgreSQL database structure for the NodeNexus application.
+// It includes tables for users, profiles, categories, sources, articles,
+// bookmarks, comments, and messages.
+//
+// The schema defines:
+// - Table structures and columns.
+// - Primary keys and foreign key relationships.
+// - One-to-one, one-to-many, and many-to-many relationships.
+//
+// The ERD diagram can be generated and viewed using dbdiagram.io.
+Table User {
+  id integer [pk]
+  username varchar
+  email varchar
+  password varchar
+  date_joined timestamp
+}
+
+Table Profile {
+  id integer [pk]
+  user_id integer [not null, unique]
+  avatar_type varchar
+  avatar_url varchar
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table Category {
+  id integer [pk]
+  name varchar
+}
+
+Table Source {
+  id integer [pk]
+  name varchar
+  created_at timestamp
+}
+
+Table Article {
+  id integer [pk]
+  category_id integer [not null]
+  source_id integer [not null]
+  title varchar
+  description text
+  image_url varchar
+  article_url varchar
+  published_date timestamp
+  created_at timestamp
+}
+
+Table Bookmark {
+  id integer [pk]
+  user_id integer [not null]
+  article_id integer [not null]
+  created_at timestamp
+
+  indexes {
+  (user_id, article_id) [unique]
+  }
+}
+
+Table Comment {
+  id integer [pk]
+  user_id integer [not null]
+  article_id integer [not null]
+  content text
+  created_at timestamp
+  updated_at timestamp
+}
+
+Table Message {
+  id integer [pk]
+  sender_id integer [not null]
+  receiver_id integer [not null]
+  content text
+  created_at timestamp
+  read_status boolean
+  archive_status boolean
+}
+
+Ref: Profile.user_id - User.id
+
+Ref: Article.category_id > Category.id
+
+Ref: Article.source_id > Source.id
+
+Ref: Bookmark.user_id > User.id
+
+Ref: Bookmark.article_id > Article.id
+
+Ref: Comment.user_id > User.id
+
+Ref: Comment.article_id > Article.id
+
+Ref: Message.sender_id > User.id
+
+Ref: Message.receiver_id > User.id

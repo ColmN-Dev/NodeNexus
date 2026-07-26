@@ -18,6 +18,7 @@
 14. [Security Features](#14-security-features)
 15. [Future Enhancements](#15-future-enhancements)
 16. [Development Approach](#16-development-approach)
+17. [Database Entity Relationship Diagram](#17-database-entity-relationship-diagram)
 
 ---
 
@@ -254,24 +255,37 @@ Stores:
 - Email.
 - Password.
 - Authentication information.
+- Date joined.
+
+Relationships:
+
+- One User has one Profile.
+- One User can create many Bookmarks.
+- One User can create many Comments.
+- One User can send and receive many Messages.
 
 ---
 
 ## Profile
 
-One-to-one relationship with User.
+Extends Django's built-in User model through a one-to-one relationship.
 
 Stores:
 
 - Avatar information.
 - Profile details.
 - Account creation date.
+- Last profile update date.
+
+Relationship:
+
+- One Profile belongs to one User.
 
 ---
 
 ## Article
 
-Central content table.
+Central content table storing aggregated news content.
 
 Stores:
 
@@ -280,14 +294,26 @@ Stores:
 - Image URL.
 - External article URL.
 - Published date.
+- Date added to NodeNexus.
 - Category relationship.
 - Source relationship.
+
+Relationships:
+
+- One Article belongs to one Category.
+- One Article belongs to one Source.
+- One Article can have many Bookmarks.
+- One Article can have many Comments.
 
 ---
 
 ## Category
 
 Stores article categories.
+
+Stores:
+
+- Category name.
 
 Examples:
 
@@ -302,6 +328,11 @@ Examples:
 
 Stores external API sources.
 
+Stores:
+
+- Source name.
+- API source information.
+
 Examples:
 
 - Currents.
@@ -311,27 +342,59 @@ Examples:
 
 ## Bookmark
 
-Many-to-many relationship between users and articles.
+Join table connecting Users and Articles.
+
+Allows users to save articles for later.
 
 Stores:
 
-- User.
-- Article.
+- User relationship.
+- Article relationship.
 - Saved timestamp.
+
+Relationships:
+
+- One User can save many Articles.
+- One Article can be saved by many Users.
+
+---
+
+## Comment
+
+Stores user comments on articles.
+
+Stores:
+
+- User relationship.
+- Article relationship.
+- Comment text.
+- Created timestamp.
+- Updated timestamp.
+
+Relationships:
+
+- One User can create many Comments.
+- One Article can have many Comments.
 
 ---
 
 ## Message
 
-Stores user-to-user messages.
+Stores user-to-user inbox messages.
 
 Stores:
 
-- Sender.
-- Receiver.
+- Sender relationship.
+- Receiver relationship.
 - Message content.
-- Timestamp.
+- Created timestamp.
+- Read status.
 - Archive status.
+
+Relationships:
+
+- One User can send many Messages.
+- One User can receive many Messages.
 
 ---
 
@@ -444,3 +507,15 @@ Development will follow an incremental approach.
 - Testing.
 - Security checks.
 - Deployment on Render.
+
+---
+
+---
+
+# 17. Database Entity Relationship Diagram
+
+The following ERD represents the planned PostgreSQL database structure for NodeNexus, including table relationships between users, profiles, articles, categories, sources, bookmarks, comments, and messages.
+
+![NodeNexus ERD](../static/images/node_nexus_erd.png)
+
+---
