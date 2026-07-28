@@ -201,7 +201,7 @@ a:hover {
    ======================================== */
 
 header,
-.navbar {
+.nn-navbar {
 
     position:fixed;
 
@@ -217,12 +217,12 @@ header,
 
 
     backdrop-filter:
-    blur(12px)
-    saturate(150%);
+    blur(12px);
+    
 
     -webkit-backdrop-filter:
-    blur(12px)
-    saturate(150%);
+    blur(12px);
+    
 
 
     border-bottom:
@@ -447,8 +447,8 @@ header,
 
     background:var(--glass-bg);
 
-    backdrop-filter:blur(12px) saturate(150%);
-    -webkit-backdrop-filter:blur(12px) saturate(150%);
+    backdrop-filter:blur(12px);
+    -webkit-backdrop-filter:blur(12px);
 
     border:1px solid var(--glass-border);
 
@@ -489,13 +489,12 @@ header,
 
 
     backdrop-filter:
-    blur(12px)
-    saturate(150%);
+    blur(12px);
+    
 
 
     -webkit-backdrop-filter:
-    blur(12px)
-    saturate(150%);
+    blur(12px);
 
 
     border-top:

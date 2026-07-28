@@ -7,30 +7,29 @@
 # Table of Contents
 
 1. [Overview](#1-overview)
+
 2. [Project Development Summary](#2-project-development-summary)
    - Initial Project Setup
    - Migration From SQLite to PostgreSQL
-   - Static Files and Deployment Setup
+   - Frontend and Backend Separation
    - Django Framework Implementation
 
 3. [Current Architecture](#3-current-architecture)
-   - Django Project Structure
+   - Backend Structure
    - Settings Configuration
    - URL Routing
-   - Template System
-   - Static File Handling
+   - Frontend Architecture
+   - Static Asset Management
    - Deployment Architecture
 
 4. [Current Folder Structure](#4-current-folder-structure)
 
 5. [Frontend Implementation](#5-frontend-implementation)
-   - Base Template
-   - Responsive Navigation
-   - Desktop Navigation
-   - Mobile Hamburger Menu
-   - Mobile Bottom Navigation
-   - Dark Mode Toggle
-   - Glass UI Design System
+   - React Preparation
+   - Asset Organisation
+   - Component Structure
+   - Page Structure
+   - Responsive Design System
    - Branding and Assets
 
 6. [Database Configuration](#6-database-configuration)
@@ -41,10 +40,10 @@
 
 7. [Django Features Implemented](#7-django-features-implemented)
    - Django Project Configuration
-   - Template Inheritance
-   - Static Files Management
-   - Authentication Foundation
+   - URL Routing
+   - Static File Management
    - Environment Configuration
+   - Backend Foundation
 
 8. [Completed Features](#8-completed-features)
 
@@ -53,7 +52,7 @@
 10. [Key Design Decisions](#10-key-design-decisions)
    - Why Django
    - Why PostgreSQL
-   - Why Server-Side Rendering
+   - Why Frontend Separation
    - Frontend Design Choices
 
 11. [Static Files and Deployment](#11-static-files-and-deployment)
@@ -92,13 +91,15 @@
 
 # 1. Overview
 
-NodeNexus is a technology intelligence hub built using the Django framework.
+NodeNexus is a technology intelligence hub built using Django as the backend framework.
 
 The project is designed to provide developers and technology enthusiasts with a central platform for discovering technology news, articles, and updates.
 
-The application uses Django for backend development, PostgreSQL for database management, and a custom responsive frontend built with HTML, CSS, JavaScript, and Bootstrap.
+The application uses Django for backend development, PostgreSQL for database management, and a separated frontend architecture prepared for future React implementation.
 
-The current development phase focuses on establishing the core Django architecture, frontend design system, responsive navigation, static asset management, and deployment workflow.
+The current development phase focuses on establishing the Django backend architecture, database integration, frontend separation, asset organisation, responsive design system, and deployment workflow.
+
+The project structure separates backend responsibilities from frontend development to allow future expansion into a full-stack application with a dedicated React frontend communicating with Django services.
 
 ---
 
@@ -106,7 +107,7 @@ The current development phase focuses on establishing the core Django architectu
 
 ## Initial Project Setup
 
-NodeNexus was created as a Django-based web application following the standard Django project structure.
+NodeNexus was created as a Django-based web application following Django's standard project structure.
 
 The initial setup included:
 
@@ -115,8 +116,9 @@ The initial setup included:
 - Installing required dependencies.
 - Configuring Django settings.
 - Preparing the project for PostgreSQL integration.
+- Creating the initial frontend structure.
 
-The project structure was created with future expansion in mind, including authentication, user profiles, article management, and external API integration.
+The project structure was created with future expansion in mind, including authentication, user profiles, article management, external API integration, and a dedicated frontend application.
 
 ---
 
@@ -134,213 +136,182 @@ Changes included:
 
 ---
 
+## Frontend and Backend Separation
+
+The project architecture was reorganised to separate backend and frontend responsibilities.
+
+The Django backend was moved into its own directory:
+
+- Django configuration.
+- Application logic.
+- Database handling.
+- Backend services.
+
+A dedicated frontend structure was created to prepare for future React development:
+
+- Frontend assets.
+- Page structure.
+- Reusable components.
+- Client-side functionality.
+
+This separation allows NodeNexus to transition towards a modern full-stack architecture while keeping Django responsible for backend functionality.
+
+---
+
 ## Django Framework Implementation
 
 NodeNexus uses Django's built-in framework features including:
 
 - URL routing.
-- Template inheritance.
-- Static file management.
 - Settings configuration.
+- Static file management.
 - Database migrations.
 - Development and production deployment workflows.
 
-A reusable base template was created to provide shared layout components across pages.
+The Django backend provides the foundation for future features including authentication, API endpoints, article management, and user functionality.
 
 ---
 
 # 3. Current Architecture
 
-## Django Project Structure
+## Backend Structure
 
-NodeNexus follows the standard Django architecture pattern.
+NodeNexus uses a separated backend and frontend architecture.
 
-The project separates configuration, templates, and static assets to maintain a clear development structure.
+The backend is built using Django and is responsible for:
 
-The main components include:
-
-- Django project configuration.
+- Project configuration.
 - URL routing.
-- HTML templates.
-- Static CSS, JavaScript, and image assets.
-- Database configuration.
-- Deployment configuration.
+- Database communication.
+- Application logic.
+- Future API development.
+- Authentication and user management.
 
-This structure allows the application to be expanded with additional features while keeping the codebase organised.
+The Django backend is contained inside the backend directory to keep server-side functionality separate from frontend development.
 
 ---
 
 ## Settings Configuration
 
-The Django settings file was configured for development and production requirements.
+The Django settings file is configured for development and production requirements.
 
-Implemented configuration includes:
+Current configuration includes:
 
-- PostgreSQL database connection.
-- Static file handling.
-- Template directory configuration.
+- PostgreSQL database integration.
 - Environment variable support.
+- Static file configuration.
 - Deployment settings.
+- Allowed hosts configuration.
 
-Static file configuration:
-
-```python
-STATIC_URL = '/static/'
-
-STATICFILES_DIRS = [
-    BASE_DIR / "static",
-]
-
-STATIC_ROOT = BASE_DIR / "staticfiles"
-```
+Sensitive values such as database credentials and API keys are stored using environment variables.
 
 ---
 
 ## URL Routing
 
-Django URL routing was configured using the project-level `urls.py` file.
+Django URL routing is managed through the project-level urls.py file.
 
-The URL configuration acts as the connection point between incoming browser requests and the relevant Django views.
+The URL configuration acts as the connection between incoming requests and backend functionality.
 
-Current routing setup includes:
+The routing system will allow NodeNexus to expand with additional features including:
 
-- Project-level URL management.
-- Inclusion of application routes.
-- Static file serving during development.
-- Future expansion for authentication and content-based pages.
-
-Example structure:
-
-```python
-urlpatterns = [
-    path("", include("main.urls")),
-]
-```
-
-The routing system allows NodeNexus features to be separated into individual Django applications as the project grows.
-
-Template System
-
-NodeNexus uses Django's template inheritance system to create reusable layouts.
-
-A central `base.html` template provides shared components including:
-
-- Navigation bar.
-- Mobile navigation.
-- Footer.
-- External stylesheet loading.
-- JavaScript loading.
-- Metadata configuration.
-
-Individual pages extend the base template instead of duplicating common HTML structures.
-
-Example:
-
-```HTML
-{% extends "base.html" %}
-
-{% block content %}
-
-Page content goes here.
-
-{% endblock %}
-```
-
-This keeps templates maintainable and ensures consistent styling across the application.
+- Authentication routes.
+- Article management.
+- API endpoints.
+- User functionality.
 
 ---
 
-## Static File Handling
+## Frontend Architecture
 
-Static files are managed using Django's built-in staticfiles framework.
+The frontend structure has been separated from the Django backend to prepare for future React implementation.
 
-The project separates development static assets from collected production assets.
+The frontend directory contains:
 
-Static files include:
+- Page structures.
+- Reusable components.
+- Static assets.
+- Client-side functionality.
 
-- CSS stylesheets.
+This separation allows the frontend and backend to be developed independently while communicating through future API endpoints.
+
+---
+
+## Static Asset Management
+
+Frontend assets are organised separately from Django backend files.
+
+Current frontend assets include:
+
+- CSS files.
 - JavaScript files.
-- Logos.
-- Background images.
-- Theme icons.
-- Favicons.
-- Web manifest files.
+- Images.
+- Branding assets.
 
-Development assets are stored in:
-
-```text
-static/
-```
-
-During deployment, Django collects these files into:
-
-```text
-staticfiles/
-```
-
-Which I used:
-
-```Bash
-python manage.py collectstatic
-```
-
-This was used to generate the staticfiles folder.
+Django's staticfiles system remains responsible for collecting and serving production static resources during deployment.
 
 ---
 
 ## Deployment Architecture
 
-The project is configured for deployment on Render using Django's production deployment workflow.
+NodeNexus is configured for deployment using Render.
 
 The deployment architecture consists of:
 
 - Render Web Service hosting the Django application.
-- PostgreSQL database hosted on Render.
+- PostgreSQL database integration.
 - Gunicorn as the production WSGI server.
-- Environment variables for sensitive configuration values.
-- Static files collected using Django's `collectstatic` command.
-- GitHub integration for automatic deployments after pushing to the main branch.
+- Environment variables for configuration.
+- GitHub integration for deployment workflow.
 
-This deployment setup closely mirrors a real-world production environment while remaining simple enough for development and future expansion.
+The project structure is organised to support future expansion into a full-stack application with a dedicated frontend and Django backend.
 
 ---
 
 # 4. Current Folder Structure
 
-NodeNexus follows a structured Django project layout separating application logic, configuration, templates, static assets, documentation, and deployment files.
+NodeNexus follows a separated backend and frontend project structure.
+
+The backend contains Django configuration, application logic, database configuration, and deployment requirements.
+
+The frontend directory has been created to organise client-side development and prepare for future React implementation.
+
+Current project structure:
 
 ```text
 NodeNexus/
 │
-├── config/
-│   ├── __init__.py
-│   ├── asgi.py
-│   ├── settings.py
-│   ├── urls.py
-│   └── wsgi.py
-│
-├── core/
-│   ├── migrations/
-│   ├── __init__.py
-│   ├── admin.py
-│   ├── apps.py
-│   ├── models.py
-│   ├── tests.py
-│   ├── urls.py
-│   └── views.py
-│
-├── templates/
-│
-├── static/
-│   ├── css/
-│   │   └── style.css
+├── backend/
+│   ├── config/
+│   │   ├── __init__.py
+│   │   ├── settings.py
+│   │   ├── urls.py
+│   │   ├── asgi.py
+│   │   └── wsgi.py
 │   │
-│   ├── js/
-│   │   └── script.js
+│   ├── core/
+│   │   ├── migrations/
+│   │   ├── __init__.py
+│   │   ├── admin.py
+│   │   ├── apps.py
+│   │   ├── models.py
+│   │   ├── tests.py
+│   │   ├── urls.py
+│   │   └── views.py
 │   │
-│   └── images/
+│   ├── staticfiles/
+│   ├── manage.py
+│   └── requirements.txt
 │
-├── staticfiles/
+├── frontend/
+│   └── src/
+│       ├── assets/
+│       │   ├── css/
+│       │   ├── js/
+│       │   └── images/
+│       │
+│       ├── components/
+│       └── pages/
 │
 ├── docs/
 │   ├── images/
@@ -348,20 +319,24 @@ NodeNexus/
 │   ├── node_nexus_erd.dbml
 │   └── planning.md
 │
-├── manage.py
-├── requirements.txt
 ├── Procfile
 ├── .python-version
-├── .env
 ├── .gitignore
 └── README.md
 ```
 
-The project structure separates Django configuration (`config`), application functionality (`core`), frontend templates, static resources, and technical documentation. The `docs` directory contains project planning materials, database design files, and documentation resources used throughout development.
+The project structure separates:
 
-The project also includes deployment configuration files such as `Procfile` and `.python-version` to support production deployment on Render.
+- Django backend functionality.
+- Frontend development resources.
+- Documentation and planning files.
+- Deployment configuration.
+
+The backend directory contains the Django project and application files, while the frontend directory contains assets and future client-side components.
+
+The docs directory contains technical documentation, database planning files, and project design resources.
+
+Deployment files such as Procfile and .python-version remain at the repository root to support Render deployment.
 
 ---
-
-# 5. 
 
