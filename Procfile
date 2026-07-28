@@ -1,1 +1,1 @@
-gunicorn config.wsgi:application
+gunicorn backend.config.wsgi:application
