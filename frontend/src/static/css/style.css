@@ -20,6 +20,9 @@
     /* Background */
     --bg-primary:#e7ecef;
 
+    /* Header Height */
+    --header-height: 80px;
+
     /* Navigation Text */
     --nav-text:#f4f7f8;
 
@@ -97,7 +100,7 @@ body {
     background-attachment:fixed;
 
 
-    padding-top:80px;
+    padding-top:var(--header-height);
 
     transition:
     background-color .3s ease,
@@ -214,6 +217,11 @@ footer .footer-text{
    NAVBAR
    ======================================== */
 
+header {
+    height:var(--header-height);
+}
+
+
 header,
 .nn-navbar {
 
@@ -255,8 +263,7 @@ header,
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding-left: 1.5rem;
-    padding-right: 1.5rem;
+    padding: 0 0.25rem;
 
 
 }
@@ -274,7 +281,7 @@ header,
 
     align-items:center;
 
-    gap: 0.75em;
+    gap: 0.5em;
 
     flex-shrink:0;
 
@@ -285,13 +292,15 @@ header,
 .logo-section img {
 
 
-    width:45px;
+    width:60px;
 
-    height:45px;
+    height:60px;
 
     object-fit:contain;
 
-    margin:0;
+    display:block;
+
+    transform: translateY(-6px);
 
 }
 
@@ -311,6 +320,8 @@ header,
     font-weight:700;
 
     border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+
+    transform: translateY(-6px);
 
 }
 
@@ -379,6 +390,8 @@ header,
     background .3s ease,
     transform .3s ease,
     text-shadow .3s ease;
+
+    transform: translateY(-3px);
 
 
 }
@@ -804,7 +817,7 @@ header,
 
     color:white;
 
-    text-shadow:0 0 8px var(--cyan);
+    text-shadow:0 0 8px var(--nav-text);
 
 }
 
@@ -857,7 +870,7 @@ header,
     .logo-section {
         display:flex;
         align-items:center;
-        gap:.5rem;
+        gap:0.5rem;
 
     }
 
@@ -927,6 +940,8 @@ header,
 
         transition:.3s ease;
 
+        transform:translateY(-3px);
+
     }
 
 
@@ -936,7 +951,7 @@ header,
 
     position:fixed;
 
-    top: 60px;
+    top: var(--header-height);
 
     bottom: 60px;
 
@@ -1171,18 +1186,22 @@ header,
 
 @media(max-width:480px){
 
-    .navbar-inner {
-
-        padding:0 1rem;
+    :root {
+         
+        --header-height: 70px;
 
     }
 
 
     .logo-section img {
 
-        width:40px;
-        height:40px;
+        width:50px;
+        height:50px;
 
+    }
+
+    .nn-navbar {
+        padding:0.75rem 0.25rem 0.25rem 0.25rem;
     }
 
 
@@ -1198,6 +1217,8 @@ header,
         width:25px;
 
         height:3px;
+
+        transform:translateY(-3px);
 
     }
 
@@ -1232,7 +1253,14 @@ header,
 
     font-size:2.5rem;
 
-}
+    }
+
+    .home-showcase-title {
+
+        font-size:2.2rem;
+
+    }
+
 
 }
 
@@ -1248,8 +1276,8 @@ header,
 
     .logo-section img {
 
-        width:35px;
-        height:35px;
+        width:45px;
+        height:45px;
 
     }
 
@@ -1308,8 +1336,8 @@ header,
 
     .logo-section img {
 
-        width:30px;
-        height:30px;
+        width:40px;
+        height:40px;
 
     }
 
