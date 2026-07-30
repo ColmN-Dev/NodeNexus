@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% load static %}
 
 {% block title %}
 Home | NodeNexus
@@ -7,18 +8,42 @@ Home | NodeNexus
 
 {% block content %}
 
-<div class="container">
-    <h1>Welcome to NodeNexus</h1>
-</div>
 
-<h2>Featured Articles</h2>
+<section class="hero glass-content">
 
-<h3>Trending Now</h3>
+    <div class="hero-content">
 
-<h3>AI</h3>
+        <h1>Explore The Future Of Technology</h1>
 
-<h3>Cybersecurity</h3>
+        <p>
+            Discover the latest technology news,
+            AI breakthroughs, cybersecurity updates,
+            and gaming developments.
+        </p>
 
-<h3>Gaming</h3>
+        {% include "search_bar.html" %}
+
+    </div>
+
+</section>
+
+
+
+<section>
+
+    <h2>Featured Articles</h2>
+
+
+    {% include "category_section.html" with title="Trending Now" %}
+
+    {% include "category_section.html" with title="AI" %}
+
+    {% include "category_section.html" with title="Cybersecurity" %}
+
+    {% include "category_section.html" with title="Gaming" %}
+
+
+</section>
+
 
 {% endblock %}

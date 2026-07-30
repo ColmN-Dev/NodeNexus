@@ -1,0 +1,122 @@
+{% load static %}
+
+<header class="nn-navbar">
+
+    <div class="navbar-inner">
+
+
+        <div class="logo-section">
+
+
+            <img src="{% static 'images/NodeNexusLogo.png' %}"
+                 alt="NodeNexus Logo">
+
+
+            <div class="site-title">
+                <a href="/">
+                    NodeNexus
+                </a>
+            </div>
+
+
+        </div>
+
+
+
+        <nav class="nav-links">
+
+
+            <a href="/">
+                Home
+            </a>
+
+
+            <a href="/ai/">
+                AI
+            </a>
+
+
+            <a href="/cybersecurity/">
+                Cybersecurity
+            </a>
+
+
+            <a href="/gaming/">
+                Gaming
+            </a>
+
+
+            <a href="/trending/">
+                Trending
+            </a>
+
+
+            <button class="dark-mode-toggle">
+
+                <img src="{% static 'images/moon.png' %}"
+                     alt="Dark Mode">
+
+            </button>
+
+
+        </nav>
+
+
+
+        <button class="hamburger">
+
+            <span></span>
+            <span></span>
+            <span></span>
+
+        </button>
+
+
+
+    </div>
+
+</header>
+
+<div class="menu-overlay"></div>
+
+
+<div class="mobile-menu">
+
+
+    {% if user.is_authenticated %}
+
+        <a href="/profile">
+        Profile
+        </a>
+
+        <a href="/logout">
+            Logout
+        </a>
+
+    {% else %}
+
+         <a href="/signup">
+            Sign Up
+        </a>
+
+        <a href="/login">
+            Login
+        </a>
+
+    {% endif %}
+
+
+
+    <div class="mobile-toggle">
+
+        <button class="dark-mode-toggle">
+
+            <img src="{% static 'images/moon.png' %}"
+                 alt="Dark Mode">
+
+        </button>
+
+    </div>
+
+
+</div>

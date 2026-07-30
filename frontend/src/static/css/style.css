@@ -20,35 +20,42 @@
     /* Background */
     --bg-primary:#e7ecef;
 
-    /* Text */
-    --heading-color:#0d161c;
-    --paragraph-color:#2c3941;
+    /* Navigation Text */
+    --nav-text:#f4f7f8;
 
-    /* Glass */
-    --header-bg: rgba(70, 80, 85, .78);
-    --footer-bg: rgba(75, 85, 88, .82);
+    /* Content Text */
+    --content-heading:#0b141a;
+    --content-text:#008aa8;
 
-    --glass-bg:rgba(224,231,236,.56);
+    /* Navigation Glass */
+    --header-bg:rgba(30,38,45,.45);
+    --footer-bg:rgba(30,38,45,.50);
 
-    --glass-border:rgba(255,255,255,.30);
+    /* Content Glass */
+    --content-glass-bg:rgba(30,38,45,.35);
+    --content-glass-border:rgba(255,255,255,.18);
 
-    --shadow:0 8px 24px rgba(0,0,0,.18);
+    --shadow:
+    0 8px 32px rgba(0,0,0,.18);
 
 }
+
 
 [data-theme="dark"]{
 
     --bg-primary:#080b0f;
 
-    --heading-color:#edf7fa;
-    --paragraph-color:#c8d4da;
+    --nav-text:#edf7fa;
 
-    --header-bg:rgba(18,24,30,.72);
-    --footer-bg:rgba(18,24,30,.76);
+    --content-heading:#edf7fa;
+    --content-text:#c8d4da;
 
-    --glass-bg:rgba(22,30,38,.60);
+    --header-bg:rgba(18,24,30,.55);
+    --footer-bg:rgba(18,24,30,.60);
 
-    --glass-border:rgba(255,255,255,.08);
+    --glass-bg:rgba(22,30,38,.45);
+
+    --glass-border:rgba(255,255,255,.12);
 
 }
 
@@ -79,7 +86,7 @@ body {
 
     background-color:var(--bg-primary);
 
-    color:var(--heading-color);
+    color:var(--content-text);
 
 
     background-image:
@@ -113,7 +120,9 @@ body {
 
 }
 
-
+main {
+    min-height:calc(100vh - 160px);
+}
 
 
 /* ========== TYPOGRAPHY ========== */
@@ -128,12 +137,11 @@ h6 {
 
     font-family:var(--heading-font);
 
-    color:var(--heading-color);
+    color:var(--content-heading);
 
     letter-spacing:.5px;
 
     font-weight:700;
-    
 
 }
 
@@ -144,6 +152,7 @@ h1 {
     text-transform:uppercase;
     text-shadow:0 2px 5px rgba(0,0,0,.3);
     text-align:center;
+    margin:1.5rem;
 
 }
 
@@ -153,6 +162,7 @@ h2 {
     font-size:2.25rem;
     text-shadow:0 2px 5px rgba(0,0,0,.3);
     text-align:center;
+    margin:1.5rem 0;
 
 }
 
@@ -167,11 +177,14 @@ h3 {
 
 p {
 
-    color:var(--paragraph-color);
+    color:var(--content-text);
 
     line-height:1.7;
 
-    font-size:1.05rem;
+    font-size:1.1rem;
+
+    font-weight:600;
+
 
 }
 
@@ -188,12 +201,13 @@ a {
 }
 
 
-a:hover {
 
-    color:white;
 
+header .site-title,
+header .nav-links a,
+footer .footer-text{
+    color:var(--nav-text);
 }
-
 
 
 /* ========================================
@@ -216,12 +230,10 @@ header,
     background:var(--header-bg);
 
 
-    backdrop-filter:
-    blur(12px);
+    backdrop-filter:blur(18px) saturate(160%);
     
 
-    -webkit-backdrop-filter:
-    blur(12px);
+    -webkit-backdrop-filter:blur(18px) saturate(160%);
     
 
 
@@ -308,13 +320,13 @@ header,
 .site-title a {
 
 
-    color:var(--heading-color);
+    color:var(--nav-text);
 
     margin:0;
 
     padding:0;
 
-    text-shadow:0 2px 5px rgba(0,0,0,.3);
+    text-shadow:0 2px 5px rgba(190, 230, 255, 0.3);
 
 }
 
@@ -327,18 +339,6 @@ header,
 
     text-shadow:0 0 8px var(--cyan);
     
-}
-
-[data-theme="dark"] .site-title a:hover {
-
-    text-shadow:0 0 8px var(--cyan);
-
-}
-
-[data-theme="dark"] .site-title a {
-
-    text-shadow:0 2px 5px rgba(255,255,255,.5);
-
 }
 
 
@@ -362,7 +362,7 @@ header,
 .nav-links a {
 
 
-    color:var(--heading-color);
+    color:var(--nav-text);
 
 
     font-family:var(--heading-font);
@@ -371,10 +371,15 @@ header,
 
     font-weight:600;
 
-
     padding:.3rem .6rem;
 
     border-radius:5px;
+
+    transition:
+    color .3s ease,
+    background .3s ease,
+    transform .3s ease,
+    text-shadow .3s ease;
 
 
 }
@@ -437,6 +442,100 @@ header,
 
 }
 
+/* ========================================
+   HERO SECTION
+   ======================================== */
+
+.hero {
+
+    max-width:900px;
+
+    margin:2rem auto;
+
+    text-align:center;
+
+}
+
+.hero h1 {
+
+    color:#101820;
+
+    font-size:3.2rem;
+
+    margin-bottom:1rem;
+
+    letter-spacing:1px;
+
+    text-shadow:
+        0 3px 10px rgba(255,255,255,.5),
+        0 4px 15px rgba(0,0,0,.35);
+
+}
+
+[data-theme="dark"] .hero h1 {
+
+    color:#edf7fa;
+
+    text-shadow:
+        0 0 15px rgba(0,184,230,.35),
+        0 4px 15px rgba(0,0,0,.6);
+
+}
+
+.hero p {
+
+    margin-top:1.5rem;
+
+}
+
+/* ========================================
+   CATEGORY PAGES
+   ======================================== */
+
+.category-header {
+    display:flex;
+    justify-content:center;
+    position:relative;
+    z-index:1;
+}
+
+.category-header .glass-content {
+    width:fit-content;
+    padding:1rem 2.5rem;
+}
+
+.category-header h1 {
+    margin:0;
+}
+
+.title-glass {
+
+    display:inline-block;
+
+    background:var(--content-glass-bg);
+
+    backdrop-filter:blur(12px);
+    -webkit-backdrop-filter:blur(12px);
+
+    border:1px solid var(--content-glass-border);
+
+    border-radius:18px;
+
+    padding:1.2rem 3rem;
+
+    box-shadow:var(--shadow);
+
+    font-size:3rem;
+
+}
+
+.category-page {
+
+    padding:3rem 1.5rem;
+
+    min-height:70vh;
+
+}
 
 /* ========================================
    GLASS COMPONENTS
@@ -445,12 +544,12 @@ header,
 
 .glass-card{
 
-    background:var(--glass-bg);
+    background:var(--content-glass-bg);
 
-    backdrop-filter:blur(12px);
-    -webkit-backdrop-filter:blur(12px);
+    backdrop-filter:blur(18px) saturate(160%);
+    -webkit-backdrop-filter:blur(18px) saturate(160%);
 
-    border:1px solid var(--glass-border);
+    border:1px solid var(--content-glass-border);
 
     border-radius:18px;
 
@@ -475,6 +574,27 @@ header,
 
 }
 
+.glass-content {
+
+    background:var(--content-glass-bg);
+
+    backdrop-filter:blur(18px) saturate(140%);
+    -webkit-backdrop-filter:blur(18px) saturate(140%);
+
+    border:1px solid var(--content-glass-border);
+
+    border-radius:18px;
+
+    box-shadow:var(--shadow);
+
+    padding:1rem;
+
+    margin:1rem auto;
+
+    text-align:center;
+
+}
+
 
 
 /* ========================================
@@ -489,12 +609,12 @@ header,
 
 
     backdrop-filter:
-    blur(12px);
+    blur(18px) saturate(160%);
     
 
 
     -webkit-backdrop-filter:
-    blur(12px);
+    blur(18px) saturate(160%);
 
 
     border-top:
@@ -509,12 +629,30 @@ header,
 
     padding:2rem;
 
+    position:relative;
+    z-index:1;
+
+}
+
+.footer a {
+
+    color:var(--cyan);
+
+}
+
+
+.footer a:hover {
+
+    color:white;
+
+    text-shadow:0 0 8px var(--cyan);
+
 }
 
 
 .footer-text {
 
-    color:var(--heading-color);
+    color:var(--nav-text);
 
 }
 
@@ -624,7 +762,7 @@ header,
 
         height:3px;
 
-        background:var(--heading-color);
+        background:var(--nav-text);
 
         border-radius:5px;
 
@@ -645,8 +783,7 @@ header,
 
     right:-320px;
 
-
-    width:280px;
+    width:min(280px,85vw);
 
 
     display:flex;
@@ -702,7 +839,7 @@ header,
 
         text-decoration:none;
 
-        color:var(--heading-color);
+        color:var(--nav-text);
 
         font-family:var(--heading-font);
 
@@ -782,7 +919,9 @@ header,
 
         left:0;
 
-        width:100%;
+        right:0;
+
+        width:auto;
 
         height:60px;
 
@@ -825,7 +964,7 @@ header,
         gap:4px;
 
 
-        color:var(--heading-color);
+        color:var(--nav-text);
 
         text-decoration:none;
 
@@ -908,11 +1047,39 @@ header,
 
     .mobile-menu {
 
-        width:260px;
+        width:min(260px,85vw);
 
     }
 
+    .hero h1 {
+
+        font-size:2.75rem;
+
+    }
+
+    .hero.glass-content {
+
+        font-size:1.75rem;
+
+    }
+
+    section.glass-content h2 {
+
+        font-size:1.75rem;
+
+    }
+
+    .title-glass {
+
+    padding:1rem 2rem;
+
+    font-size:2.5rem;
+
 }
+
+}
+
+
 
 
 
@@ -920,12 +1087,30 @@ header,
    MOBILE MEDIUM
    ======================================== */
 
-@media(max-width:360px){
+@media(max-width:380px){
 
     .logo-section img {
 
         width:35px;
         height:35px;
+
+    }
+
+    .hero h1 {
+
+        font-size:2rem;
+
+    }
+
+    .hero.glass-content {
+
+        font-size:1.5rem;
+
+    }
+
+    section.glass-content h2 {
+
+        font-size:1.5rem;
 
     }
 
@@ -941,6 +1126,12 @@ header,
 
         width:22px;
         height:22px;
+
+    }
+
+    .title-glass {
+
+        font-size:2rem;
 
     }
 
@@ -962,6 +1153,30 @@ header,
     .site-title a {
 
         font-size:1.5rem;
+
+    }
+
+    .hero h1 {
+
+        font-size:1.75rem;
+
+    }
+
+    .hero.glass-content {
+
+        font-size:1.25rem;
+
+    }
+
+    section.glass-content h2 {
+
+        font-size:1.25rem;
+
+    }
+
+    p.footer-text {
+
+        font-size:1rem;
 
     }
 }
