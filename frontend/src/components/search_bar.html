@@ -1,25 +1,37 @@
 {% load static %}
 
-<div class="search-container">
+<!-- Search Section -->
+<section class="container search-container my-5">
 
-    <form class="search-form" method="GET">
+    <form class="row g-2 justify-content-center search-form">
 
-        <div class="search-input-wrapper">
+        <div class="col-12 col-md-8">
+            <label for="searchInput" class="visually-hidden">
+                Search articles
+            </label>
 
-            <input
-                type="text"
-                name="query"
+            <input 
+                type="search"
+                id="searchInput"
+                class="form-control"
                 placeholder="Search technology news..."
-                autocomplete="off"
+                aria-label="Search articles"
             >
 
         </div>
 
 
-        <button type="submit">
-            Search
-        </button>
+        <div class="col-12 col-md-auto">
+
+            <button 
+                type="submit"
+                class="btn btn-primary w-100"
+            >
+                Search
+            </button>
+
+        </div>
 
     </form>
 
-</div>
+</section>

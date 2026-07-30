@@ -25,14 +25,14 @@
 
     /* Content Text */
     --content-heading:#0b141a;
-    --content-text:#008aa8;
+    --content-text:#222222;
 
     /* Navigation Glass */
     --header-bg:rgba(30,38,45,.45);
     --footer-bg:rgba(30,38,45,.50);
 
     /* Content Glass */
-    --content-glass-bg:rgba(30,38,45,.35);
+    --content-glass-bg:rgba(35,38,45,.25);
     --content-glass-border:rgba(255,255,255,.18);
 
     --shadow:
@@ -237,8 +237,7 @@ header,
     
 
 
-    border-bottom:
-    1px solid var(--glass-border);
+    border-bottom: 1px solid rgba(140, 140, 140, 0.5);
 
 
     box-shadow:
@@ -489,6 +488,146 @@ header,
 }
 
 /* ========================================
+   SEARCH BAR
+   ======================================== */
+
+.search-container{
+
+    max-width:700px;
+
+    margin:2rem auto;
+
+}
+
+.search-form{
+
+    display:flex;
+
+    gap:0.75rem;
+
+    align-items:center;
+
+}
+
+.search-form .form-control{
+
+    background:var(--content-glass-bg);
+
+    backdrop-filter:blur(12px);
+    -webkit-backdrop-filter:blur(12px);
+
+    border:1px solid var(--content-glass-border);
+
+    border-radius:18px;
+
+    color:var(--content-text);
+
+    font-family:var(--body-font);
+
+    font-size:1rem;
+
+    padding:0.85rem 1.25rem;
+
+    box-shadow:var(--shadow);
+
+    transition:
+        border-color .25s ease,
+        box-shadow .25s ease;
+
+}
+
+.search-form .form-control::placeholder{
+
+    color:#4b6570;
+
+    text-shadow:0 0 3px rgba(0, 0, 0, .35);
+
+    font-weight:700;
+
+}
+
+[data-theme="dark"] .search-form .form-control::placeholder{
+
+    color:#edf7fa;
+
+    text-shadow:0 0 3px rgba(0, 0, 0, .35);
+
+    font-weight:700;
+
+}
+
+.search-form .form-control:focus{
+
+    background:var(--content-glass-bg);
+
+    color:#4b6570;
+
+    font-weight:700;
+
+    border-color:var(--cyan);
+
+    box-shadow:
+        0 0 0 .2rem rgba(0,184,230,.15);
+
+}
+
+[data-theme="dark"] .search-form .form-control:focus{
+
+    background:var(--content-glass-bg);
+
+    color:#edf7fa;
+
+    font-weight:700;
+
+    border-color:var(--cyan);
+
+    box-shadow:
+        0 0 0 .2rem rgba(0,184,230,.25);
+
+}
+
+.search-form .btn{
+
+    background:var(--cyan-dark);
+
+    color:#fff;
+
+    border:none;
+
+    border-radius:18px;
+
+    padding:0.85rem 1.75rem;
+
+    font-family:var(--heading-font);
+
+    font-weight:600;
+
+    transition:
+        background .25s ease,
+        transform .25s ease,
+        box-shadow .25s ease;
+
+}
+
+.search-form .btn:hover{
+
+    background:var(--cyan-dark);
+
+    transform:translateY(-2px);
+
+    box-shadow:
+        0 0 12px rgba(0,184,230,.35);
+
+}
+
+.search-form .btn:focus{
+
+    box-shadow:
+        0 0 0 .2rem rgba(0,184,230,.2);
+
+}
+
+/* ========================================
    CATEGORY PAGES
    ======================================== */
 
@@ -617,8 +756,7 @@ header,
     blur(18px) saturate(160%);
 
 
-    border-top:
-    1px solid var(--glass-border);
+    border-top: 1px solid rgba(140, 140, 140, 0.5);
 
 
     box-shadow:
