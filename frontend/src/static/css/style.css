@@ -570,7 +570,7 @@ header,
 
 .search-form .form-control::placeholder{
 
-    color:#4b6570;
+    color:var(--cyan-dark);
 
     text-shadow:0 0 3px rgba(0, 0, 0, .35);
 
@@ -592,7 +592,7 @@ header,
 
     background:var(--content-glass-bg);
 
-    color:#4b6570;
+    color:var(--cyan-dark);
 
     font-weight:700;
 
@@ -620,7 +620,7 @@ header,
 
 .search-form .btn{
 
-    background:var(--cyan-dark);
+    background:var(--cyan);
 
     color:#fff;
 
@@ -763,6 +763,17 @@ header,
     margin:1rem auto;
 
     text-align:center;
+
+}
+
+.glass-content p {
+
+    color:var(--cyan-dark);
+}
+
+[data-theme="dark"] .glass-content p {
+
+    color: #edf7fa;
 
 }
 
