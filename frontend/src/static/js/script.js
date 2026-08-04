@@ -1,6 +1,8 @@
 "use strict";
 
-(() => {   
+(() => {
+
+    // Wrap everything in an IIFE to avoid leaking variables into the global scope.
 
     // ==========================
     // DARK MODE TOGGLE
@@ -9,60 +11,36 @@
     const themeToggles = document.querySelectorAll(".dark-mode-toggle");
     const icons = document.querySelectorAll(".dark-mode-toggle img");
 
-    const savedTheme = localStorage.getItem("theme");
+    // The inline script in <head> already set data-theme before paint (FOUC fix).
+    // This just syncs the toggle icon to whatever theme is currently active.
+    function syncThemeIcon() {
 
-
-    if (savedTheme === "dark") {
-
-        document.documentElement.setAttribute("data-theme", "dark");
-
-        icons.forEach(icon => {
-            icon.src = "/static/images/sun.png";
-        });
-
-    } else {
-
-        document.documentElement.setAttribute("data-theme", "light");
+        const isDark = document.documentElement.getAttribute("data-theme") === "dark";
 
         icons.forEach(icon => {
-            icon.src = "/static/images/moon.png";
+            icon.src = isDark ? "/static/images/sun.png" : "/static/images/moon.png";
         });
 
     }
 
+    syncThemeIcon();
 
     themeToggles.forEach(toggle => {
 
         toggle.addEventListener("click", () => {
 
             const currentTheme = document.documentElement.getAttribute("data-theme");
+            const newTheme = currentTheme === "dark" ? "light" : "dark";
 
+            document.documentElement.setAttribute("data-theme", newTheme);
+            localStorage.setItem("theme", newTheme);
 
-            if (currentTheme === "dark") {
-
-                document.documentElement.setAttribute("data-theme", "light");
-
-                localStorage.setItem("theme", "light");
-
-                icons.forEach(icon => {
-                    icon.src = "/static/images/moon.png";
-                });
-
-            } else {
-
-                document.documentElement.setAttribute("data-theme", "dark");
-
-                localStorage.setItem("theme", "dark");
-
-                icons.forEach(icon => {
-                    icon.src = "/static/images/sun.png";
-                });
-
-            }
+            syncThemeIcon();
 
         });
 
     });
+
 
     // ==========================
     // HAMBURGER MENU
@@ -72,7 +50,6 @@
     const mobileMenu = document.querySelector(".mobile-menu");
     const menuOverlay = document.querySelector(".menu-overlay");
 
-    // Variable to store the scroll position when the menu is opened.
     let scrollPosition = 0;
 
     function setMenuOpen(isOpen) {
@@ -81,16 +58,18 @@
         menuOverlay.classList.toggle("active", isOpen);
         document.body.classList.toggle("menu-open", isOpen);
 
-        // Prevent background scrolling when the menu is open.
         if (isOpen) {
+
             scrollPosition = window.scrollY;
             document.body.style.top = `-${scrollPosition}px`;
+
         } else {
+
             document.body.style.top = "";
             window.scrollTo(0, scrollPosition);
+
         }
 
-        // Update ARIA attributes for accessibility.
         hamburger.setAttribute("aria-label", isOpen ? "Close menu" : "Open menu");
         hamburger.setAttribute("aria-pressed", String(isOpen));
         mobileMenu.setAttribute("aria-hidden", String(!isOpen));
@@ -99,32 +78,236 @@
 
     }
 
+
     if (hamburger && mobileMenu && menuOverlay) {
 
-        // Toggle the menu open/closed when the hamburger icon is clicked.
         hamburger.addEventListener("click", () => {
             setMenuOpen(!mobileMenu.classList.contains("open"));
         });
 
-        // Close the menu when clicking outside of it (menu overlay).
+
         menuOverlay.addEventListener("click", () => {
             setMenuOpen(false);
         });
 
-        // Close the menu when pressing the Escape key.
+
         document.addEventListener("keydown", (event) => {
+
             if (event.key === "Escape" && mobileMenu.classList.contains("open")) {
                 setMenuOpen(false);
             }
+
         });
 
-        // Close the menu when clicking on any link inside it.
-        mobileMenu.querySelectorAll("a").forEach((link) => {
+
+        mobileMenu.querySelectorAll("a").forEach(link => {
+
             link.addEventListener("click", () => {
                 setMenuOpen(false);
             });
+
         });
 
     }
+
+
+    // ====================================
+    // SEARCH AUTOCOMPLETE & CLEAR BUTTON
+    // ====================================
+
+    const searchInput = document.getElementById("searchInput");
+    const clearBtn = document.getElementById("clearBtn");
+    const suggestions = document.getElementById("suggestions");
+
+    let timeout;
+    let latestQuery = "";
+
+
+    function clearAutocomplete() {
+
+        if (!suggestions) return;
+
+        suggestions.innerHTML = "";
+        suggestions.classList.remove("open");
+
+    }
+
+
+    if (searchInput && suggestions) {
+
+        searchInput.addEventListener("input", () => {
+
+            const query = searchInput.value.trim();
+            latestQuery = query;
+
+            clearBtn?.classList.toggle("visible", query !== "");
+
+            clearAutocomplete();
+
+            clearTimeout(timeout);
+
+
+            if (query.length < 2) return;
+
+
+            timeout = setTimeout(async () => {
+
+                try {
+
+                    const response = await fetch(
+                        `/auto-complete/?q=${encodeURIComponent(query)}`
+                    );
+
+
+                    if (!response.ok) {
+                        throw new Error("Autocomplete request failed");
+                    }
+
+
+                    const results = await response.json();
+
+                    // Ignore outdated results
+                    if (latestQuery !== query) return; 
+
+                    const limitedResults = results.slice(0, 8);
+
+
+                    limitedResults.forEach(title => {
+
+                        const item = document.createElement("div");
+
+                        item.className = "suggestion";
+                        item.textContent = title;
+
+
+                        item.addEventListener("click", () => {
+
+                            searchInput.value = title;
+
+                            clearAutocomplete();
+
+                            clearBtn?.classList.add("visible");
+
+                        });
+
+
+                        suggestions.appendChild(item);
+
+                    });
+
+
+                    if (limitedResults.length > 0) {
+                        suggestions.classList.add("open");
+                    }
+
+
+                } catch (error) {
+
+                    console.error("Autocomplete error:", error);
+
+                    clearAutocomplete();
+
+                }
+
+
+            }, 250);
+
+        });
+
+
+        clearBtn?.addEventListener("click", () => {
+
+            searchInput.value = "";
+
+            searchInput.focus();
+
+            clearAutocomplete();
+
+            clearBtn.classList.remove("visible");
+
+        });
+
+
+        searchInput.addEventListener("keydown", event => {
+
+            if (event.key === "Escape") {
+
+                // Prevent the default behavior of the Escape key, to close the dropdown first before clearing the input.
+                event.preventDefault();
+
+                const isOpen = suggestions.classList.contains("open");
+
+                if (isOpen) {
+                    clearAutocomplete();
+                } else {
+
+                searchInput.value = "";
+
+                clearBtn?.classList.remove("visible");
+
+                }
+            }
+
+        });
+
+
+        clearBtn?.classList.toggle(
+            "visible",
+            searchInput.value.trim() !== ""
+        );
+
+    }
+
+
+    // ==========================
+    // LOADING OVERLAY
+    // ==========================
+
+
+    document.querySelectorAll("a").forEach(link => {
+
+        link.addEventListener("click", () => {
+
+
+            // Ignore external links and anchor links
+            if (
+                link.hostname !== window.location.hostname ||
+                link.pathname === window.location.pathname && link.hash
+            ) {
+                return;
+            }
+
+
+            const overlay = document.getElementById("loading-overlay");
+
+
+            if (overlay) {
+                overlay.classList.remove("hidden");
+            }
+
+
+        });
+
+    });
+
+
+    const searchForm = document.querySelector(".search-form");
+
+
+    if (searchForm) {
+
+        searchForm.addEventListener("submit", () => {
+
+            const overlay = document.getElementById("loading-overlay");
+
+
+            if (overlay) {
+                overlay.classList.remove("hidden");
+            }
+
+        });
+
+    }
+
 
 })();
