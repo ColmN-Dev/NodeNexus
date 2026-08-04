@@ -1,0 +1,56 @@
+{% load static %}
+
+<section>
+
+    <div class="container py-4">
+
+        <h2 class="article-section-title">
+            {{ title }}
+        </h2>
+
+        <div class="row g-4">
+
+            {% for article in articles %}
+
+            <div class="col-12 col-lg-4">
+
+                <div class="article-card">
+
+                    {% if article.image and article.image != "None" %}
+                    <img
+                        src="{{ article.image }}"
+                        alt="{{ article.title }}"
+                    >
+                    {% endif %}
+
+                    <h3>
+                        {{ article.title }}
+                    </h3>
+
+                    <p>
+                        {{ article.description }}
+                    </p>
+
+                    <small class="published-date">
+                        {{ article.published }}
+                    </small>
+
+                    <a
+                        href="{{ article.url }}"
+                        target="_blank"
+                        class="btn btn-primary mt-auto"
+                    >
+                        Read Article
+                    </a>
+
+                </div>
+
+            </div>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+</section>

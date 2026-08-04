@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+    Search Results for "{{ query }}"
+{% endblock %}
+
+{% block content %}
+
+<div class="category-header">
+    <div class="glass-content title-glass">
+        <h1>Results for "{{ query }}"</h1>
+    </div>
+</div>
+
+<div class="text-center mb-4">
+    <a href="{% url 'home' %}" class="btn nn-btn">
+        &larr; Back to Home
+    </a>
+</div>
+
+<div class="article-grid">
+
+    {% for article in articles %}
+    <div class="article-card">
+
+        <img src="{{ article.image }}" alt="{{ article.title }}">
+
+        <h3>{{ article.title }}</h3>
+
+        <p>{{ article.description|truncatewords:25 }}</p>
+
+        <span class="published-date">{{ article.published }}</span>
+
+        <a href="{{ article.url }}" class="btn" target="_blank" rel="noopener">
+            Read More
+        </a>
+
+    </div>
+    {% empty %}
+    <p>No results found for "{{ query }}".</p>
+    {% endfor %}
+
+</div>
+
+{% endblock %}

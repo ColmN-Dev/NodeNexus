@@ -21,7 +21,33 @@ AI | NodeNexus
 
     </div>
 
+    <div class="text-center mb-4">
+    <a href="{% url 'home' %}" class="btn nn-btn">
+        &larr; Back to Home
+    </a>
+</div>
+
     <div class="article-grid">
+
+        {% for article in articles %}
+        <div class="article-card">
+
+            <img src="{{ article.image }}" alt="{{ article.title }}">
+
+            <h3>{{ article.title }}</h3>
+
+            <p>{{ article.description|truncatewords:25 }}</p>
+
+            <span class="published-date">{{ article.published }}</span>
+
+            <a href="{{ article.url }}" class="btn" target="_blank" rel="noopener">
+                Read More
+            </a>
+
+        </div>
+        {% empty %}
+        <p>No articles found right now. Try again shortly.</p>
+        {% endfor %}
 
     </div>
 

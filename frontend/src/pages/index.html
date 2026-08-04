@@ -27,23 +27,12 @@ Home | NodeNexus
 
 </section>
 
+{% include "article_card.html" with title="Trending Technology" articles=trending_articles %}
 
+{% include "article_card.html" with title="Artificial Intelligence" articles=ai_articles %}
 
-<section>
+{% include "article_card.html" with title="Cybersecurity News" articles=cybersecurity_articles %}
 
-    <h2 class="home-showcase-title">Featured Articles</h2>
-
-
-    {% include "category_section.html" with title="Trending Now" %}
-
-    {% include "category_section.html" with title="AI" %}
-
-    {% include "category_section.html" with title="Cybersecurity" %}
-
-    {% include "category_section.html" with title="Gaming" %}
-
-
-</section>
-
+{% include "article_card.html" with title="Gaming News" articles=gaming_articles %}
 
 {% endblock %}
