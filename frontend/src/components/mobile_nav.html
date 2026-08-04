@@ -3,7 +3,7 @@
 <nav class="mobile-bottom-nav">
 
 
-    <a href="/" aria-label="Home" >
+    <a href="/" aria-label="Home" class="{% if request.resolver_match.url_name == 'home' %}active{% endif %}">
     <svg xmlns="http://www.w3.org/2000/svg"
     width="24" height="24" viewBox="0 0 24 24"
     fill="none" stroke="currentColor" stroke-width="2" 
@@ -16,7 +16,7 @@
 
 
 
-    <a href="/ai" aria-label="AI">
+    <a href="/ai" aria-label="AI" class="{% if request.resolver_match.url_name == 'ai' %}active{% endif %}">
     <svg xmlns="http://www.w3.org/2000/svg"
      width="24" height="24" viewBox="0 0 24 24" 
      fill="none" stroke="currentColor" stroke-width="2"
@@ -31,7 +31,7 @@
 
 
 
-    <a href="/cybersecurity" aria-label="Cybersecurity">
+    <a href="/cybersecurity" aria-label="Cybersecurity" class="{% if request.resolver_match.url_name == 'cybersecurity' %}active{% endif %}">
     <svg xmlns="http://www.w3.org/2000/svg" 
     width="24" height="24" viewBox="0 0 24 24" 
     fill="none" stroke="currentColor" stroke-width="2" 
@@ -44,7 +44,7 @@
 
 
 
-    <a href="/gaming" aria-label="Gaming">
+    <a href="/gaming" aria-label="Gaming" class="{% if request.resolver_match.url_name == 'gaming' %}active{% endif %}">
     <svg xmlns="http://www.w3.org/2000/svg"
     width="24" height="24" viewBox="0 0 24 24" 
     fill="none" stroke="currentColor" stroke-width="2" 
@@ -58,7 +58,7 @@
 
 
 
-    <a href="/trending" aria-label="Trending">
+    <a href="/trending" aria-label="Trending" class="{% if request.resolver_match.url_name == 'trending' %}active{% endif %}">
     <svg xmlns="http://www.w3.org/2000/svg" 
     width="24" height="24" viewBox="0 0 24 24" 
     fill="none" stroke="currentColor" stroke-width="2"

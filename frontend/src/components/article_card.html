@@ -18,8 +18,10 @@
 
                     {% if article.image and article.image != "None" %}
                     <img
-                        src="{{ article.image }}"
+                        src="{% if article.image and article.image != 'None' %}{{ article.image }}{% else %}{% static 'images/placeholder.png' %}{% endif %}"
                         alt="{{ article.title }}"
+                        data-fallback-src="{% static 'images/placeholder.png' %}"
+                        onerror="this.onerror=null; this.src=this.dataset.fallback;"
                     >
                     {% endif %}
 
