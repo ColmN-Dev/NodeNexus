@@ -1,6 +1,6 @@
 # NodeNexus Documentation
 
-**Last updated:** August 3, 2026
+**Last updated:** August 4, 2026
 
 ---
 
@@ -49,6 +49,8 @@
 8. [Completed Features](#8-completed-features)
    - News Aggregation
    - Search System
+   - Search Autocomplete
+   - Content Quality Filtering
    - Frontend Interface
    - API Integration
    - Deployment Foundation
@@ -552,15 +554,33 @@ The current NodeNexus implementation includes the following completed features:
 
 ---
 
+## Search Autocomplete
+
+- Live search suggestions implemented through a dedicated `auto_complete` endpoint, returning matching article titles as JSON.
+- Debounced input handling to reduce unnecessary requests while typing.
+- A stale-response guard was added to discard out-of-order API replies, preventing earlier partial queries from overwriting more recent search results.
+- Category pages (AI, Cybersecurity, Gaming, Trending) now render live articles fetched directly from the Currents API, replacing the previous placeholder templates.
+
+## Content Quality Filtering
+
+- Low-quality and duplicate articles are filtered from API results before display.
+- A domain exclusion list removes known low-value sources such as forum
+  threads and raw vulnerability database dumps.
+- Articles with titles that are auto-generated CVE announcements are
+  filtered out, while genuine journalism that references a CVE number
+  within a proper headline is retained.
+
 ## Frontend Interface
 
 - Responsive homepage layout.
 - Category pages for different technology topics.
+- Fallback placeholder image displayed when article images are missing or fail to load.
 - Reusable template components.
 - Article card components.
 - Search bar component.
 - Navigation components.
 - Mobile navigation system.
+- Active page indication on the mobile bottom navigation bar, based on the currently matched URL route
 - Dark/light theme support.
 - Glass-style UI design.
 
@@ -883,6 +903,16 @@ The current structure separates search-related logic from views, allowing the sy
 
 ---
 
+## Autocomplete Race Conditions
+
+Implementing live search suggestions introduced a race condition: multiple autocomplete requests could be in flight simultaneously as a user typed, and slower earlier requests occasionally resolved after faster, more recent ones. This caused outdated results to visually overwrite correct ones.
+
+The solution was tracking the most recently submitted query and discarding any response that did not match it upon arrival, ensuring only the latest keystroke's results are ever rendered.
+
+## CSS Stacking Context Issues
+
+The autocomplete dropdown initially rendered behind other page sections despite having a high `z-index`. This was caused by `backdrop-filter` properties on sibling elements creating independent stacking contexts, which isolate `z-index` comparisons to within that context rather than the whole page. The fix involved explicitly establishing a stacking context on the hero section with `position: relative` and an appropriate `z-index`, allowing its contents, including the dropdown, to render above later sections.
+
 ## Deployment Configuration
 
 Deployment introduced challenges around configuring Django correctly for a production environment.
@@ -938,8 +968,6 @@ The next stages of NodeNexus development will focus on completing the core appli
 
 Planned next steps include:
 
-- Refining the news API integration and improving article processing.
-- Completing the search system and improving result handling.
 - Adding article detail pages for expanded article information and user interactions.
 - Implementing database models and migrations for articles, categories, users, bookmarks, and related features.
 - Developing authentication and user profile functionality.
