@@ -58,5 +58,31 @@ Cybersecurity | NodeNexus
 
 </section>
 
+<h3>
+    <span class="title-glass">PAGE {{ page}}</span>
+</h3>
+
+<div class="pagination">
+
+    {% if page > 1 %}
+        <a href="?page={{ page|add:'-1' }}" class="pagination-link" title="Previous Page">
+            &laquo;
+        </a>
+    {% endif %}
+
+
+    <span class="pagination-number current-page" title="Current Page">
+        {{ page }}
+    </span>
+
+
+    {% if has_next %}
+        <a href="?page={{ page|add:'1' }}" class="pagination-link" title="Next Page">
+            &raquo;
+        </a>
+    {% endif %}
+
+</div>
+
 
 {% endblock %}

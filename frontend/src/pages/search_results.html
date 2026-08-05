@@ -7,6 +7,8 @@
 
 {% block content %}
 
+<section class="category-page">
+
 <div class="category-header">
     <div class="glass-content title-glass">
         <h1>Results for "{{ query }}"</h1>
@@ -45,6 +47,34 @@
     {% empty %}
     <p>No results found for "{{ query }}".</p>
     {% endfor %}
+
+</div>
+
+</section>
+
+<h3>
+    <span class="title-glass">PAGE {{ page}}</span>
+</h3>
+
+<div class="pagination">
+
+    {% if page > 1 %}
+        <a href="?q={{ query }}&page={{ page|add:'-1' }}" class="pagination-link" title="Previous Page">
+            &laquo;
+        </a>
+    {% endif %}
+
+
+    <span class="pagination-number current-page" title="Current Page">
+        {{ page }}
+    </span>
+
+
+    {% if has_next %}
+        <a href="?q={{ query }}&page={{ page|add:'1' }}" class="pagination-link" title="Next Page">
+            &raquo;
+        </a>
+    {% endif %}
 
 </div>
 

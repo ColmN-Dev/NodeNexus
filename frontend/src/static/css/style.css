@@ -163,6 +163,8 @@ h6 {
 
     font-weight:700;
 
+    text-align:center;
+
 }
 
 
@@ -814,7 +816,7 @@ a.btn.nn-btn:focus {
 }
 
 /* ========================================
-   ARTICLE GRID
+   ARTICLES
    ======================================== */
 
 .article-grid {
@@ -984,7 +986,7 @@ a.btn:hover {
 
     background:var(--cyan-dark);
 
-    transform:translateY(-2px);
+    transform:translateY(-3px);
 
     box-shadow:
         0 0 12px rgba(0,184,230,.35);
@@ -1045,6 +1047,85 @@ a.btn:hover {
 
     min-height:70vh;
 
+}
+
+/* ========================================
+   PAGINATION
+   ======================================== */
+
+
+.pagination {
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+    
+    gap: 0.5rem;
+
+    margin: 3rem 0;
+
+    flex-wrap: wrap;
+}
+
+
+.current-page {
+    
+    background: var(--cyan);
+
+    color: var(--content-text);
+
+    border-color: var(--cyan);
+
+    font-weight: bold;
+
+    font-size: 1.25rem;
+}
+
+.current-page:hover {
+    
+    background: var(--cyan);
+
+    color: var(--content-text);
+
+    transform: translateY(-3px);
+
+    box-shadow: 0 0 12px rgba(0,184,230,.35);
+
+    border-color: var(--cyan-dark);
+}
+
+
+.pagination-link {
+
+    text-decoration: none;
+
+    font-size: 1.25rem;
+
+    color: var(--cyan);
+
+    border: 1px solid var(--cyan);
+
+    background: var(--content-glass-bg);
+
+    padding: 1rem 1.5rem;
+
+    border-radius: 10px;
+
+    transition: all 0.3s ease;
+}
+
+.pagination-link:hover {
+    background: var(--cyan);
+
+    color: #2b2b2b;
+
+    transform: translateY(-3px);
+
+    box-shadow: 0 0 12px rgba(0,184,230,.35);
+
+    font-weight: bold;
 }
 
 
