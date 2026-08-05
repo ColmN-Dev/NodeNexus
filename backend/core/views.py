@@ -1,6 +1,6 @@
 #core/views.py
 
-from django.shortcuts import render, redirect
+from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from news.services.currents import search_articles, get_category_articles
 
