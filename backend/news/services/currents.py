@@ -92,6 +92,8 @@ def fetch_articles(params):
             "news",
             []
         )
+        
+        logger.info(f"Currents returned {len(articles)} articles")
 
         _cache.set(cache_key, articles)
 
@@ -111,7 +113,7 @@ def fetch_articles(params):
 # ARTICLE SEARCH
 # -----------------------------
 
-def search_articles(query):
+def search_articles(query, page=1):
     """
     Searches Currents API by free-text keywords,
     then removes duplicates and low-quality results.
@@ -120,17 +122,22 @@ def search_articles(query):
     articles = fetch_articles({
 
         "keywords": query,
-        "language": "en"
+        "language": "en",
+        "page_number": page
     })
     
-    return (_filter_low_quality(_deduplicate(articles)))
+    has_next = len(articles) == 20  # Check if there are more articles for pagination
+    
+    filtered = _filter_low_quality(_deduplicate(articles))
+    
+    return filtered, has_next
 
 
 # -----------------------------
 # CATEGORY FETCHING
 # -----------------------------
 
-def get_category_articles(category):
+def get_category_articles(category, page=1):
     """
     Fetches articles for a fixed Currents API category,
     then removes duplicates and low-quality results.
@@ -139,10 +146,16 @@ def get_category_articles(category):
     articles = fetch_articles({
 
         "category": category,
-        "language": "en"
+        "language": "en",
+        "page_number": page
 
     })
-    return (_filter_low_quality(_deduplicate(articles)))
+    
+    has_next = len(articles) == 20  # Check if there are more articles for pagination
+    
+    filtered = _filter_low_quality(_deduplicate(articles))
+    
+    return filtered, has_next
     
 #-----------------------------
 # DEDUPLICATION
