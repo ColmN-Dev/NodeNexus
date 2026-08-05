@@ -70,22 +70,40 @@ An external scheduled ping (cron-job.org) is used to periodically request the li
 
 ## Features
 
-Technology News Aggregation
+### Technology News Aggregation
+
 - Category pages for AI, Cybersecurity, Gaming, and Trending Technology
 - Homepage featuring curated articles across all categories
 - Content sourced live from the Currents API
 
-Search
+---
+
+### Article Search
+
 - Global keyword search across articles
 - Live search autocomplete with debounced requests
 - Stale-response protection to prevent outdated results overwriting current ones
 
-Content Quality Filtering
+---
+
+### Content Quality Filtering
+
 - Duplicate articles removed based on source URL
 - Known low-quality domains excluded from results
 - Auto-generated vulnerability database listings filtered from cybersecurity results, while genuine journalism referencing a CVE is retained
 
-Frontend
+---
+
+### Pagination
+
+- Previous/next page navigation across category and search results pages
+- Page availability derived from the Currents API response rather than a fixed total
+- Search queries preserved across paginated results
+
+---
+
+### Frontend
+
 - Deep-space, cyan-accented glass UI design system
 - Dark/light theme toggle with flash-of-unstyled-content prevention
 - Responsive layout across desktop, tablet, and mobile
