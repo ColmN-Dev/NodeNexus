@@ -48,12 +48,13 @@
 
 8. [Completed Features](#8-completed-features)
    - News Aggregation
-   - Search System
+   - Search Functionality
    - Search Autocomplete
    - Content Quality Filtering
+   - Pagination
    - Frontend Interface
-   - API Integration
-   - Deployment Foundation
+   - API Reliability Features
+   - Development Foundation
 
 9. [Current Limitations](#9-current-limitations)
 
@@ -72,13 +73,17 @@
    - Render Deployment
 
 12. [Challenges Faced and Solutions](#12-challenges-faced-and-solutions)
-   - Django Project Reorganisation
-   - PostgreSQL Migration
-   - Static Files and Cache Issues
-   - Bootstrap and CSS Conflicts
-   - Responsive Layout Challenges
-   - API Integration and Data Handling
+   - Frontend Layout and Bootstrap Integration
+   - Responsive Design Challenges
+   - Static Files, collectstatic, and CSS Caching
+   - External API Integration
+   - API Usage and Caching
+   - Search System Development
+   - Autocomplete Race Conditions
+   - CSS Stacking Context Issues
+   - Pagination Implementation
    - Deployment Configuration
+   - Project Structure and Code Organisation
 
 13. [What Was Learned So Far](#13-what-was-learned-so-far)
 
@@ -561,6 +566,8 @@ The current NodeNexus implementation includes the following completed features:
 - A stale-response guard was added to discard out-of-order API replies, preventing earlier partial queries from overwriting more recent search results.
 - Category pages (AI, Cybersecurity, Gaming, Trending) now render live articles fetched directly from the Currents API, replacing the previous placeholder templates.
 
+---
+
 ## Content Quality Filtering
 
 - Low-quality and duplicate articles are filtered from API results before display.
@@ -569,6 +576,31 @@ The current NodeNexus implementation includes the following completed features:
 - Articles with titles that are auto-generated CVE announcements are
   filtered out, while genuine journalism that references a CVE number
   within a proper headline is retained.
+
+---
+
+## Pagination
+
+- Custom pagination system implemented to handle article results returned
+  from external news APIs across the AI, Cybersecurity, Gaming, Trending,
+  and Search Results pages.
+- Pagination controls display the current page with previous and next
+  navigation, rather than a fully numbered page list, reflecting the
+  Currents API's lack of a reliable indicator for whether further pages
+  of results exist.
+- `currents.py` was updated to support page-based API requests and return
+  `has_next` pagination information, alongside the existing filtering,
+  deduplication, and caching logic.
+- `core/views.py` and `news/views.py` were updated to retrieve the
+  requested page, validate page requests, and redirect users to the last
+  valid page when an unavailable page is requested.
+- Pagination templates preserve the active search query when navigating
+  between search result pages.
+- Pagination styling was added to `style.css`, including navigation
+  buttons, active page indicators, hover states, and responsive behaviour
+  consistent with the NodeNexus theme.
+
+---
 
 ## Frontend Interface
 
@@ -909,9 +941,28 @@ Implementing live search suggestions introduced a race condition: multiple autoc
 
 The solution was tracking the most recently submitted query and discarding any response that did not match it upon arrival, ensuring only the latest keystroke's results are ever rendered.
 
+---
+
 ## CSS Stacking Context Issues
 
 The autocomplete dropdown initially rendered behind other page sections despite having a high `z-index`. This was caused by `backdrop-filter` properties on sibling elements creating independent stacking contexts, which isolate `z-index` comparisons to within that context rather than the whole page. The fix involved explicitly establishing a stacking context on the hero section with `position: relative` and an appropriate `z-index`, allowing its contents, including the dropdown, to render above later sections.
+
+---
+
+## Pagination Implementation
+
+Prior pagination experience came from a previous Flask project using the Google Books API, where the `start_index` parameter allowed simple offset-based pagination. Django's built-in `Paginator` class was used in an initial attempt at pagination for NodeNexus, alongside a similar numbered pagination system.
+
+The Currents API had no reliable way to indicate whether a next page of results existed. `Paginator` expects a known total count to calculate page numbers, which the API could not consistently provide. This caused several issues:
+
+- Invalid page requests returning errors instead of failing gracefully
+- Empty responses on out-of-range pages
+- Pagination buttons remaining active on pages with no data, letting users navigate to empty or broken pages and breaking the page layout
+- Inconsistent navigation state, with next/previous controls not accurately reflecting whether further results were actually available
+
+`Paginator` was dropped in favour of a simpler current-page indicator with previous/next navigation, deriving page availability directly from the API response rather than a known total. `currents.py` was updated to support page-based requests and expose `has_next`, while views validate requested pages and redirect to the last valid page using `HttpResponseRedirect` when an invalid or empty page is requested.
+
+---
 
 ## Deployment Configuration
 
@@ -954,6 +1005,7 @@ Key areas learned include:
 - Using PostgreSQL with Django ORM and preparing applications for scalable database development.
 - Integrating external APIs and separating API communication from application logic.
 - Implementing caching strategies to improve API reliability and reduce unnecessary requests.
+- Evaluating and moving away from Django's built-in `Paginator` when working with externally sourced, unreliable-total data, in favour of a simpler API-driven pagination approach.
 - Managing static files, production configuration, and deployment workflows using Render and WhiteNoise.
 - Combining Bootstrap with custom CSS to create responsive layouts and maintain a consistent design system.
 - Debugging real-world issues involving frontend layouts, static assets, deployment configuration, and external services.
@@ -994,6 +1046,9 @@ The following documentation sources were used throughout the development of Node
 
 - Django Templates Documentation  
   https://docs.djangoproject.com/en/6.0/topics/templates/
+
+- Django Pagination Documentation  
+  https://docs.djangoproject.com/en/6.0/topics/pagination/
 
 - Django Models and Migrations Documentation  
   https://docs.djangoproject.com/en/6.0/topics/db/models/
