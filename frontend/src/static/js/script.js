@@ -241,11 +241,25 @@
                     clearAutocomplete();
                 } else {
 
-                searchInput.value = "";
+                    searchInput.value = "";
 
-                clearBtn?.classList.remove("visible");
+                    clearBtn?.classList.remove("visible");
 
                 }
+            }
+
+        });
+
+        // Close the autocomplete dropdown if the user clicks outside of the search input, suggestions, or clear button.
+        document.addEventListener("click", event => {
+
+            const clickedInsideSearch =
+                searchInput?.contains(event.target) ||
+                suggestions?.contains(event.target) ||
+                clearBtn?.contains(event.target);
+
+            if (!clickedInsideSearch) {
+                clearAutocomplete();
             }
 
         });
