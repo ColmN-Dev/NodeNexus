@@ -409,6 +409,7 @@ Current frontend implementation includes:
 - A deep-space background theme with cyan technology-inspired accents.
 - Dark/light theme support using custom CSS variables.
 - Mobile navigation using a bottom navigation bar and an off-canvas menu system.
+- Responsive horizontal article carousels were added for smaller screen sizes on homepage category sections, allowing users to horizontally scroll through category articles on tablet and mobile devices while maintaining the desktop grid layout.
 
 The frontend combines Bootstrap's layout system with custom styling. Bootstrap handles general spacing, grid behaviour, and responsive utilities, while custom CSS controls the NodeNexus branding, component styling, and theme appearance.
 
