@@ -116,3 +116,49 @@ def auto_complete(request):
     titles = [article.get("title") for article in articles if article.get("title")]
 
     return JsonResponse(titles, safe=False)
+
+def article_detail(request):
+
+    """
+    Article detail view.
+    Displays detailed information about a specific article based on its URL.
+    """
+
+    article = {
+        "title": request.GET.get("title"),
+        "description": request.GET.get("description"),
+        "image": request.GET.get("image"),
+        "published": request.GET.get("published"),
+        "source": request.GET.get("source"),
+        "url": request.GET.get("url"),
+    }
+
+    if not article.get("url"):
+        return render(request, "article_detail.html", {"error": "Article URL is missing."})
+    
+    # Split the article title into words for generating a related query
+    title_words = article["title"].split()
+    
+    # Generate a related query using the first 3 words of the article title
+    related_query = " ".join(title_words[:3])
+
+    related_articles, _ = search_articles(related_query)
+
+    # Filter out the current article from the related articles
+    related_articles = [
+        item for item in related_articles
+        if item.get("url") != article["url"]
+    ][:12]  # Limit to 12 related articles
+
+
+    context = {
+        "article": article,
+        "related_articles": related_articles,
+    }
+
+
+    return render(
+        request,
+        "article_detail.html",
+        context
+    )
