@@ -32,21 +32,32 @@ Gaming | NodeNexus
         {% for article in articles %}
         <div class="article-card">
 
+            <a 
+                href="{% url 'article_detail' %}?title={{ article.title|urlencode }}&description={{ article.description|urlencode }}&image={{ article.image|urlencode }}&published={{ article.published|urlencode }}&source={{ article.source|urlencode }}&url={{ article.url|urlencode }}&category={{ title|urlencode }}">
             <img
                 src="{% if article.image and article.image != 'None' %}{{ article.image }}{% else %}{% static 'images/placeholder.png' %}{% endif %}"
                 alt="{{ article.title }}"
                 data-fallback-src="{% static 'images/placeholder.png' %}"
                 onerror="this.onerror=null; this.src=this.dataset.fallback;"
             >
+            </a>
 
-            <h3>{{ article.title }}</h3>
+            <a 
+                href="{% url 'article_detail' %}?title={{ article.title|urlencode }}&description={{ article.description|urlencode }}&image={{ article.image|urlencode }}&published={{ article.published|urlencode }}&source={{ article.source|urlencode }}&url={{ article.url|urlencode }}&category={{ title|urlencode }}">
+            <h3>
+                {{ article.title }}
+            </h3>
+            </a>
 
             <p>{{ article.description|truncatewords:25 }}</p>
 
             <span class="published-date">{{ article.published }}</span>
 
-            <a href="{{ article.url }}" class="btn" target="_blank" rel="noopener">
-                Read More
+            <a 
+                href="{% url 'article_detail' %}?title={{ article.title|urlencode }}&description={{ article.description|urlencode }}&image={{ article.image|urlencode }}&published={{ article.published|urlencode }}&source={{ article.source|urlencode }}&url={{ article.url|urlencode }}&category={{ title|urlencode }}"
+                class="btn btn-primary mt-auto"
+            >
+                View Details
             </a>
 
         </div>
