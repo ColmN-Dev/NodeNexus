@@ -6,108 +6,98 @@ from news.services.currents import search_articles, get_category_articles
 
 
 """
+Helper function to get articles for a specific page, handling cases where the requested page has no articles
+"""
+
+def get_page_articles(request, query, use_category=False):
+    page = int(request.GET.get("page", 1))
+    original_page = page
+
+    # Get articles based on whether to use category or search
+    if use_category:
+        articles, has_next = get_category_articles(query, page=page)
+    else:
+        articles, has_next = search_articles(query, page=page)
+
+    # If the requested page has no articles, go back one page until articles are found or redirect to the first page
+    while page > 1 and not articles:
+        page -= 1
+
+        if use_category:
+            articles, has_next = get_category_articles(query, page=page)
+        else:
+            articles, has_next = search_articles(query, page=page)
+
+    return articles[:12], page, has_next, original_page
+
+
+"""
 Core views for the NodeNexus application.
+
 """
 def ai(request):
     
-    page = int(request.GET.get("page", 1))
-        
-    articles, has_next = search_articles(
-        "'artificial intelligence' OR 'machine learning' OR 'OpenAI' OR 'ChatGPT' OR 'generative AI' OR 'Claude' OR 'Anthropic'",
-        page=page
-    )
-       
-    # Store the original page number for redirect    
-    original_page = page  
+    query = "'artificial intelligence' OR 'machine learning' OR 'OpenAI' OR 'ChatGPT' OR 'generative AI' OR 'Claude' OR 'Anthropic'"
     
-    # If someone requests an invalid page, go back one page
-    while page > 1 and not articles:
-        page -= 1
-        
-    articles, has_next = search_articles(
-    "'artificial intelligence' OR 'machine learning' OR 'OpenAI' OR 'ChatGPT' OR 'generative AI' OR 'Claude' OR 'Anthropic'",
-    page=page
+    articles, page, has_next, original_page = get_page_articles(
+        request, query
     )
-                
+
     if page != original_page:
-    # If the user requests a page with no articles, redirect to the previous page
         return HttpResponseRedirect(f"?page={page}")
-    
-    articles = articles[:12]
-        
-    return render(request, 'ai.html', {'articles': articles, 'page': page, 'has_next': has_next})
+
+    return render(
+        request,
+        "ai.html",
+        {"articles": articles, "page": page, "has_next": has_next}
+    )
 
 def cybersecurity(request):
     
-    page = int(request.GET.get("page", 1))
+    query = "'cybersecurity' OR ransomware OR malware OR 'cyber attacks'"
     
-    articles, has_next = search_articles(
-        "'cybersecurity' OR ransomware OR malware OR 'cyber attacks'",
-        page=page
+    articles, page, has_next, original_page = get_page_articles(
+        request, query
     )
-    
-    original_page = page  # Store the original page number for redirect
-    
-    while page > 1 and not articles:
-        page -= 1
-        
-        articles, has_next = search_articles(
-            "'cybersecurity' OR ransomware OR malware OR 'cyber attacks'",
-            page=page
-        )
-        
+
     if page != original_page:
-        # If the user requests a page with no articles, redirect to the previous page
         return HttpResponseRedirect(f"?page={page}")
-    
-    articles = articles[:12]  
-    
-    return render(request, 'cybersecurity.html', {'articles': articles, 'page': page, 'has_next': has_next})
+
+    return render(
+        request,
+        "cybersecurity.html",
+        {"articles": articles, "page": page, "has_next": has_next}
+    )
 
 def gaming(request):
     
-    page = int(request.GET.get("page", 1))
+    query = "videogames OR PlayStation OR Xbox OR Nintendo OR 'PC gaming'"
     
-    articles, has_next = search_articles(
-        "videogames OR PlayStation OR Xbox OR Nintendo OR 'PC gaming'",
-        page=page
+    articles, page, has_next, original_page = get_page_articles(
+        request, query
     )
-    
-    original_page = page  # Store the original page number for redirect
-    
-    while page > 1 and not articles:
-        page -= 1
-        
-        articles, has_next = search_articles(
-            "videogames OR PlayStation OR Xbox OR Nintendo OR 'PC gaming'",
-            page=page
-        )
-        
+
     if page != original_page:
-        # If the user requests a page with no articles, redirect to the previous page
         return HttpResponseRedirect(f"?page={page}")
-    
-    articles = articles[:12]
-        
-    return render(request, 'gaming.html', {'articles': articles, 'page': page, 'has_next': has_next})
+
+    return render(
+        request,
+        "gaming.html",
+        {"articles": articles, "page": page, "has_next": has_next}
+    )
 
 def trending(request):
     
-    page = int(request.GET.get("page", 1))
     
-    articles, has_next = get_category_articles("technology", page=page)
-    
-    original_page = page  # Store the original page number for redirect
-    
-    while page > 1 and not articles:
-        page -= 1
-        
-        articles, has_next = get_category_articles("technology", page=page)
-        
+    articles, page, has_next, original_page = get_page_articles(
+        request, "technology", use_category=True
+    )
+
     if page != original_page:
-        # If the user requests a page with no articles, redirect to the previous page
         return HttpResponseRedirect(f"?page={page}")
-    
-    articles = articles[:12]
-        
-    return render(request, 'trending.html', {'articles': articles, 'page': page, 'has_next': has_next})
+
+    return render(
+        request,
+        "trending.html",
+        {"articles": articles, "page": page, "has_next": has_next}
+    )

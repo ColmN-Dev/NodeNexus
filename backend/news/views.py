@@ -60,13 +60,15 @@ def search_results(request):
     query = request.GET.get("q", "").strip()
 
     page = int(request.GET.get("page", 1))
+    
+    
+    articles = []
+    has_next = False
 
     if query:
         articles, has_next = search_articles(query, page=page)
-    else:
-        articles = []
-        has_next = False
-
+    
+    
     original_page = page
 
     while page > 1 and not articles:
