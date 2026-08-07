@@ -107,6 +107,7 @@ An external scheduled ping (cron-job.org) is used to periodically request the li
 - Deep-space, cyan-accented glass UI design system
 - Dark/light theme toggle with flash-of-unstyled-content prevention
 - Responsive layout across desktop, tablet, and mobile
+- Horizontal article carousel interaction on tablet and mobile homepage layouts
 - Mobile bottom navigation with active page indication
 - Off-canvas mobile menu
 - Fallback placeholder image for missing or broken article images
