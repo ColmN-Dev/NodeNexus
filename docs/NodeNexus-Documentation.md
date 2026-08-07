@@ -1,6 +1,6 @@
 # NodeNexus Documentation
 
-**Last updated:** August 4, 2026
+**Last updated:** August 7, 2026
 
 ---
 
@@ -393,31 +393,25 @@ The frontend directory currently organises Django template resources and static 
 
 # 5. Frontend Implementation
 
-NodeNexus uses Django Templates as the current presentation layer, with Bootstrap providing the responsive grid system, layout utilities, and base component structure.
-
-Custom CSS and JavaScript are used alongside Bootstrap to create the NodeNexus visual identity, interactive elements, and responsive behaviour.
+NodeNexus uses Django Templates as the current presentation layer, with Bootstrap, custom CSS, and JavaScript providing the layout, styling, and interactive functionality.
 
 Current frontend implementation includes:
 
-- A shared `base.html` layout extended by all pages.
-- Reusable template components for navigation, footer, search, article cards, and category sections.
-- A homepage hero section containing the project branding, description, and search functionality.
-- Category pages for AI, cybersecurity, gaming, and trending technology content.
-- A search results page displaying matching articles using shared article card components.
-- Bootstrap-powered article layouts with responsive behaviour across desktop, tablet, and mobile devices.
-- A custom glass UI design system for cards, navigation, search components, and content sections.
-- A deep-space background theme with cyan technology-inspired accents.
-- Dark/light theme support using custom CSS variables.
-- Mobile navigation using a bottom navigation bar and an off-canvas menu system.
-- Responsive horizontal article carousels were added for smaller screen sizes on homepage category sections, allowing users to horizontally scroll through category articles on tablet and mobile devices while maintaining the desktop grid layout.
+- Shared `base.html` template with reusable components for navigation, footer, search, article cards, and category sections.
+- Homepage hero section with branding, project description, and search functionality.
+- Category pages for AI, Cybersecurity, Gaming, and Trending technology.
+- Search results page using reusable article cards.
+- Responsive layouts for desktop, tablet, and mobile devices.
+- Custom glass UI design with a deep-space background and cyan accents.
+- Dark/light theme support using CSS variables.
+- Mobile bottom navigation and off-canvas menu.
+- Responsive horizontal article carousels on tablet and mobile while maintaining the desktop grid layout.
+- Responsive related-article carousel with mobile card sizing and overflow handling.
+- Fallback images for articles with missing or failed images.
 
-The frontend combines Bootstrap's layout system with custom styling. Bootstrap handles general spacing, grid behaviour, and responsive utilities, while custom CSS controls the NodeNexus branding, component styling, and theme appearance.
+Bootstrap provides the core layout and responsive utilities, while custom CSS controls NodeNexus-specific styling, branding, themes, spacing, and responsive refinements.
 
-Responsive behaviour is handled through a combination of Bootstrap utilities and custom CSS media queries. The responsive system supports desktop, tablet, and mobile layouts while maintaining consistent spacing, navigation behaviour, and content presentation.
-
-The frontend structure uses reusable components and shared layouts to reduce duplication between pages. Article cards, category sections, navigation elements, and search components are reused across different views to maintain consistency.
-
-The frontend resources are organised separately from backend logic, allowing the current Django Template implementation to remain maintainable while preparing the project for a future React frontend migration.
+Reusable templates and components reduce duplication and keep the frontend consistent across the application. The frontend remains separated from backend logic, providing a foundation for a future React frontend.
 
 ---
 
@@ -582,48 +576,32 @@ The current NodeNexus implementation includes the following completed features:
 
 ## Pagination
 
-- Custom pagination system implemented to handle article results returned
-  from external news APIs across the AI, Cybersecurity, Gaming, Trending,
-  and Search Results pages.
-- Pagination controls display the current page with previous and next
-  navigation, rather than a fully numbered page list, reflecting the
-  Currents API's lack of a reliable indicator for whether further pages
-  of results exist.
-- `currents.py` was updated to support page-based API requests and return
-  `has_next` pagination information, alongside the existing filtering,
-  deduplication, and caching logic.
-- `core/views.py` and `news/views.py` were updated to retrieve the
-  requested page, validate page requests, and redirect users to the last
-  valid page when an unavailable page is requested.
-- Pagination templates preserve the active search query when navigating
-  between search result pages.
-- Pagination styling was added to `style.css`, including navigation
-  buttons, active page indicators, hover states, and responsive behaviour
-  consistent with the NodeNexus theme.
+- Custom API-driven pagination implemented across the AI, Cybersecurity, Gaming, Trending, and Search Results pages.
+- Pagination uses previous/next navigation and a current-page indicator instead of relying on a known total number of results.
+- `currents.py` handles page requests and returns `has_next` alongside filtering, deduplication, and caching.
+- `core/views.py` and `news/views.py` validate requested pages and redirect invalid or unavailable pages appropriately.
+- Search pagination preserves the active search query.
+- Responsive pagination styling was added to match the NodeNexus theme.
 
 ---
 
 ## Frontend Interface
 
-- Responsive homepage layout.
-- Category pages for different technology topics.
-- Fallback placeholder image displayed when article images are missing or fail to load.
-- Reusable template components.
-- Article card components.
-- Search bar component.
-- Navigation components.
-- Mobile navigation system.
-- Active page indication on the mobile bottom navigation bar, based on the currently matched URL route
-- Dark/light theme support.
-- Glass-style UI design.
+- Responsive homepage and category page layouts.
+- Reusable template components for articles, navigation, search, and category sections.
+- Fallback images for missing or failed article images.
+- Mobile bottom navigation with active-page indication.
+- Dark/light theme support and glass-style UI.
+- Responsive horizontal article carousels on tablet and mobile while retaining the desktop layout.
+- Responsive related-article carousel with viewport-based card sizing to prevent clipping on smaller screens.
+- Refined mobile card spacing, sizing, and overflow behaviour across different viewport widths.
 
 ---
 
 ## API Reliability Features
 
-- API response caching implemented to reduce unnecessary external requests.
-- Dedicated service layer created for external API communication.
-- External API data processing separated from Django views.
+- API response caching implemented to reduce unnecessary external requests and improve reliability.
+- External API failures and repeated requests are mitigated through the service-layer caching system.
 
 ---
 
@@ -859,9 +837,12 @@ Challenges included:
 
 - Mobile navigation positioning.
 - Preventing content from being hidden behind the bottom navigation bar.
-- Maintaining article card layouts across screen sizes.
-- Adjusting typography and spacing for smaller displays.
-- Handling unusual viewport widths.
+- Maintaining article card layouts across different screen sizes.
+- Implementing horizontal article carousels for smaller screens.
+- Maintaining the existing desktop grid layout while introducing mobile carousel behaviour.
+- Handling different viewport widths without unnecessarily changing the overall page structure.
+- Preventing related article cards from being clipped by their containing carousel on mobile.
+- Maintaining visibility of article images, titles, and action buttons within responsive cards.
 
 These issues were resolved through custom media queries, responsive spacing adjustments, and testing across different device sizes.
 
@@ -952,16 +933,21 @@ The autocomplete dropdown initially rendered behind other page sections despite 
 
 ## Pagination Implementation
 
-Prior pagination experience came from a previous Flask project using the Google Books API, where the `start_index` parameter allowed simple offset-based pagination. Django's built-in `Paginator` class was used in an initial attempt at pagination for NodeNexus, alongside a similar numbered pagination system.
+Pagination was implemented around the limitations of the Currents API rather than relying on Django's built-in `Paginator`.
 
-The Currents API had no reliable way to indicate whether a next page of results existed. `Paginator` expects a known total count to calculate page numbers, which the API could not consistently provide. This caused several issues:
+The initial implementation encountered several issues because the external API did not provide a reliable total result count. This made traditional numbered pagination unsuitable.
 
-- Invalid page requests returning errors instead of failing gracefully
-- Empty responses on out-of-range pages
-- Pagination buttons remaining active on pages with no data, letting users navigate to empty or broken pages and breaking the page layout
-- Inconsistent navigation state, with next/previous controls not accurately reflecting whether further results were actually available
+The final implementation uses the requested API page together with a `has_next` value returned by the news service.
 
-`Paginator` was dropped in favour of a simpler current-page indicator with previous/next navigation, deriving page availability directly from the API response rather than a known total. `currents.py` was updated to support page-based requests and expose `has_next`, while views validate requested pages and redirect to the last valid page using `HttpResponseRedirect` when an invalid or empty page is requested.
+The backend was updated so that:
+
+- `currents.py` handles page-based API requests and determines whether another page is available.
+- `core/views.py` and `news/views.py` retrieve and validate the requested page.
+- Invalid or unavailable page requests are redirected to the last valid page.
+- Search queries are preserved when navigating between pages.
+- Pagination controls display previous/next navigation and the current page rather than attempting to calculate an unreliable total number of pages.
+
+The frontend pagination controls were styled to match the NodeNexus design system and remain responsive on smaller screens.
 
 ---
 
@@ -998,20 +984,21 @@ Creating dedicated service modules helped prevent API logic and utility function
 
 # 13. What Was Learned So Far
 
-Developing NodeNexus has strengthened understanding of building a full-stack Django application and the relationship between backend systems, frontend design, databases, APIs, and deployment.
+Developing NodeNexus has strengthened understanding of building a full-stack Django application and the relationship between backend systems, frontend design, APIs, databases, and deployment.
 
 Key areas learned include:
 
 - Structuring a Django project using apps, views, templates, services, and reusable components.
-- Using PostgreSQL with Django ORM and preparing applications for scalable database development.
-- Integrating external APIs and separating API communication from application logic.
-- Implementing caching strategies to improve API reliability and reduce unnecessary requests.
-- Evaluating and moving away from Django's built-in `Paginator` when working with externally sourced, unreliable-total data, in favour of a simpler API-driven pagination approach.
-- Managing static files, production configuration, and deployment workflows using Render and WhiteNoise.
-- Combining Bootstrap with custom CSS to create responsive layouts and maintain a consistent design system.
-- Debugging real-world issues involving frontend layouts, static assets, deployment configuration, and external services.
+- Integrating external APIs while keeping API logic separated from Django views.
+- Implementing caching to reduce unnecessary API requests and improve reliability.
+- Designing pagination around the limitations of an external API rather than relying on a known total result count.
+- Keeping pagination logic within the service layer while Django views handle request validation and navigation.
+- Combining Bootstrap with custom CSS to build responsive layouts while preserving existing functionality.
+- Understanding how container widths, spacing, gaps, and overflow affect responsive layouts.
+- Using targeted media queries to solve specific responsive issues.
+- Debugging real-world issues across the backend, frontend, APIs, static files, and deployment.
 
-The project has improved understanding of building maintainable applications by focusing on separation of concerns, reusable structures, and preparing the codebase for future expansion.
+The project has improved understanding of separation of concerns, reusable structures, responsive design, and building applications that can be expanded over time.
 
 ---
 
