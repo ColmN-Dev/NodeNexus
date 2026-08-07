@@ -22,7 +22,7 @@ The application is deployed on Render using Gunicorn and PostgreSQL.
 
 **Render Web Service configuration:**
 
-- Build command: `pip install -r requirements.txt && python manage.py collectstatic --noinput`
+- Build command: `pip install -r backend/requirements.txt && cd backend && python manage.py collectstatic --no-input && python manage.py migrate`
 - Start command: `cd backend && gunicorn config.wsgi:application`
 - Environment variables set in the Render dashboard:
   - `SECRET_KEY`
@@ -36,7 +36,7 @@ A Render PostgreSQL instance is linked to the web service.
 
 **Keeping the free web service warm:**
 
-An external scheduled ping (cron-job.org) is used to periodically request the live site, reducing cold-start delays caused by Render's free tier spin-down behaviour.
+An external scheduled ping (https://cron-job.org) is used to periodically request the live site, reducing cold-start delays caused by Render's free tier spin-down behaviour.
 
 ---
 
@@ -59,7 +59,7 @@ An external scheduled ping (cron-job.org) is used to periodically request the li
 
 - Django project structure using apps, views, templates, and services
 - Separation of external API logic from Django views via a dedicated service layer
-- REST API integration and response caching
+- External API integration and response caching
 - PostgreSQL relational database setup with Django
 - Environment-based settings configuration for development and production
 - Responsive frontend development combining Bootstrap and custom CSS
@@ -83,6 +83,15 @@ An external scheduled ping (cron-job.org) is used to periodically request the li
 - Global keyword search across articles
 - Live search autocomplete with debounced requests
 - Stale-response protection to prevent outdated results overwriting current ones
+
+---
+
+### Article Detail
+
+- Dedicated article detail page for individual news stories
+- Full article information presented separately from article cards
+- Related articles displayed alongside the selected article
+- Navigation from article cards to the corresponding article detail page
 
 ---
 
@@ -206,7 +215,7 @@ python backend/manage.py collectstatic --noinput
 
 ## Routing Structure
 
-- `backend/core/urls.py` → main pages (`/`, `/ai/`, `/cybersecurity/`, `/gaming/`, `/trending/`, `/search/`, `/auto-complete/`)
+- `backend/core/urls.py` → main pages (`/`, `/ai/`, `/cybersecurity/`, `/gaming/`, `/trending/`, `/search/`, `/auto-complete/`, `/article`)
 
 ---
 
@@ -221,12 +230,12 @@ python backend/manage.py collectstatic --noinput
 | `/trending/` | Trending technology category |
 | `/search/` | Search results |
 | `/auto-complete/` | Search autocomplete |
+| `/article/` | Individual article detail |
 
 ---
 
 ## Planned Features
 
-- Article detail pages
 - User accounts, authentication, and profiles
 - Saved/bookmarked articles
 - Comment system
