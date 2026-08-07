@@ -3,7 +3,7 @@
 <section>
 
     <div class="container py-4">
-
+        
         <h2 class="article-section-title">
             {{ title }}
         </h2>
@@ -17,17 +17,23 @@
                 <div class="article-card">
 
                     {% if article.image and article.image != "None" %}
+                    <a 
+                        href="{% url 'article_detail' %}?title={{ article.title|urlencode }}&description={{ article.description|urlencode }}&image={{ article.image|urlencode }}&published={{ article.published|urlencode }}&source={{ article.source|urlencode }}&url={{ article.url|urlencode }}&category={{ title|urlencode }}"> 
                     <img
                         src="{% if article.image and article.image != 'None' %}{{ article.image }}{% else %}{% static 'images/placeholder.png' %}{% endif %}"
                         alt="{{ article.title }}"
                         data-fallback-src="{% static 'images/placeholder.png' %}"
                         onerror="this.onerror=null; this.src=this.dataset.fallback;"
                     >
+                    </a>
                     {% endif %}
 
+                    <a 
+                        href="{% url 'article_detail' %}?title={{ article.title|urlencode }}&description={{ article.description|urlencode }}&image={{ article.image|urlencode }}&published={{ article.published|urlencode }}&source={{ article.source|urlencode }}&url={{ article.url|urlencode }}&category={{ title|urlencode }}">
                     <h3>
                         {{ article.title }}
                     </h3>
+                    </a>
 
                     <p>
                         {{ article.description }}
@@ -37,12 +43,11 @@
                         {{ article.published }}
                     </small>
 
-                    <a
-                        href="{{ article.url }}"
-                        target="_blank"
+                    <a 
+                        href="{% url 'article_detail' %}?title={{ article.title|urlencode }}&description={{ article.description|urlencode }}&image={{ article.image|urlencode }}&published={{ article.published|urlencode }}&source={{ article.source|urlencode }}&url={{ article.url|urlencode }}&category={{ title|urlencode }}"
                         class="btn btn-primary mt-auto"
                     >
-                        Read Article
+                        View Details
                     </a>
 
                 </div>

@@ -1,0 +1,216 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+{{ article.title }} | NodeNexus
+{% endblock %}
+
+{% block content %}
+
+<section class="category-page">
+
+<div class="text-center mb-4">
+    <a href="{% url 'home' %}" class="btn nn-btn">
+        &larr; Back to Home
+    </a>
+</div>
+
+
+
+<div class="container py-4">
+
+
+    <div class="glass-content article-detail">
+
+
+        <div class="article-detail-header">
+
+
+            <h1>
+                {{ article.title }}
+            </h1>
+
+
+
+            <div class="article-detail-info">
+
+
+                {% if article.source %}
+
+                <p>
+                    Source: {{ article.source }}
+                </p>
+
+                {% endif %}
+
+
+
+                {% if article.published %}
+
+                <p>
+                    Published: {{ article.published }}
+                </p>
+
+                {% endif %}
+
+
+            </div>
+
+
+        </div>
+
+
+
+
+
+        <div class="article-detail-image">
+
+
+            <img
+                src="{% if article.image and article.image != 'None' %}{{ article.image }}{% else %}{% static 'images/placeholder.png' %}{% endif %}"
+                alt="{{ article.title }}"
+                data-fallback-src="{% static 'images/placeholder.png' %}"
+                onerror="this.onerror=null; this.src=this.dataset.fallback;"
+            >
+
+
+        </div>
+
+
+
+
+
+        <div class="glass-card article-detail-section">
+
+
+            <h2>
+                Summary
+            </h2>
+
+
+            {% if article.description %}
+
+            <p>
+                {{ article.description }}
+            </p>
+
+            {% else %}
+
+            <p>
+                No summary available.
+            </p>
+
+            {% endif %}
+
+
+        </div>
+
+
+
+
+
+        <div class="glass-card article-detail-section">
+
+
+            <h2>
+                Article Source
+            </h2>
+
+
+            <div class="text-center">
+
+
+                <a
+                    href="{{ article.url }}"
+                    target="_blank"
+                    rel="noopener"
+                    class="btn nn-btn">
+
+                    Read Full Article
+
+                </a>
+
+
+            </div>
+
+
+        </div>
+
+
+
+
+
+        {% if related_articles %}
+
+
+        <div class="glass-card article-detail-section">
+
+
+            <h2>
+                Related Articles
+            </h2>
+
+
+            <div class="related-articles-carousel">
+
+
+                {% for article in related_articles %}
+
+                    <div class="article-card">
+
+                        {% if article.image and article.image != "None" %}
+                        <a 
+                            href="{% url 'article_detail' %}?title={{ article.title|urlencode }}&description={{ article.description|urlencode }}&image={{ article.image|urlencode }}&published={{ article.published|urlencode }}&source={{ article.source|urlencode }}&url={{ article.url|urlencode }}&category={{ title|urlencode }}"> 
+                        <img
+                            src="{% if article.image and article.image != 'None' %}{{ article.image }}{% else %}{% static 'images/placeholder.png' %}{% endif %}"
+                            alt="{{ article.title }}"
+                            data-fallback-src="{% static 'images/placeholder.png' %}"
+                            onerror="this.onerror=null; this.src=this.dataset.fallback;"
+                        >
+                        </a>
+                        {% endif %}
+
+                        <a 
+                            href="{% url 'article_detail' %}?title={{ article.title|urlencode }}&description={{ article.description|urlencode }}&image={{ article.image|urlencode }}&published={{ article.published|urlencode }}&source={{ article.source|urlencode }}&url={{ article.url|urlencode }}&category={{ title|urlencode }}">
+                        <h3>
+                            {{ article.title }}
+                        </h3>
+                        </a>
+
+                        <p>
+                            {{ article.description }}
+                        </p>
+
+                        <small class="published-date">
+                            {{ article.published }}
+                        </small>
+
+                        <a 
+                            href="{% url 'article_detail' %}?title={{ article.title|urlencode }}&description={{ article.description|urlencode }}&image={{ article.image|urlencode }}&published={{ article.published|urlencode }}&source={{ article.source|urlencode }}&url={{ article.url|urlencode }}&category={{ title|urlencode }}"
+                            class="btn btn-primary mt-auto"
+                        >
+                            View Details
+                        </a>
+
+                    </div>
+                
+                {% endfor %}
+
+
+            </div>
+
+
+        </div>
+
+
+        {% endif %}
+
+
+    </div>
+
+
+</div>
+
+</section>
+
+{% endblock %}
