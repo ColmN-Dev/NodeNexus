@@ -1551,7 +1551,38 @@ a.btn:hover {
     }
 }
 
+/* ========================================
+   ARTICLE CAROUSEL & CARD STYLING FOR MOBILE
+   ======================================== */
+
 @media (max-width: 768px) {
+
+    .article-carousel {
+        display: flex;
+        flex-wrap: nowrap;
+        gap: 1rem;
+        overflow-x: auto;
+        scroll-behavior: smooth;
+        padding: 1rem 0.5rem;
+        scroll-snap-type: x mandatory;
+        scrollbar-width: auto;
+        cursor: grab;
+    }
+
+    .article-carousel::-webkit-scrollbar {
+        height: 12px;
+    }
+
+    .article-carousel::-webkit-scrollbar-thumb {
+        background: var(--cyan);
+        border-radius: 10px;
+    }
+
+    .article-carousel .col-12 {
+        flex: 0 0 85%;
+        max-width: 85%;
+        scroll-snap-align: start;
+    }
 
     .article-grid {
         gap: 1rem;
