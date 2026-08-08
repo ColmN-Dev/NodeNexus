@@ -1,5 +1,29 @@
 # NodeNexus - Explore The Future Of Technology
 
+## Table of Contents
+
+- [Overview](#Overview)
+- [Site Logo](#site-logo)
+- [Application Link](#application-link)
+- [Deployment](#deployment)
+- [Technologies Used](#technologies-used)
+- [Key Skills Demonstrated](#key-skills-demonstrated)
+- [Features](#features)
+- [Architecture](#architecture)
+- [Database](#database)
+- [Project Structure](#project-structure)
+- [Setup](#setup)
+- [Run](#run)
+- [Routing Structure](#routing-structure)
+- [Implemented Routes](#implemented-routes)
+- [Planned Features](#planned-features)
+- [Documentation](#documentation)
+- [Screenshots](#screenshots)
+
+---
+
+## Overview
+
 NodeNexus is a full-stack Django web application that aggregates technology news from external APIs, letting users discover the latest developments across AI, cybersecurity, gaming, and trending tech through a unified, searchable platform.
 
 The application uses PostgreSQL for persistent storage and follows a structured Django project layout with separate `core` and `news` applications, keeping general site functionality distinct from news aggregation and API integration logic.
@@ -15,6 +39,8 @@ The application uses PostgreSQL for persistent storage and follows a structured 
 ## Application Link
 
 ### Live Site: [NodeNexus - Explore The Future Of Technology](https://nodenexus-htnu.onrender.com)
+
+---
 
 ## Deployment
 
@@ -90,7 +116,7 @@ An external scheduled ping (https://cron-job.org) is used to periodically reques
 
 - Dedicated article detail page for individual news stories
 - Full article information presented separately from article cards
-- Related articles displayed alongside the selected article
+- Related articles matched by title keywords, displayed in a horizontal carousel on tablet and mobile
 - Navigation from article cards to the corresponding article detail page
 
 ---
@@ -105,8 +131,9 @@ An external scheduled ping (https://cron-job.org) is used to periodically reques
 
 ### Pagination
 
-- Previous/next page navigation across category and search results pages
+- Five-button numbered pagination with previous/next arrows across category and search results pages
 - Page availability derived from the Currents API response rather than a fixed total
+- Responsive layout: arrows beside the page buttons on desktop, arrows moved below the buttons on tablet and smaller
 - Search queries preserved across paginated results
 
 ---
@@ -116,7 +143,7 @@ An external scheduled ping (https://cron-job.org) is used to periodically reques
 - Deep-space, cyan-accented glass UI design system
 - Dark/light theme toggle with flash-of-unstyled-content prevention
 - Responsive layout across desktop, tablet, and mobile
-- Horizontal article carousel interaction on tablet and mobile homepage layouts
+- Horizontal article carousel on tablet and mobile for both the homepage layout and related articles on the article detail page
 - Mobile bottom navigation with active page indication
 - Off-canvas mobile menu
 - Fallback placeholder image for missing or broken article images
@@ -263,3 +290,7 @@ python backend/manage.py collectstatic --noinput
 ### Search Results
 
 ![Search Results](frontend/src/static/images/Search.png)
+
+### Article Detail Page
+
+![Article Detail Page](frontend/src/static/images/Detail.png)

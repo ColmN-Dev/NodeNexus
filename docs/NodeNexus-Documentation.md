@@ -1,1106 +1,289 @@
 # NodeNexus Documentation
 
-**Last updated:** August 7, 2026
+**Last updated:** August 8, 2026
 
 ---
 
 # Table of Contents
 
 1. [Overview](#1-overview)
-
-2. [Project Development Summary](#2-project-development-summary)
-   - Initial Project Setup
-   - Migration From SQLite to PostgreSQL
-   - Project Structure Reorganisation
-   - Django Framework Implementation
-
-3. [Current Architecture](#3-current-architecture)
-   - Backend Structure
-   - Settings Configuration
-   - URL Routing
-   - Template Structure
-   - Static Asset Management
-   - Deployment Architecture
-
-4. [Current Folder Structure](#4-current-folder-structure)
-
-5. [Frontend Implementation](#5-frontend-implementation)
-   - Django Templates
-   - Bootstrap Layout System
-   - Reusable Components
-   - Responsive Design
-   - Custom CSS and Theme System
-   - JavaScript Functionality
-
-6. [Database Configuration](#6-database-configuration)
-   - PostgreSQL Setup
-   - Development Database
-   - Production Database
-   - Django ORM and Migrations
-
-7. [Django Features Implemented](#7-django-features-implemented)
-   - Project Configuration
-   - URL Routing
-   - Template Rendering
-   - Static File Management
-   - Environment Configuration
-   - Application Structure
-
-8. [Completed Features](#8-completed-features)
-   - News Aggregation
-   - Search Functionality
-   - Search Autocomplete
-   - Content Quality Filtering
-   - Pagination
-   - Frontend Interface
-   - API Reliability Features
-   - Development Foundation
-
-9. [Current Limitations](#9-current-limitations)
-
-10. [Key Design Decisions](#10-key-design-decisions)
-   - Why Django
-   - Why PostgreSQL
-   - Why Frontend Separation
-   - Why Bootstrap and Custom CSS
-   - Service Layer Design
-
-11. [Deployment](#11-deployment)
-   - Production Settings
-   - WhiteNoise Configuration
-   - collectstatic Process
-   - Gunicorn Configuration
-   - Render Deployment
-
-12. [Challenges Faced and Solutions](#12-challenges-faced-and-solutions)
-   - Frontend Layout and Bootstrap Integration
-   - Responsive Design Challenges
-   - Static Files, collectstatic, and CSS Caching
-   - External API Integration
-   - API Usage and Caching
-   - Search System Development
-   - Autocomplete Race Conditions
-   - CSS Stacking Context Issues
-   - Pagination Implementation
-   - Deployment Configuration
-   - Project Structure and Code Organisation
-
-13. [What Was Learned So Far](#13-what-was-learned-so-far)
-
-14. [Next Steps](#14-next-steps)
-
-15. [References](#15-references)
+2. [Project Structure](#2-project-structure)
+3. [Backend](#3-backend)
+4. [Frontend](#4-frontend)
+5. [Database](#5-database)
+6. [Completed Features](#6-completed-features)
+7. [Current Limitations](#7-current-limitations)
+8. [Key Design Decisions](#8-key-design-decisions)
+9. [Deployment](#9-deployment)
+10. [Challenges and Solutions](#10-challenges-and-solutions)
+11. [What Was Learned](#11-what-was-learned)
+12. [Next Steps](#12-next-steps)
+13. [References](#13-references)
 
 ---
 
 # 1. Overview
 
-NodeNexus is a technology intelligence hub built using the Django framework.
+NodeNexus is a technology news aggregator built with Django. It pulls articles from the Currents API and displays them across category pages (AI, cybersecurity, gaming, trending), plus search and article detail pages.
 
-The project is designed as a platform for discovering technology news and content across areas including artificial intelligence, cybersecurity, gaming, and trending technology topics. News content is retrieved from external APIs and presented through a responsive, category-based interface.
-
-The application currently uses Django for backend development, PostgreSQL for database management, and Django Templates with Bootstrap, custom CSS, and JavaScript for the frontend.
-
-The current development phase focuses on establishing the Django project structure, database integration, API integration, responsive frontend design, static asset management, and deployment workflow.
-
-The project architecture has been organised to allow future expansion into a larger full-stack application with features including user authentication, personalised article bookmarking, user profiles, and a future React frontend.
+The stack is Django, PostgreSQL, and Django Templates with Bootstrap, custom CSS, and vanilla JavaScript. The project is structured so a React frontend and DRF API layer can be added later without a rewrite but currently all pages are plain Django templates.
 
 ---
 
-# 2. Project Development Summary
+# 2. Project Structure
 
-## Initial Project Setup
-
-NodeNexus was created as a Django-based web application.
-
-The initial setup included:
-
-- Creating the Django project.
-- Creating the virtual environment.
-- Installing required dependencies.
-- Configuring Django settings.
-- Preparing PostgreSQL integration.
-- Creating the initial application structure.
-- Creating the frontend templates and static asset structure.
-- Setting up Git version control and GitHub.
-- Preparing the project for deployment on Render.
-
-The project was structured with future expansion in mind, including authentication, article management, external API integration, user profiles, bookmarking functionality, and a future React frontend.
-
----
-
-## Migration to PostgreSQL
-
-The default SQLite database configuration was replaced with PostgreSQL to provide a more production-ready database environment.
-
-Changes included:
-
-- Installing PostgreSQL dependencies.
-- Configuring Django database settings.
-- Using environment variables for database credentials.
-- Running Django migrations.
-- Preparing the project for local and production database usage.
-
-At the current stage, PostgreSQL has been successfully configured and connected to the application, with the database prepared for future model implementation as additional features are developed.
-
----
-
-## Project Structure Reorganisation
-
-The project structure was reorganised to improve separation between backend functionality and frontend resources.
-
-Changes included:
-
-- Moving Django project files into the backend directory.
-- Organising frontend templates and assets separately.
-- Creating dedicated locations for static files.
-- Preparing the project structure for future React development.
-
-This organisation improves maintainability by separating server-side logic from presentation assets while also providing a smoother transition to a future React frontend.
-
----
-
-## Django Framework Implementation
-
-NodeNexus currently uses several core Django framework features including:
-
-- URL routing.
-- View rendering.
-- Template inheritance.
-- Settings configuration.
-- Static file management.
-- Database migrations.
-- Development and production deployment configuration.
-
-The Django backend provides the foundation for future features including authentication, article management, external API integration, bookmarking functionality, and personalised user features.
-
----
-
-# 3. Current Architecture
-
-## Backend Structure
-
-NodeNexus currently uses Django as the backend framework.
-
-The backend is responsible for:
-
-- Django project configuration.
-- URL routing.
-- Database communication.
-- Application logic.
-- API development.
-
-The Django project is contained inside the backend directory to separate server-side functionality from frontend resources.
-
----
-
-## Settings Configuration
-
-The Django settings file has been configured for both development and deployment requirements.
-
-Current configuration includes:
-
-- PostgreSQL database integration.
-- Environment variable support using `.env`.
-- Static file configuration.
-- Allowed hosts configuration.
-- Deployment settings for Render.
-- Environment-based DEBUG configuration.
-
-Sensitive configuration values such as secret keys, database credentials, API keys, and debug settings are stored using environment variables rather than directly within the source code.
-
-The application uses different static file behaviour depending on the environment. During development, Django handles static files normally while `DEBUG=True`. In production, when `DEBUG=False`, WhiteNoise middleware is enabled and Django uses compressed manifest static file storage to improve performance and provide cache-safe static asset versioning.
-
----
-
-## URL Routing
-
-Django URL routing is managed through the project-level `urls.py` configuration.
-
-The routing system connects incoming browser requests to the appropriate Django views.
-
-Current routes include:
-
-- Homepage
-- AI
-- Cybersecurity
-- Gaming
-- Trending
-- Search Results
-
-The routing structure has been designed to support future expansion including authentication routes, user profiles, bookmarking functionality, and additional API endpoints.
-
----
-
-## Template Structure
-
-NodeNexus uses Django template inheritance combined with reusable template partials.
-
-A reusable `base.html` template provides the shared site structure, including:
-
-- Navigation.
-- Footer.
-- Metadata.
-- Static file loading.
-- JavaScript loading.
-- Theme functionality.
-- Bootstrap CSS and JavaScript.
-
-Individual pages extend the `base.html` template instead of duplicating common HTML structures. Shared UI elements are organised as reusable template components within the `components/` directory and included where required.
-
-Reusable components include the hero section, search bar, article cards, navbar, footer, and mobile navigation. This structure improves maintainability by allowing shared interface elements to be updated from a single location.
-
----
-
-## Static Asset Management
-
-Static files are managed using Django's built-in `staticfiles` framework alongside Bootstrap and custom frontend assets.
-
-Current assets include:
-
-- CSS stylesheets.
-- JavaScript files.
-- Images.
-- Logos.
-- Branding assets.
-
-During development, static files are served using Django's development static file handling.
-
-For production deployment, the project enables WhiteNoise when `DEBUG=False`. Django runs the `collectstatic` process to gather frontend assets, and `CompressedManifestStaticFilesStorage` generates versioned filenames for improved caching behaviour and reliable updates after deployment.
-
-The main custom stylesheet controls the application's glass UI, theme variables, homepage hero section, responsive navigation, article cards, typography, and overall branding, while Bootstrap provides the responsive grid system and base components.
-
----
-
-## Deployment Architecture
-
-NodeNexus is configured for deployment using Render.
-
-The deployment setup includes:
-
-- Render Web Service hosting the Django application.
-- PostgreSQL database integration.
-- Gunicorn as the production WSGI server.
-- WhiteNoise for serving static files.
-- Environment variables for configuration.
-- Django's `collectstatic` process during deployment.
-- GitHub-based continuous deployment workflow.
-
----
-
-# 4. Current Folder Structure
-
-NodeNexus follows a separated backend and frontend structure.
-
-Current project structure:
+The project splits backend and frontend into separate top-level folders, so Django logic and frontend resources aren't mixed together, and so a React frontend can slot into `frontend/` later without restructuring the backend.
 
 ```text
 NodeNexus/
 │
 ├── backend/
-│   ├── config/
-│   │   ├── __init__.py
-│   │   ├── settings.py
-│   │   ├── urls.py
-│   │   ├── asgi.py
-│   │   └── wsgi.py
-│   │
-│   ├── core/
-│   │   ├── migrations/
-│   │   ├── __init__.py
-│   │   ├── admin.py
-│   │   ├── apps.py
-│   │   ├── models.py
-│   │   ├── tests.py
-│   │   ├── urls.py
-│   │   └── views.py
-│   │
-│   ├── news/
-│   │   ├── migrations/
-│   │   ├── services/
-│   │   │   ├── __init__.py
-│   │   │   ├── cache.py
-│   │   │   └── currents.py
-│   │   │
-│   │   ├── __init__.py
-│   │   ├── admin.py
-│   │   ├── apps.py
-│   │   ├── models.py
-│   │   ├── tests.py
-│   │   └── views.py
-│   │
+│   ├── config/            # Django settings, urls, wsgi/asgi
+│   ├── core/               # General site views (ai, cybersecurity, gaming, trending)
+│   ├── news/                # News app: models, views, and services/
+│   │   └── services/
+│   │       ├── currents.py  # Currents API calls + processing
+│   │       └── cache.py     # API response caching
 │   ├── staticfiles/
 │   ├── manage.py
 │   └── requirements.txt
 │
 ├── frontend/
 │   └── src/
-│       ├── components/
-│       │   ├── article_card.html
-│       │   ├── category_section.html
-│       │   ├── footer.html
-│       │   ├── mobile_nav.html
-│       │   ├── navbar.html
-│       │   └── search_bar.html
-│       │
-│       ├── pages/
-│       │   ├── ai.html
-│       │   ├── base.html
-│       │   ├── cybersecurity.html
-│       │   ├── gaming.html
-│       │   ├── index.html
-│       │   ├── search_results.html
-│       │   └── trending.html
-│       │
-│       └── static/
-│           ├── css/
-│           ├── images/
-│           └── js/
+│       ├── components/     # Reusable template partials (navbar, footer, article_card, etc.)
+│       ├── pages/          # Page templates (index, ai, cybersecurity, gaming, trending, search_results)
+│       └── static/         # css, js, images
 │
 ├── docs/
-│   ├── images/
-│   ├── NodeNexus-Documentation.md
-│   ├── node_nexus_erd.dbml
-│   └── planning.md
-│
 ├── Procfile
-├── .python-version
-├── .gitignore
 └── README.md
 ```
 
-The project structure separates:
-
-- Django project configuration.
-- Core application functionality.
-- News functionality and external API integrations.
-- Frontend templates and static resources.
-- Documentation and planning files.
-- Deployment configuration.
-
-The `core` application provides the foundation for general site functionality, while the `news` application manages technology news features and category-based content.
-
-The `news/services` package separates external API communication and supporting logic from Django views:
-
-- `currents.py` handles communication with the Currents API and processes external news data.
-- `cache.py` provides caching functionality to reduce unnecessary external API requests and improve reliability.
-
-This separation keeps Django views focused on handling requests and rendering responses while allowing API integrations and utility logic to be maintained independently.
-
-The frontend directory currently organises Django template resources and static assets separately from backend logic. This structure also prepares the project for a future React frontend migration while allowing Django Templates to remain the current presentation layer.
+`core` handles general site pages. `news` handles article fetching and category logic. The `news/services` package keeps Currents API calls and caching logic out of the views — views just call the service functions and render a template.
 
 ---
 
-# 5. Frontend Implementation
+# 3. Backend
 
-NodeNexus uses Django Templates as the current presentation layer, with Bootstrap, custom CSS, and JavaScript providing the layout, styling, and interactive functionality.
+## Views and URL routing
 
-Current frontend implementation includes:
+Each category page (AI, cybersecurity, gaming, trending) and the search results page has a view that: reads the requested page number from the URL, calls the relevant service function, falls back to a valid page if the requested one is empty, and renders the template.
 
-- Shared `base.html` template with reusable components for navigation, footer, search, article cards, and category sections.
-- Homepage hero section with branding, project description, and search functionality.
-- Category pages for AI, Cybersecurity, Gaming, and Trending technology.
-- Search results page using reusable article cards.
-- Responsive layouts for desktop, tablet, and mobile devices.
-- Custom glass UI design with a deep-space background and cyan accents.
-- Dark/light theme support using CSS variables.
-- Mobile bottom navigation and off-canvas menu.
-- Responsive horizontal article carousels on tablet and mobile while maintaining the desktop grid layout.
-- Responsive related-article carousel with mobile card sizing and overflow handling.
-- Fallback images for articles with missing or failed images.
-
-Bootstrap provides the core layout and responsive utilities, while custom CSS controls NodeNexus-specific styling, branding, themes, spacing, and responsive refinements.
-
-Reusable templates and components reduce duplication and keep the frontend consistent across the application. The frontend remains separated from backend logic, providing a foundation for a future React frontend.
+A shared `get_page_articles` helper handles the "requested page has no results, step back until one does" logic so it isn't repeated in every view.
 
 ---
 
-# 6. Database Configuration
+## Currents API service
 
-NodeNexus uses PostgreSQL as the primary database system.
+`currents.py` handles all communication with the Currents API: building the request, processing the response into a consistent article format, and returning `has_next` so views know whether another page exists.
 
-PostgreSQL was selected to provide a production-ready relational database environment and to support future expansion of the application.
-
-## PostgreSQL Setup
-
-The project was migrated from Django's default SQLite database to PostgreSQL.
-
-Configuration includes:
-
-- PostgreSQL database integration through Django settings.
-- Environment variables for database credentials.
-- Database connection management through Django ORM.
-- Separate development and production database configuration.
-
-Sensitive database information is stored outside the source code using environment variables.
+The Currents API doesn't return a total result count, so pagination can't use a normal "page X of Y" approach — instead, each request returns whether a next page is available, and the app works page-by-page from there. In practice, and from testing, results are capped at five pages per query.
 
 ---
 
-## Development Database
+## Caching
 
-During development, NodeNexus uses a local PostgreSQL database for testing and building application functionality.
-
-The development environment allows:
-
-- Running Django migrations.
-- Testing database connections.
-- Developing models and application logic.
-- Verifying backend functionality before deployment.
+`cache.py` provides a TTL-based cache in front of the Currents API calls, so repeated requests for the same query/page don't hit the external API every time. This reduces API usage and makes the app more resilient to slow or inconsistent API responses.
 
 ---
 
-## Production Database
+## Content filtering
 
-The production environment uses PostgreSQL hosted through Render.
-
-The deployed application connects to the production database using environment variables configured through the hosting platform.
-
-This keeps database credentials secure while allowing the same Django configuration structure to be used across development and production environments.
-
----
-
-## Django Migrations
-
-Django migrations are used to manage database schema changes.
-
-Current migration workflow includes:
-
-- Creating migrations when models are updated.
-- Applying migrations through Django management commands.
-- Keeping database structure synchronised with application changes.
-
-The current database foundation is prepared for future NodeNexus features including articles, categories, user profiles, bookmarks, and other application models.
+Before articles are shown, low-quality results are filtered out:
+- A domain exclusion list removes known low-value sources (forum threads, raw vulnerability database dumps).
+- Auto-generated CVE announcement titles are filtered out, while genuine articles that reference a CVE number in a proper headline are kept.
+- Duplicate articles are removed.
 
 ---
 
-# 7. Django Features Implemented
+# 4. Frontend
 
-NodeNexus currently uses Django features to provide the application foundation and connect backend functionality with the frontend presentation layer.
+## Templates
 
-## Django Application Structure
-
-The project is organised using separate Django applications:
-
-- `core` handles general site functionality.
-- `news` handles technology news features and external API integration.
-
-This separation keeps different areas of functionality organised into independent Django applications.
+`base.html` holds the shared site structure (nav, footer, theme switching, static/JS loading). Individual pages extend it. Shared UI pieces (article cards, navbar, footer, search bar, category sections) live in `components/` and get included where needed, so changing one component updates it everywhere it's used.
 
 ---
 
-## Django Views
+## Styling
 
-Django views handle incoming requests and prepare data before rendering templates.
-
-Current views provide:
-
-- Homepage content.
-- Technology category pages.
-- Search functionality.
-- News data processing through service modules.
-
-The views remain focused on handling requests and responses, while external API communication and utility logic are separated into the `services` package.
+Bootstrap handles the responsive grid and base components. Custom CSS on top of that controls the NodeNexus look: a deep-space background with cyan accents, glass-style translucent panels, and dark/light theme support via CSS variables.
 
 ---
 
-## News Service Integration
+## Search
 
-The `news` application contains service modules responsible for external data processing.
+- A search bar with live autocomplete, calling a dedicated endpoint that returns matching article titles as JSON.
+- Input is debounced to avoid firing a request on every keystroke.
+- A stale-response guard tracks the most recent query and discards any autocomplete response that doesn't match it, so a slow earlier request can't overwrite a newer one on screen.
 
-Current services include:
-
-- Currents API integration.
-- API response handling.
-- Caching functionality.
-
-This allows external API logic to remain separate from Django views and improves maintainability.
-
----
-
-## Template Rendering
-
-Django's template engine is used to render dynamic pages.
-
-Implemented features include:
-
-- Passing backend data into templates.
-- Rendering category-specific content.
-- Reusing shared template components.
-- Displaying API-generated article data through the frontend.
-
----
-
-# 8. Completed Features
-
-The current NodeNexus implementation includes the following completed features:
-
-## News Aggregation
-
-- Integration with the Currents API for retrieving technology news content.
-- Processing of external API responses into a consistent article format.
-- Category-based news sections for:
-  - Artificial Intelligence.
-  - Cybersecurity.
-  - Gaming.
-  - Trending technology.
-
----
-
-## Search Functionality
-
-- Global search functionality available from the main interface.
-- Search results page displaying matching articles.
-- Reusable article cards used for displaying search results.
-
----
-
-## Search Autocomplete
-
-- Live search suggestions implemented through a dedicated `auto_complete` endpoint, returning matching article titles as JSON.
-- Debounced input handling to reduce unnecessary requests while typing.
-- A stale-response guard was added to discard out-of-order API replies, preventing earlier partial queries from overwriting more recent search results.
-- Category pages (AI, Cybersecurity, Gaming, Trending) now render live articles fetched directly from the Currents API, replacing the previous placeholder templates.
-
----
-
-## Content Quality Filtering
-
-- Low-quality and duplicate articles are filtered from API results before display.
-- A domain exclusion list removes known low-value sources such as forum
-  threads and raw vulnerability database dumps.
-- Articles with titles that are auto-generated CVE announcements are
-  filtered out, while genuine journalism that references a CVE number
-  within a proper headline is retained.
+```javascript
+if (latestQuery !== query) return; 
+```
 
 ---
 
 ## Pagination
 
-- Custom API-driven pagination implemented across the AI, Cybersecurity, Gaming, Trending, and Search Results pages.
-- Pagination uses previous/next navigation and a current-page indicator instead of relying on a known total number of results.
-- `currents.py` handles page requests and returns `has_next` alongside filtering, deduplication, and caching.
-- `core/views.py` and `news/views.py` validate requested pages and redirect invalid or unavailable pages appropriately.
-- Search pagination preserves the active search query.
-- Responsive pagination styling was added to match the NodeNexus theme.
+Pagination controls show up to five numbered page buttons (matching the Currents API's five-page cap) plus previous/next arrows, with the current page highlighted.
+
+Layout is responsive:
+- **Desktop:** arrows sit on either side of the five page number buttons.
+- **Tablet and smaller:** the five page buttons stay on top, with the previous/next arrows moved underneath as their own row.
+- Buttons scale down in size on narrower screens to avoid crowding.
+
+The same pagination component is used across the category pages and search results, and search pagination preserves the active query string.
+
+## Homepage and article layout
+
+The homepage article grid is a three-column layout on desktop. On tablet and mobile it switches to a horizontal scrolling carousel instead of stacking into a single column, so users can swipe through articles rather than scroll a long vertical list.
+
+The article detail page has a "related articles" section that uses the same horizontal carousel pattern on tablet and mobile, with related articles matched by comparing the first three words of each article title. This can sometimes return non-tech results, however this is expected when working with external APIs.
+
+```python
+related_query = " ".join(title_words[:3])
+```
+
+## Responsive Design
+
+Getting Bootstrap and the custom CSS to work consistently across different screen sizes required ongoing testing and adjustments as new features were added. Components such as the mobile navigation, article carousels, pagination, article cards, and article detail layout each required responsive styling to maintain a consistent appearance and layout across desktop, tablet, and mobile devices.
+
+The homepage uses a desktop grid layout that changes to a horizontal carousel on smaller screens, while related articles also use a responsive horizontal carousel. Pagination controls, navigation elements, spacing, card sizes, and typography adjust at different screen sizes to maintain usability.
+
+Responsive testing was carried out across different viewport widths using browser developer tools and physical device testing. This helped identify and resolve layout, spacing, sizing, and overflow issues that were not always visible at standard desktop and mobile breakpoints.
+
+Other responsive features include the mobile bottom navigation bar, off-canvas mobile menu, responsive article cards, and fallback images for articles with missing or broken images.
 
 ---
 
-## Frontend Interface
+# 5. Database
 
-- Responsive homepage and category page layouts.
-- Reusable template components for articles, navigation, search, and category sections.
-- Fallback images for missing or failed article images.
-- Mobile bottom navigation with active-page indication.
-- Dark/light theme support and glass-style UI.
-- Responsive horizontal article carousels on tablet and mobile while retaining the desktop layout.
-- Responsive related-article carousel with viewport-based card sizing to prevent clipping on smaller screens.
-- Refined mobile card spacing, sizing, and overflow behaviour across different viewport widths.
+NodeNexus uses PostgreSQL instead of Django's default SQLite, for a more production-realistic setup and to support future features like user accounts, bookmarks, and comments. Credentials are kept in environment variables rather than in the codebase. Development and production use separate PostgreSQL databases, both accessed through the same Django ORM configuration.
+
+No custom models exist yet beyond Django's defaults — the database is set up and connected, ready for the article/bookmark/user models planned next.
 
 ---
 
-## API Reliability Features
+# 6. Completed Features
 
-- API response caching implemented to reduce unnecessary external requests and improve reliability.
-- External API failures and repeated requests are mitigated through the service-layer caching system.
+- **News aggregation:** Currents API integration with category pages for AI, cybersecurity, gaming, and trending tech.
+- **Search:** global search with a results page, plus live autocomplete with debouncing and stale-response handling.
+- **Content filtering:** domain exclusion list, CVE-title filtering, and deduplication.
+- **Pagination:** five-button numbered pagination with previous/next arrows, responsive layout, applied across category and search pages.
+- **Article detail pages:** full article view with a larger image, a link to the original article, and a related-articles carousel.
+- **Responsive frontend:** desktop grid / mobile carousel layouts, mobile bottom nav, off-canvas menu, fallback images.
+- **Theming:** dark/light mode via CSS variables.
+- **Caching:** TTL cache in front of the Currents API to cut down on repeat requests.
+- **Deployment setup:** Render hosting, PostgreSQL, Gunicorn, WhiteNoise for static files.
 
----
-
-## Development Foundation
-
-- Django project configured with environment-based settings.
-- PostgreSQL integration completed.
-- Render deployment configuration prepared.
-- Production static file handling configured using WhiteNoise.
-
----
-
-# 9. Current Limitations
-
-The current NodeNexus implementation provides the core foundation for a technology news platform; however, some areas may require further refinement as development continues.
-
-## External API Dependency
-
-The application currently relies on external APIs for retrieving news content.
-
-Potential challenges include:
-
-- API availability and response reliability.
-- Changes to external API structures.
-- Rate limits and request restrictions.
-- Ensuring consistent article formatting when processing external data.
-
-The service layer and caching system reduce dependency issues, but external data sources remain outside of direct application control.
+Not yet built: authentication, user profiles, bookmarks, comments, and the inbox/messaging system.
 
 ---
 
-## Article Data Processing
+# 7. Current Limitations
 
-External news data may vary between sources and requires normalisation before being displayed.
-
-Potential improvements include:
-
-- More advanced duplicate detection.
-- Better handling of missing article fields.
-- Improved filtering of low-quality or irrelevant content.
+- The app depends entirely on the Currents API — if it's slow, rate-limited, or changes its response format, that directly affects the site. Caching helps but doesn't remove the dependency.
+- Article data from the API isn't perfectly consistent (missing fields, occasional thin category results), so some normalisation and filtering will likely need further tuning.
+- Related-articles matching (first three words of the title) is a simple heuristic, not true topic matching, so results are sometimes only loosely related.
+- Article detail pages currently pass full article metadata (title, description, image, source, published date, URL) through query parameters in the URL, rather than looking articles up by an ID from the database. This works for now but is only temporary until articles are stored with proper IDs once the database models are built.
+- No user accounts yet, so there's no personalisation, bookmarking, or saved state.
 
 ---
 
-## Responsive Frontend Refinement
+# 8. Key Design Decisions
 
-The frontend currently supports desktop, tablet, and mobile layouts; however, maintaining consistent behaviour across different screen sizes requires ongoing testing.
+**Why Django** — built-in URL routing, templates, ORM, and auth (for later) meant less to build from scratch compared to Flask, which was used on earlier projects.
 
-Potential challenges include:
+**Why PostgreSQL** — more production-realistic than SQLite, and better suited to the relational data coming later (users, bookmarks, comments).
 
-- Bootstrap component interactions with custom CSS.
-- Managing complex responsive layouts.
-- Preventing styling conflicts between framework utilities and custom designs.
+**Why separate `backend/` and `frontend/`** — keeps Django logic and frontend templates/assets cleanly split, so a future React frontend can be added without reorganising the backend.
 
----
+**Why previous/next pagination instead of numbered totals** — the Currents API doesn't report a total result count, so a traditional "page X of Y" approach wasn't possible. Since results are capped at five pages, a fixed five-button layout was used instead of calculating a page range.
 
-## Frontend and Backend Scaling
-
-The current Django Template architecture provides a maintainable foundation, but larger application growth may require additional architectural changes.
-
-Potential considerations include:
-
-- Increasing separation between frontend and backend logic.
-- Optimising API requests as content volume increases.
-- Maintaining reusable components as more features are introduced.
+**Why a service layer for the API** — keeping `currents.py` and `cache.py` separate from the views means the views stay focused on handling requests, and the API/caching logic can be tested and changed independently.
 
 ---
 
-## Static Asset Management
+# 9. Deployment
 
-Production static file handling is configured using Django staticfiles and WhiteNoise, but deployment environments require careful management of asset updates.
+NodeNexus is deployed on Render, with Gunicorn as the WSGI server and PostgreSQL as the database, both hosted on Render.
 
-Potential challenges include:
+Static files are handled differently depending on environment:
+- In development (`DEBUG=True`), Django serves static files directly.
+- In production (`DEBUG=False`), WhiteNoise serves collected static files, and `CompressedManifestStaticFilesStorage` generates versioned filenames so updated CSS/JS don't get served from stale browser caches.
 
-- Ensuring updated CSS and JavaScript files are correctly collected during deployment.
-- Avoiding stale cached assets after changes.
-- Maintaining reliable static file versioning.
-
----
-
-# 10. Key Design Decisions
-
-## Why Django
-
-Django was selected as the backend framework because it provides a structured development environment with built-in features including URL routing, template rendering, authentication support, security features, and database management through the Django ORM.
-
-Using Django allows NodeNexus to be developed with a clear separation between backend logic, database functionality, and frontend presentation while providing a strong foundation for future expansion.
+Deployment flow: push to GitHub → Render pulls the update → installs dependencies → runs `collectstatic` → Gunicorn starts the app → app connects to the production database. Secrets (Django secret key, database credentials, API keys) are all set as environment variables on Render, not committed to the repo.
 
 ---
 
-## Why PostgreSQL
+# 10. Challenges and Solutions
 
-PostgreSQL was selected instead of Django's default SQLite database because it provides a more production-ready relational database system.
+**Bootstrap vs custom CSS conflicts** — Bootstrap's default grid and component styles sometimes fought with the custom glass UI design. Fixed by using Bootstrap for layout structure only, and custom CSS/media queries for anything branding- or spacing-related.
 
-PostgreSQL offers better scalability, reliability, and support for future application features including user accounts, article storage, bookmarks, comments, and personalised content.
+**Static files not updating after deployment** — CSS changes weren't showing up after deploy because old cached static files were still being served. This came down to understanding how WhiteNoise and `CompressedManifestStaticFilesStorage` version filenames — running `collectstatic` properly and letting the manifest generate new filenames fixed it.
 
----
+**Currents API has no total result count** — Django's built-in `Paginator` needs a known total, which the API doesn't provide, and using it led to broken/stuck pagination. Solved by switching to a `has_next`-based approach: fetch a page, check if another exists, and let the view decide whether to render or redirect. Since the API caps out around five pages per query, pagination was later simplified further to a fixed five-button layout instead of computing a page range.
 
-## Why Frontend Separation
+**Autocomplete race condition** — Typing quickly could fire multiple autocomplete requests, and a slower earlier request would sometimes resolve after a newer one, overwriting correct results with stale ones. Fixed by tracking the latest submitted query and discarding any response that doesn't match it.
 
-Frontend resources are organised separately from backend functionality to improve maintainability and project structure.
+**Autocomplete dropdown rendering behind other content** — despite a high `z-index`, the dropdown appeared behind later page sections. Caused by `backdrop-filter` on sibling elements creating their own stacking contexts, which isolates `z-index` comparisons within that context. Fixed by giving the hero section `position: relative` with an explicit `z-index` so its contents (including the dropdown) stack above later sections.
 
-The current application uses Django Templates as the presentation layer, while frontend assets are organised independently to allow future migration to React without requiring a complete project restructure.
+**Article detail page not loading with just a URL param** — the initial approach passed only the article URL through the query string and tried to look the article back up from that, which didn't work reliably since the API doesn't support fetching a single article by URL. Solved by passing the full article data (title, description, image, published date, source, URL) through query parameters instead, so the detail view builds the article directly from what's in the request rather than re-fetching it. Related articles are then generated by searching on the first three words of the title and filtering out the current article from the results.
 
-This approach keeps backend logic, templates, styling, and JavaScript responsibilities separated.
-
----
-
-## Frontend Design Choices
-
-NodeNexus uses a technology-focused visual identity based around a deep-space theme with cyan accents and glass-style interface elements.
-
-The design choices include:
-
-- A responsive layout system supporting desktop, tablet, and mobile devices.
-- Reusable UI components to maintain consistency across pages.
-- Bootstrap for responsive layout utilities and component structure.
-- Custom CSS for branding, themes, animations, and unique interface styling.
-- JavaScript for interactive frontend behaviour such as theme switching and navigation features.
-
-The frontend design aims to create a modern developer-focused interface while maintaining usability and consistency across the application.
+**Carousel not activating on mobile landscape** — the homepage still showed the desktop grid instead of the carousel on a mobile device in landscape orientation. Traced to the device's landscape width being wider than the `768px` breakpoint the carousel styling was scoped to. Rather than adding another breakpoint, the carousel rules were moved into the existing `max-width: 992px` section, which already covers tablet and landscape-mobile widths.
 
 ---
 
-# 11. Deployment
+# 11. What Was Learned
 
-NodeNexus is configured for deployment using Render as the hosting platform.
-
-The deployment architecture includes:
-
-- Render Web Service hosting the Django application.
-- PostgreSQL database hosted through Render.
-- Gunicorn as the production WSGI server.
-- WhiteNoise for production static file serving.
-- Environment variables for production configuration.
-- GitHub integration for deployment updates.
-
----
-
-## Static Files Configuration
-
-Static files are managed using Django's staticfiles framework.
-
-During development, Django serves static assets normally through the development server.
-
-For production deployment:
-
-- `DEBUG=False` enables production static file handling.
-- WhiteNoise middleware serves collected static files.
-- `CompressedManifestStaticFilesStorage` creates versioned static filenames to improve caching and asset reliability.
+- Structuring a Django project using apps, views, templates, and a separate services layer.
+- Understanding separation of responsibilities by keeping API requests and caching outside of Django views.
+- Working with external APIs and adapting the application around their limitations, including missing total result counts, inconsistent results, and limited ways to identify individual articles.
+- Designing pagination around the capabilities of the external API rather than assuming Django's built-in pagination tools would be suitable.
+- Combining Bootstrap with custom CSS to create responsive layouts while keeping control over the application's design.
+- Understanding how responsive layouts, breakpoints, overflow, and viewport sizes affect different devices.
+- Understanding CSS stacking contexts and why `z-index` alone does not always control which elements appear above others.
+- Debugging problems by testing different parts of the application and investigating the actual cause rather than assuming the first solution will work.
+- Working with temporary solutions while the database structure is still being developed, such as passing article data through URLs.
+- Making practical development decisions when a perfect solution is not necessary, such as using relevant title keywords for related articles instead of trying to achieve perfect article matching.
+- Gaining a better understanding of how the frontend, Django backend, external APIs, and deployment environment work together as one application.
 
 ---
 
-## collectstatic Process
+# 12. Next Steps
 
-The Django `collectstatic` command is used during deployment to gather all static assets into the production static directory.
-
-This process collects:
-
-- Custom CSS files.
-- JavaScript files.
-- Images.
-- Branding assets.
-- Third-party static resources.
-
-A key deployment consideration was understanding how static file caching affects updates. Changes to CSS and frontend assets may not appear immediately if previous cached versions are still being served. Updating the collected static files and ensuring new manifest versions are generated resolves these issues.
+- Authentication and user profiles.
+- Bookmarks (saved articles), comments, and the inbox/messaging system required by the assignment brief.
+- Continued testing and bug fixes on API result consistency (some categories occasionally return fewer than 12 articles).
+- Eventual migration to a React frontend with a DRF API layer — models and the service layer are expected to carry over largely unchanged.
 
 ---
 
-## Gunicorn Configuration
-
-Gunicorn is used as the production WSGI server to run the Django application.
-
-The deployment configuration uses:
-
-- Django WSGI application entry point.
-- Gunicorn worker process management.
-- Render start commands for production execution.
-
----
-
-## Render Deployment Workflow
-
-The deployment workflow follows:
-
-1. Code changes are pushed to GitHub.
-2. Render detects repository updates.
-3. Dependencies are installed from `requirements.txt`.
-4. Django collects static files using `collectstatic`.
-5. Gunicorn starts the Django application.
-6. The application connects to the production PostgreSQL database.
-
-Environment variables are configured through Render to provide:
-
-- Django secret key.
-- Database credentials.
-- API keys.
-- Production configuration values.
-
-This deployment structure provides a production-ready workflow while maintaining separate development and production environments.
-
----
-
-# 12. Challenges Faced and Solutions
-
-During the development of NodeNexus, several technical challenges were encountered across backend development, frontend implementation, static file management, API integration, and deployment.
-
----
-
-## Frontend Layout and Bootstrap Integration
-
-One of the main frontend challenges was balancing Bootstrap's built-in layout system with custom CSS styling.
-
-Bootstrap provided useful responsive utilities and grid functionality, but some default behaviours conflicted with the custom NodeNexus design system. This required adjustments to:
-
-- Container sizing.
-- Grid behaviour.
-- Component spacing.
-- Navigation layouts.
-- Card positioning.
-- Responsive breakpoints.
-
-Custom CSS media queries were introduced alongside Bootstrap utilities to provide more control over desktop, tablet, and mobile layouts.
-
-The final approach was to use Bootstrap for general structure while allowing custom CSS to control branding, appearance, and specific component behaviour.
-
----
-
-## Responsive Design Challenges
-
-Creating a consistent experience across different screen sizes required additional testing and refinement.
-
-Challenges included:
-
-- Mobile navigation positioning.
-- Preventing content from being hidden behind the bottom navigation bar.
-- Maintaining article card layouts across different screen sizes.
-- Implementing horizontal article carousels for smaller screens.
-- Maintaining the existing desktop grid layout while introducing mobile carousel behaviour.
-- Handling different viewport widths without unnecessarily changing the overall page structure.
-- Preventing related article cards from being clipped by their containing carousel on mobile.
-- Maintaining visibility of article images, titles, and action buttons within responsive cards.
-
-These issues were resolved through custom media queries, responsive spacing adjustments, and testing across different device sizes.
-
----
-
-## Static Files, collectstatic, and CSS Caching
-
-Static file management created challenges during development and deployment.
-
-A major issue occurred where CSS changes appeared not to update after deployment because previously collected static files were still being served from cache.
-
-The solution involved understanding Django's static file pipeline:
-
-- Development static handling when `DEBUG=True`.
-- Production static collection through `collectstatic`.
-- WhiteNoise static file serving when `DEBUG=False`.
-- Manifest-based static file versioning through `CompressedManifestStaticFilesStorage`.
-
-This highlighted the importance of understanding how browsers, Django staticfiles, and production asset handling interact.
-
----
-
-## External API Integration
-
-Integrating external news APIs required handling differences between external data sources and the NodeNexus application structure.
-
-Challenges included:
-
-- Processing external API responses.
-- Converting API data into a consistent article format.
-- Handling missing or inconsistent data fields.
-- Reducing unnecessary API requests.
-
-The solution was creating a dedicated services layer separate from Django views.
-
-The `news/services` package separates API communication and supporting logic:
-
-- `currents.py` handles external API requests and data processing.
-- `cache.py` manages temporary API response caching.
-
-This keeps views focused on handling requests and rendering responses.
-
----
-
-## API Usage and Caching
-
-External APIs introduced challenges around request limits, reliability, and repeated calls.
-
-A caching system was introduced to:
-
-- Reduce unnecessary API requests.
-- Improve response times.
-- Protect API usage limits.
-- Provide more reliable behaviour during repeated searches.
-
-The caching system will continue to be refined as more API functionality is added.
-
----
-
-## Search System Development
-
-Building a unified search system required additional planning because different search queries may require different handling.
-
-The search system required:
-
-- Processing user search input.
-- Determining the correct API pipeline.
-- Normalising API responses.
-- Displaying results through reusable components.
-
-The current structure separates search-related logic from views, allowing the system to be expanded and improved.
-
----
-
-## Autocomplete Race Conditions
-
-Implementing live search suggestions introduced a race condition: multiple autocomplete requests could be in flight simultaneously as a user typed, and slower earlier requests occasionally resolved after faster, more recent ones. This caused outdated results to visually overwrite correct ones.
-
-The solution was tracking the most recently submitted query and discarding any response that did not match it upon arrival, ensuring only the latest keystroke's results are ever rendered.
-
----
-
-## CSS Stacking Context Issues
-
-The autocomplete dropdown initially rendered behind other page sections despite having a high `z-index`. This was caused by `backdrop-filter` properties on sibling elements creating independent stacking contexts, which isolate `z-index` comparisons to within that context rather than the whole page. The fix involved explicitly establishing a stacking context on the hero section with `position: relative` and an appropriate `z-index`, allowing its contents, including the dropdown, to render above later sections.
-
----
-
-## Pagination Implementation
-
-Pagination was implemented around the limitations of the Currents API rather than relying on Django's built-in `Paginator`.
-
-The initial implementation encountered several issues because the external API did not provide a reliable total result count. This made traditional numbered pagination unsuitable.
-
-The final implementation uses the requested API page together with a `has_next` value returned by the news service.
-
-The backend was updated so that:
-
-- `currents.py` handles page-based API requests and determines whether another page is available.
-- `core/views.py` and `news/views.py` retrieve and validate the requested page.
-- Invalid or unavailable page requests are redirected to the last valid page.
-- Search queries are preserved when navigating between pages.
-- Pagination controls display previous/next navigation and the current page rather than attempting to calculate an unreliable total number of pages.
-
-The frontend pagination controls were styled to match the NodeNexus design system and remain responsive on smaller screens.
-
----
-
-## Deployment Configuration
-
-Deployment introduced challenges around configuring Django correctly for a production environment.
-
-Issues included:
-
-- Managing environment variables.
-- Configuring allowed hosts.
-- Preparing Gunicorn.
-- Handling static files correctly.
-- Separating development and production settings.
-
-These were resolved by introducing environment-based configuration and separating development behaviour from production deployment requirements.
-
----
-
-## Project Structure and Code Organisation
-
-As NodeNexus expanded, maintaining a clean structure became increasingly important.
-
-The project was reorganised to separate:
-
-- Django configuration.
-- Core application functionality.
-- News and API functionality.
-- Frontend templates and static resources.
-
-Creating dedicated service modules helped prevent API logic and utility functions from becoming mixed with Django views.
-
----
-
-# 13. What Was Learned So Far
-
-Developing NodeNexus has strengthened understanding of building a full-stack Django application and the relationship between backend systems, frontend design, APIs, databases, and deployment.
-
-Key areas learned include:
-
-- Structuring a Django project using apps, views, templates, services, and reusable components.
-- Integrating external APIs while keeping API logic separated from Django views.
-- Implementing caching to reduce unnecessary API requests and improve reliability.
-- Designing pagination around the limitations of an external API rather than relying on a known total result count.
-- Keeping pagination logic within the service layer while Django views handle request validation and navigation.
-- Combining Bootstrap with custom CSS to build responsive layouts while preserving existing functionality.
-- Understanding how container widths, spacing, gaps, and overflow affect responsive layouts.
-- Using targeted media queries to solve specific responsive issues.
-- Debugging real-world issues across the backend, frontend, APIs, static files, and deployment.
-
-The project has improved understanding of separation of concerns, reusable structures, responsive design, and building applications that can be expanded over time.
-
----
-
-# 14. Next Steps
-
-The next stages of NodeNexus development will focus on completing the core application functionality and improving the overall user experience.
-
-Planned next steps include:
-
-- Adding article detail pages for expanded article information and user interactions.
-- Implementing database models and migrations for articles, categories, users, bookmarks, and related features.
-- Developing authentication and user profile functionality.
-- Adding bookmarking and personalised user features.
-- Expanding frontend interactivity using JavaScript.
-- Testing application functionality and improving reliability.
-- Preparing the project for future React frontend migration.
-
-Development will continue incrementally, prioritising core functionality before adding additional features.
-
----
-
-# 15. References
-
-The following documentation sources were used throughout the development of NodeNexus:
-
-## Frameworks and Backend
-
-- Django Documentation  
-  https://docs.djangoproject.com/en/6.0/
-
-- Django Static Files Documentation  
-  https://docs.djangoproject.com/en/6.0/howto/static-files/
-
-- Django Templates Documentation  
-  https://docs.djangoproject.com/en/6.0/topics/templates/
-
-- Django Pagination Documentation  
-  https://docs.djangoproject.com/en/6.0/topics/pagination/
-
-- Django Models and Migrations Documentation  
-  https://docs.djangoproject.com/en/6.0/topics/db/models/
-
-- Django Authentication Documentation  
-  https://docs.djangoproject.com/en/6.0/topics/auth/
-
----
-
-## Frontend Development
-
-- Bootstrap Documentation  
-  https://getbootstrap.com/docs/
-
-- MDN Web Documentation (HTML, CSS, JavaScript references)  
-  https://developer.mozilla.org/
-
-- CSS Media Queries Documentation  
-  https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_media_queries
-
-- JavaScript Documentation  
-  https://developer.mozilla.org/en-US/docs/Web/JavaScript
-
----
-
-## Database
-
-- PostgreSQL Documentation  
-  https://www.postgresql.org/docs/
-
-- Django PostgreSQL Database Backend Documentation  
-  https://docs.djangoproject.com/en/6.0/ref/databases/#postgresql-notes
-
----
-
-## Deployment and Production Configuration
-
-- WhiteNoise Documentation  
-  https://whitenoise.readthedocs.io/en/latest/
-
-- Gunicorn Documentation  
-  https://docs.gunicorn.org/
-
-- Render Documentation  
-  https://render.com/docs
-
----
-
-## API Integration
-
-- Currents API Documentation  
-  https://currentsapi.services/en/docs/
-
-- HTTP Requests Documentation  
-  https://requests.readthedocs.io/
-
----
-
-## Version Control and Development Tools
-
-- Git Documentation  
-  https://git-scm.com/doc
-
-- GitHub Documentation  
-  https://docs.github.com/
-
----
+# 13. References
+
+**Backend**
+- Django Documentation — https://docs.djangoproject.com/en/6.0/
+- Django Pagination — https://docs.djangoproject.com/en/6.0/topics/pagination/
+- Django Models and Migrations — https://docs.djangoproject.com/en/6.0/topics/db/models/
+- Django Authentication — https://docs.djangoproject.com/en/6.0/topics/auth/
+
+**Frontend**
+- Bootstrap Documentation — https://getbootstrap.com/docs/
+- MDN Web Docs — https://developer.mozilla.org/
+- CSS Media Queries — https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_media_queries
+
+**Database**
+- PostgreSQL Documentation — https://www.postgresql.org/docs/
+- Django PostgreSQL Notes — https://docs.djangoproject.com/en/6.0/ref/databases/#postgresql-notes
+
+**Deployment**
+- WhiteNoise Documentation — https://whitenoise.readthedocs.io/en/latest/
+- Gunicorn Documentation — https://docs.gunicorn.org/
+- Render Documentation — https://render.com/docs
+
+**API**
+- Currents API Documentation — https://currentsapi.services/en/docs/
+- Requests Documentation — https://requests.readthedocs.io/
+
+**Tools**
+- Git Documentation — https://git-scm.com/doc
+- GitHub Documentation — https://docs.github.com/
