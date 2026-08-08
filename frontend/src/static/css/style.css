@@ -1710,7 +1710,7 @@ a.btn:hover {
         border-radius: 10px;
     }
 
-    .article-carousel .article-card {
+    .article-carousel > .col-12 {
         flex: 0 0 95%;
         max-width: 95%;
         scroll-snap-align: start;
@@ -1937,7 +1937,7 @@ a.btn:hover {
         font-size: 2rem;
     }
 
-    .article-carousel .article-card {
+    .article-carousel > .col-12 {
         flex:0 0 100%;
         max-width:100%;
     }
@@ -1973,7 +1973,7 @@ a.btn:hover {
         font-size: 1.75rem;
     }
 
-    .article-carousel .article-card {
+    .article-carousel > .col-12 {
         flex:0 0 100%;
         max-width:100%;
         padding:0 0.5rem;
