@@ -1221,7 +1221,27 @@ a.btn:hover {
 
     border: 1px solid var(--cyan-dark);
 
-    transition: all 0.2s ease;
+    transition: all 0.2s ease-in-out;
+}
+
+.pagination:has(.pagination-number:not(.current-page):hover) .current-page {
+
+    background: #2b2b2b;
+    
+    color: var(--cyan);
+}
+
+.pagination-number:hover {
+
+    background: var(--cyan);
+
+    color: var(--content-text);
+
+    transform: translateY(-3px);
+
+    box-shadow: 0 0 12px rgba(0,184,230,.35);
+
+    border-color: var(--cyan-dark);
 }
 
 .current-page {
@@ -1233,22 +1253,8 @@ a.btn:hover {
     border-color: var(--cyan);
 
     font-weight: bold;
-
-    font-size: 1.25rem;
 }
 
-.current-page:hover {
-    
-    background: var(--cyan);
-
-    color: var(--content-text);
-
-    transform: translateY(-3px);
-
-    box-shadow: 0 0 12px rgba(0,184,230,.35);
-
-    border-color: var(--cyan-dark);
-}
 
 .page-label {
 
@@ -1760,6 +1766,7 @@ a.btn:hover {
         max-width:100%;
         box-sizing:border-box;
     }
+
 }
 
 @media (max-width: 600px) {
@@ -1810,6 +1817,19 @@ a.btn:hover {
 
     .article-detail-section {
         padding:1rem;
+    }
+
+    .pagination {
+        flex-wrap: wrap;
+    }
+
+    .pagination-link {
+        order: 2;
+        margin:1rem;
+    }
+
+    .pagination-number {
+        order: 1;
     }
 }
 
@@ -1862,6 +1882,15 @@ a.btn:hover {
 
     .article-section-title {
         font-size: 2.2rem;
+    }
+
+    .pagination-number {
+        width: 50px;
+        padding: 0.75rem;
+    }
+
+    .pagination-link {
+        padding: 0.75rem 1.25rem;
     }
 }
 
@@ -1971,6 +2000,15 @@ a.btn:hover {
 
     #suggestions {
         font-size: 0.9rem;
+    }
+
+    .pagination-number {
+        width: 40px;
+        padding: 0.65rem;
+    }
+
+    .pagination-link {
+        padding: 0.65rem 1rem;
     }
 
     p.footer-text {

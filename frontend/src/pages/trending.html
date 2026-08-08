@@ -81,11 +81,13 @@ Trending | NodeNexus
         </a>
     {% endif %}
 
-
-    <span class="pagination-number current-page" title="Current Page">
-        {{ page }}
-    </span>
-
+    {% for p in "12345" %}
+        <a href="?page={{ forloop.counter }}"
+        class="pagination-number {% if page == forloop.counter %}current-page{% endif %}"
+        {% if page == forloop.counter %}aria-current="page"{% endif %}>
+            {{ forloop.counter }}
+        </a>
+    {% endfor %}
 
     {% if has_next %}
         <a href="?page={{ page|add:'1' }}" class="pagination-link" title="Next Page">
