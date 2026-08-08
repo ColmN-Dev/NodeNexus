@@ -1499,7 +1499,7 @@ a.btn:hover {
     display: none;
 }
 
-/* Tablet and Mobile */
+/* Tablet and Mobile Landscape */
 @media (max-width: 992px) {
 
     body {
@@ -1512,6 +1512,46 @@ a.btn:hover {
         max-width: 700px;
         gap: 1.25rem;
     }
+
+        .article-carousel {
+        display: flex;
+        flex-wrap: nowrap;
+        gap: 1rem;
+        overflow-x: auto;
+        scroll-behavior: smooth;
+        padding: 1rem 0.5rem;
+        scroll-snap-type: x mandatory;
+        scrollbar-width: auto;
+        cursor: grab;
+    }
+
+    .article-carousel::-webkit-scrollbar {
+        height: 12px;
+    }
+
+    .article-carousel::-webkit-scrollbar-thumb {
+        background: var(--cyan);
+        border-radius: 10px;
+    }
+
+    .article-carousel > .col-12 {
+        flex: 0 0 95%;
+        max-width: 95%;
+        width: 95%;
+        scroll-snap-align: start;
+    }
+
+    .article-grid .article-card {
+        padding: .75rem;
+        border-radius: 16px;
+        margin: 0;
+        width: 100%;
+    }
+
+    .article-grid .article-card img {
+        height: 180px;
+    }
+    
 
     .logo-section {
         display: flex;
@@ -1688,48 +1728,6 @@ a.btn:hover {
    ======================================== */
 
 @media (max-width: 768px) {
-
-    .article-carousel {
-        display: flex;
-        flex-wrap: nowrap;
-        gap: 1rem;
-        overflow-x: auto;
-        scroll-behavior: smooth;
-        padding: 1rem 0.5rem;
-        scroll-snap-type: x mandatory;
-        scrollbar-width: auto;
-        cursor: grab;
-    }
-
-    .article-carousel::-webkit-scrollbar {
-        height: 12px;
-    }
-
-    .article-carousel::-webkit-scrollbar-thumb {
-        background: var(--cyan);
-        border-radius: 10px;
-    }
-
-    .article-carousel > .col-12 {
-        flex: 0 0 95%;
-        max-width: 95%;
-        scroll-snap-align: start;
-    }
-
-    .article-grid {
-        gap: 1rem;
-    }
-
-    .article-grid .article-card {
-        padding: .75rem;
-        border-radius: 16px;
-        margin: 0;
-        width: 100%;
-    }
-
-    .article-grid .article-card img {
-        height: 180px;
-    }
 
     .article-section-title {
         font-size: 2.5rem;
