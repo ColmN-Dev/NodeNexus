@@ -323,5 +323,55 @@
 
     }
 
+    // ==========================
+    // PASSWORD VISIBILITY TOGGLE
+    // ==========================
+
+    function setupPasswordToggle(toggleId, inputId, iconId) {
+
+        const toggle = document.getElementById(toggleId);
+        const passwordInput = document.getElementById(inputId);
+        const eyeicon = document.getElementById(iconId);
+
+        if (!toggle || !passwordInput || !eyeicon) {
+            return;
+        }
+
+        const openIcon = toggle.dataset.open;
+        const closedIcon = toggle.dataset.closed;
+
+        toggle.addEventListener("click", () => {
+
+            if (passwordInput.type === "password") {
+
+                passwordInput.type = "text";
+
+                eyeicon.src = closedIcon;
+
+                toggle.setAttribute("aria-label", "Hide password");
+                toggle.setAttribute("aria-pressed", "true");
+                toggle.setAttribute("title", "true");
+
+            } else {
+
+                passwordInput.type = "password";
+
+                eyeicon.src = openIcon;
+
+                toggle.setAttribute("aria-label", "Show password");
+                toggle.setAttribute("aria-pressed", "false");
+                toggle.setAttribute("title", "false");
+
+            }
+
+        });
+
+    }
+
+    // Setup password toggles for the three password fields - signup password, confirm password, and login password.
+    setupPasswordToggle("togglePassword1", "id_password1", "password-eye1");
+    setupPasswordToggle("togglePassword2", "id_password2", "password-eye2");
+    setupPasswordToggle("togglePassword", "id_password", "password-eye");
+
 
 })();

@@ -1,0 +1,168 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+
+<section class="page-container">
+
+<div class="page-header">
+
+    <h1>
+        <span class="title-glass">
+            Create Account
+        </span>
+    </h1>
+
+</div>
+
+<div class="auth-form-container">
+
+    <form method="post" class="auth-form">
+
+        {% csrf_token %}
+
+        <div class="auth-form-fields">
+
+            <div class="auth-field">
+
+                {{ form.username.label_tag }}
+
+                {{ form.username }}
+
+                {% if form.username.errors %}
+                    {{ form.username.errors }}
+                {% endif %}
+
+                {% if form.username.help_text %}
+                    {{ form.username.help_text }}
+                {% endif %}
+
+            </div>
+
+
+            <div class="auth-field">
+
+                {{ form.email.label_tag }}
+
+                {{ form.email }}
+
+                {% if form.email.errors %}
+                    {{ form.email.errors }}
+                {% endif %}
+
+            </div>
+
+
+            <div class="auth-field">
+
+                {{ form.password1.label_tag }}
+
+                <div class="password-field">
+
+                    {{ form.password1 }}
+
+                    <button
+                        type="button"
+                        id="togglePassword1"
+                        class="password-toggle"
+                        data-open="{% static 'images/eye-open.svg' %}"
+                        data-closed="{% static 'images/eye-closed.svg' %}"
+                        aria-label="Show password"
+                        aria-pressed="false"
+                        title="Show password"
+                    >
+                        <img
+                            src="{% static 'images/eye-open.svg' %}"
+                            alt=""
+                            id="password-eye1"
+                        >
+                    </button>
+
+                </div>
+
+                {% if form.password1.errors %}
+                    {{ form.password1.errors }}
+                {% endif %}
+
+                {% if form.password1.help_text %}
+                    {{ form.password1.help_text }}
+                {% endif %}
+
+            </div>
+
+
+            <div class="auth-field">
+
+                {{ form.password2.label_tag }}
+
+                <div class="password-field">
+
+                    {{ form.password2 }}
+
+                    <button
+                        type="button"
+                        id="togglePassword2"
+                        class="password-toggle"
+                        data-open="{% static 'images/eye-open.svg' %}"
+                        data-closed="{% static 'images/eye-closed.svg' %}"
+                        aria-label="Show password"
+                        aria-pressed="false"
+                        title="Show password"
+                    >
+                        <img
+                            src="{% static 'images/eye-open.svg' %}"
+                            alt=""
+                            id="password-eye2"
+                        >
+                    </button>
+
+                </div>
+
+                {% if form.password2.errors %}
+                    {{ form.password2.errors }}
+                {% endif %}
+
+                {% if form.password2.help_text %}
+                    {{ form.password2.help_text }}
+                {% endif %}
+
+            </div>
+
+        </div>
+
+
+        <div class="text-center mt-4">
+
+            <button
+                type="submit"
+                class="btn nn-btn"
+                title="Sign Up"
+            >
+                Sign Up
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+
+<div class="auth-form-container text-center mt-4">
+
+    <p>
+        Already have an account?
+
+        <a
+            href="{% url 'login' %}"
+            class="nn-link"
+        >
+            Log In
+        </a>
+    </p>
+
+</div>
+
+</section>
+
+{% endblock %}
