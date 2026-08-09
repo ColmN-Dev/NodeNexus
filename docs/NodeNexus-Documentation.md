@@ -1,6 +1,6 @@
 # NodeNexus Documentation
 
-**Last updated:** August 8, 2026
+**Last updated:** August 9, 2026
 
 ---
 
@@ -159,7 +159,9 @@ Other responsive features include the mobile bottom navigation bar, off-canvas m
 
 NodeNexus uses PostgreSQL instead of Django's default SQLite, for a more production-realistic setup and to support future features like user accounts, bookmarks, and comments. Credentials are kept in environment variables rather than in the codebase. Development and production use separate PostgreSQL databases, both accessed through the same Django ORM configuration.
 
-No custom models exist yet beyond Django's defaults — the database is set up and connected, ready for the article/bookmark/user models planned next.
+The database currently includes Django's default authentication tables. User accounts created through the NodeNexus signup page are stored in PostgreSQL and can be viewed in pgAdmin.
+
+No custom models have been created yet. User profiles, bookmarks, comments, and messaging will be added later.
 
 ---
 
@@ -173,9 +175,12 @@ No custom models exist yet beyond Django's defaults — the database is set up a
 - **Responsive frontend:** desktop grid / mobile carousel layouts, mobile bottom nav, off-canvas menu, fallback images.
 - **Theming:** dark/light mode via CSS variables.
 - **Caching:** TTL cache in front of the Currents API to cut down on repeat requests.
+- **User authentication:** Django's built-in authentication system is used for signup, login, logout, password hashing, validation, and sessions.
+- **Authentication forms:** Custom signup and login pages with Django form validation, inline errors, and password visibility toggles.
+- **Authentication navigation:** Signup, login, and logout links have been added to the desktop and mobile navigation.
 - **Deployment setup:** Render hosting, PostgreSQL, Gunicorn, WhiteNoise for static files.
 
-Not yet built: authentication, user profiles, bookmarks, comments, and the inbox/messaging system.
+Not yet built: user profiles, bookmarks, comments, and the inbox/messaging system.
 
 ---
 
@@ -185,13 +190,15 @@ Not yet built: authentication, user profiles, bookmarks, comments, and the inbox
 - Article data from the API isn't perfectly consistent (missing fields, occasional thin category results), so some normalisation and filtering will likely need further tuning.
 - Related-articles matching (first three words of the title) is a simple heuristic, not true topic matching, so results are sometimes only loosely related.
 - Article detail pages currently pass full article metadata (title, description, image, source, published date, URL) through query parameters in the URL, rather than looking articles up by an ID from the database. This works for now but is only temporary until articles are stored with proper IDs once the database models are built.
-- No user accounts yet, so there's no personalisation, bookmarking, or saved state.
+- User authentication is implemented, but user-specific features such as profiles, bookmarking, comments, and messaging have not been built yet.
 
 ---
 
 # 8. Key Design Decisions
 
-**Why Django** — built-in URL routing, templates, ORM, and auth (for later) meant less to build from scratch compared to Flask, which was used on earlier projects.
+**Why Django** — built-in URL routing, templates, ORM, and authentication meant less to build from scratch compared to Flask, which was used on earlier projects.
+
+**Why Django authentication** — Django handles account creation, password hashing, password validation, login, logout, and sessions out of the box. This avoids having to build security-sensitive authentication features from scratch.
 
 **Why PostgreSQL** — more production-realistic than SQLite, and better suited to the relational data coming later (users, bookmarks, comments).
 
@@ -231,6 +238,8 @@ Deployment flow: push to GitHub → Render pulls the update → installs depende
 
 **Carousel not activating on mobile landscape** — the homepage still showed the desktop grid instead of the carousel on a mobile device in landscape orientation. Traced to the device's landscape width being wider than the `768px` breakpoint the carousel styling was scoped to. Rather than adding another breakpoint, the carousel rules were moved into the existing `max-width: 992px` section, which already covers tablet and landscape-mobile widths.
 
+**Authentication frontend integration** — Django handled most of the backend authentication logic, including account creation, password validation, login, logout, and sessions. The main work was integrating the forms into the existing NodeNexus design, including custom styling, password visibility toggles, and responsive authentication links in the navbar.
+
 ---
 
 # 11. What Was Learned
@@ -246,12 +255,16 @@ Deployment flow: push to GitHub → Render pulls the update → installs depende
 - Working with temporary solutions while the database structure is still being developed, such as passing article data through URLs.
 - Making practical development decisions when a perfect solution is not necessary, such as using relevant title keywords for related articles instead of trying to achieve perfect article matching.
 - Gaining a better understanding of how the frontend, Django backend, external APIs, and deployment environment work together as one application.
+- Using Django's built-in authentication system for user signup, login, logout, password validation, and sessions.
+- Understanding how Django forms handle validation and display errors directly in templates.
+- Connecting Django authentication to a custom frontend rather than using Django's default styling.
+- Adding custom JavaScript functionality to Django forms, such as password visibility toggles.
 
 ---
 
 # 12. Next Steps
 
-- Authentication and user profiles.
+- User profiles.
 - Bookmarks (saved articles), comments, and the inbox/messaging system required by the assignment brief.
 - Continued testing and bug fixes on API result consistency (some categories occasionally return fewer than 12 articles).
 - Eventual migration to a React frontend with a DRF API layer — models and the service layer are expected to carry over largely unchanged.

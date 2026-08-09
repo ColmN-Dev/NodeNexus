@@ -83,13 +83,17 @@ An external scheduled ping (https://cron-job.org) is used to periodically reques
 
 ## Key Skills Demonstrated
 
-- Django project structure using apps, views, templates, and services
+- Django project structure using apps, views, forms, templates, and URL routing
+- Django built-in authentication for user registration, login, and logout
+- Custom Django forms for user registration and email validation
+- Password validation using Django's built-in validators
 - Separation of external API logic from Django views via a dedicated service layer
 - External API integration and response caching
-- PostgreSQL relational database setup with Django
+- PostgreSQL database setup with Django's ORM
 - Environment-based settings configuration for development and production
 - Responsive frontend development combining Bootstrap and custom CSS
-- Debugging real-world CSS stacking context and async race condition issues
+- Custom authentication page styling using HTML, CSS, and JavaScript
+- Debugging real-world CSS layout, stacking context, and responsive design issues
 - Production deployment and static file management using WhiteNoise and Render
 
 ---
@@ -151,20 +155,38 @@ An external scheduled ping (https://cron-job.org) is used to periodically reques
 
 ---
 
+### User Authentication
+
+- User registration using Django's built-in authentication system
+- Username, email, password, and password confirmation fields
+- Django's built-in password validation
+- Login and logout functionality
+- Password visibility toggle using JavaScript
+- Inline form validation and error messages provided by Django
+- Authentication links integrated into the desktop and mobile navigation
+
+---
+
 ## Architecture
 
 The project follows a Django multi-app structure with a separated frontend/backend layout.
 
 - `core` handles general site routing and category page views.
 - `news` handles external API communication, caching, and search logic.
+- `accounts` handles user authentication, including registration, login, and logout.
 - A dedicated `services` layer within `news` separates Currents API integration from Django views.
 - Reusable template components (navbar, footer, search bar, article cards, mobile navigation) reduce duplication across pages.
+- Django's built-in authentication system handles user accounts and stores users in the PostgreSQL database.
 
 ---
 
 ## Database
 
-The application uses PostgreSQL, configured through Django's ORM and prepared for future expansion into user accounts, saved articles, comments, and direct messaging.
+The application uses PostgreSQL, configured through Django's ORM.
+
+Django's built-in authentication tables are currently being used for user accounts. User registration creates users in the PostgreSQL database, and the accounts can be viewed through pgAdmin.
+
+Custom application models for articles, bookmarks, comments, and messaging have not been created yet.
 
 ---
 
@@ -174,6 +196,7 @@ The application uses PostgreSQL, configured through Django's ORM and prepared fo
 NodeNexus/
 │
 ├── backend/
+│   ├── accounts/
 │   ├── config/
 │   ├── core/
 │   ├── news/
@@ -242,38 +265,47 @@ python backend/manage.py collectstatic --noinput
 
 ## Routing Structure
 
-- `backend/core/urls.py` → main pages (`/`, `/ai/`, `/cybersecurity/`, `/gaming/`, `/trending/`, `/search/`, `/auto-complete/`, `/article`)
+- `backend/config/urls.py` → includes the main application and accounts routes
+- `backend/core/urls.py` → main pages (`/`, `/ai/`, `/cybersecurity/`, `/gaming/`, `/trending/`, `/search/`, `/auto-complete/`, `/article/`)
+- `backend/accounts/urls.py` → authentication routes for registration, login, and logout
 
 ---
 
 ## Implemented Routes
 
-| Route | Purpose |
-|-------|---------|
-| `/` | Homepage |
-| `/ai/` | AI news category |
-| `/cybersecurity/` | Cybersecurity news category |
-| `/gaming/` | Gaming news category |
-| `/trending/` | Trending technology category |
-| `/search/` | Search results |
-| `/auto-complete/` | Search autocomplete |
-| `/article/` | Individual article detail |
+| Route                | Purpose                      |
+| -------------------- | ---------------------------- |
+| `/`                  | Homepage                     |
+| `/ai/`               | AI news category             |
+| `/cybersecurity/`    | Cybersecurity news category  |
+| `/gaming/`           | Gaming news category         |
+| `/trending/`         | Trending technology category |
+| `/search/`           | Search results               |
+| `/auto-complete/`    | Search autocomplete          |
+| `/article/`          | Individual article detail    |
+| `/accounts/signup/`  | User registration            |
+| `/accounts/login/`   | User login                   |
+| `/accounts/logout/`  | User logout                  |
 
 ---
 
 ## Planned Features
 
-- User accounts, authentication, and profiles
+- User profiles
 - Saved/bookmarked articles
 - Comment system
 - User-to-user direct messaging
+- Password reset/recovery by email
 - React frontend migration
+- Django REST Framework API layer
 
 ---
 
 ## Documentation
 
-- Documentation: [docs/NodeNexus-Documentation.md](docs/NodeNexus-Documentation.md)
+- Planning: [NodeNexus Planning Documentation](docs/planning.md)
+
+- Documentation: [NodeNexus Project Documentation](docs/NodeNexus-Documentation.md)
 
 ---
 
@@ -294,3 +326,11 @@ python backend/manage.py collectstatic --noinput
 ### Article Detail Page
 
 ![Article Detail Page](frontend/src/static/images/Detail.png)
+
+### Sign Up 
+
+![Sign Up](frontend/src/static/images/Signup.png)
+
+### Log In
+
+![Log In](frontend/src/static/images/Login.png)
