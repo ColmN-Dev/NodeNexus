@@ -1,6 +1,6 @@
 # NodeNexus Documentation
 
-**Last updated:** August 9, 2026
+**Last updated:** August 10, 2026
 
 ---
 
@@ -38,12 +38,13 @@ The project splits backend and frontend into separate top-level folders, so Djan
 NodeNexus/
 │
 ├── backend/
-│   ├── config/            # Django settings, urls, wsgi/asgi
-│   ├── core/               # General site views (ai, cybersecurity, gaming, trending)
-│   ├── news/                # News app: models, views, and services/
+│   ├── accounts/               # Authentication and account-related views/forms
+│   ├── config/                 # Django settings, urls, wsgi/asgi
+│   ├── core/                   # General site views (ai, cybersecurity, gaming, trending)
+│   ├── news/                   # News app: models, views, and services/
 │   │   └── services/
-│   │       ├── currents.py  # Currents API calls + processing
-│   │       └── cache.py     # API response caching
+│   │       ├── currents.py     # Currents API calls + processing
+│   │       └── cache.py        # API response caching
 │   ├── staticfiles/
 │   ├── manage.py
 │   └── requirements.txt
@@ -59,7 +60,7 @@ NodeNexus/
 └── README.md
 ```
 
-`core` handles general site pages. `news` handles article fetching and category logic. The `news/services` package keeps Currents API calls and caching logic out of the views — views just call the service functions and render a template.
+The `core` app handles general site pages. `news` handles article fetching and category logic. The `news/services` package keeps Currents API calls and caching logic out of the views. The `accounts` app handles user registration, login, logout, profile access, password resets, and password changes.
 
 ---
 
@@ -93,6 +94,40 @@ Before articles are shown, low-quality results are filtered out:
 - A domain exclusion list removes known low-value sources (forum threads, raw vulnerability database dumps).
 - Auto-generated CVE announcement titles are filtered out, while genuine articles that reference a CVE number in a proper headline are kept.
 - Duplicate articles are removed.
+
+---
+
+## Authentication
+
+NodeNexus uses Django's built-in authentication system for user registration, password hashing, validation, login, logout, sessions, password resets, and password changes.
+
+The registration form extends Django's `UserCreationForm` and adds an email field. Additional validation requires passwords to contain at least one uppercase letter, lowercase letter, digit, and special character.
+
+The authentication system currently provides:
+
+- User registration
+- Login and logout
+- Protected profile page
+- Password reset by email
+- Password reset confirmation
+- Password reset completion
+- Change password for authenticated users
+
+Django handles the security-sensitive password hashing and authentication logic rather than implementing these systems manually.
+
+---
+
+## Password Reset and Email
+
+Django's built-in password reset system is used to handle password recovery.
+
+The user enters their email address and Django sends a password reset link. The user can then choose a new password and return to the login page.
+
+During development, Django's console email backend was initially used to print reset emails in the terminal. This was later replaced with SMTP so real emails could be sent.
+
+SMTP settings and the email account password are stored in environment variables rather than the codebase.
+
+The complete reset process was tested successfully using a real email account.
 
 ---
 
@@ -155,13 +190,21 @@ Other responsive features include the mobile bottom navigation bar, off-canvas m
 
 ---
 
+## Password Visibility
+
+The existing password visibility JavaScript was extended to support the password reset and change password forms.
+
+The same `setupPasswordToggle()` function is reused across the authentication pages, allowing users to show or hide password fields without adding separate JavaScript for each form.
+
+---
+
 # 5. Database
 
 NodeNexus uses PostgreSQL instead of Django's default SQLite, for a more production-realistic setup and to support future features like user accounts, bookmarks, and comments. Credentials are kept in environment variables rather than in the codebase. Development and production use separate PostgreSQL databases, both accessed through the same Django ORM configuration.
 
 The database currently includes Django's default authentication tables. User accounts created through the NodeNexus signup page are stored in PostgreSQL and can be viewed in pgAdmin.
 
-No custom models have been created yet. User profiles, bookmarks, comments, and messaging will be added later.
+User features such as bookmarks, comments, and messaging will be added later.
 
 ---
 
@@ -178,9 +221,11 @@ No custom models have been created yet. User profiles, bookmarks, comments, and 
 - **User authentication:** Django's built-in authentication system is used for signup, login, logout, password hashing, validation, and sessions.
 - **Authentication forms:** Custom signup and login pages with Django form validation, inline errors, and password visibility toggles.
 - **Authentication navigation:** Signup, login, and logout links have been added to the desktop and mobile navigation.
+- **Password reset:** Users can request a password reset email, set a new password, and return to the login page.
+- **Change password:** Logged-in users can change their password from their profile.
 - **Deployment setup:** Render hosting, PostgreSQL, Gunicorn, WhiteNoise for static files.
 
-Not yet built: user profiles, bookmarks, comments, and the inbox/messaging system.
+Not yet built: user profile pictures, bookmarks, comments, and the inbox/messaging system.
 
 ---
 
@@ -190,7 +235,7 @@ Not yet built: user profiles, bookmarks, comments, and the inbox/messaging syste
 - Article data from the API isn't perfectly consistent (missing fields, occasional thin category results), so some normalisation and filtering will likely need further tuning.
 - Related-articles matching (first three words of the title) is a simple heuristic, not true topic matching, so results are sometimes only loosely related.
 - Article detail pages currently pass full article metadata (title, description, image, source, published date, URL) through query parameters in the URL, rather than looking articles up by an ID from the database. This works for now but is only temporary until articles are stored with proper IDs once the database models are built.
-- User authentication is implemented, but user-specific features such as profiles, bookmarking, comments, and messaging have not been built yet.
+- User authentication, profile access, password reset, and change password are implemented. Profile pictures, bookmarking, comments, and messaging have not been built yet.
 
 ---
 
@@ -238,7 +283,9 @@ Deployment flow: push to GitHub → Render pulls the update → installs depende
 
 **Carousel not activating on mobile landscape** — the homepage still showed the desktop grid instead of the carousel on a mobile device in landscape orientation. Traced to the device's landscape width being wider than the `768px` breakpoint the carousel styling was scoped to. Rather than adding another breakpoint, the carousel rules were moved into the existing `max-width: 992px` section, which already covers tablet and landscape-mobile widths.
 
-**Authentication frontend integration** — Django handled most of the backend authentication logic, including account creation, password validation, login, logout, and sessions. The main work was integrating the forms into the existing NodeNexus design, including custom styling, password visibility toggles, and responsive authentication links in the navbar.
+**Authentication frontend integration** — Django handled the backend authentication logic, including account creation, password validation, login, logout, and sessions. The main work was integrating the forms into the existing NodeNexus design across signup, login, password reset, and change password, including custom styling, validation errors, password visibility toggles, and responsive authentication links in the navbar.
+
+**Real email setup** — Password reset emails initially used Django's console backend, which printed the email in the terminal. SMTP was later configured so password reset emails could be sent to a real email address. Email credentials are stored in environment variables.
 
 ---
 
@@ -259,12 +306,15 @@ Deployment flow: push to GitHub → Render pulls the update → installs depende
 - Understanding how Django forms handle validation and display errors directly in templates.
 - Connecting Django authentication to a custom frontend rather than using Django's default styling.
 - Adding custom JavaScript functionality to Django forms, such as password visibility toggles.
+- Understanding Django's built-in password reset and change password functionality.
+- Configuring SMTP email so the application can send real password reset emails.
+- Using environment variables to keep email credentials outside the codebase.
 
 ---
 
 # 12. Next Steps
 
-- User profiles.
+- Expand the user profile with profile pictures and additional account information.
 - Bookmarks (saved articles), comments, and the inbox/messaging system required by the assignment brief.
 - Continued testing and bug fixes on API result consistency (some categories occasionally return fewer than 12 articles).
 - Eventual migration to a React frontend with a DRF API layer — models and the service layer are expected to carry over largely unchanged.
@@ -278,6 +328,9 @@ Deployment flow: push to GitHub → Render pulls the update → installs depende
 - Django Pagination — https://docs.djangoproject.com/en/6.0/topics/pagination/
 - Django Models and Migrations — https://docs.djangoproject.com/en/6.0/topics/db/models/
 - Django Authentication — https://docs.djangoproject.com/en/6.0/topics/auth/
+- Django Messages — https://docs.djangoproject.com/en/6.0/ref/contrib/messages/
+- Django Password Management — https://docs.djangoproject.com/en/6.0/topics/auth/passwords/
+- Django Email — https://docs.djangoproject.com/en/6.0/topics/email/
 
 **Frontend**
 - Bootstrap Documentation — https://getbootstrap.com/docs/

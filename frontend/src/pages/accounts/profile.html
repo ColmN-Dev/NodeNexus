@@ -1,0 +1,70 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+Your Profile | NodeNexus
+{% endblock %}
+
+{% block content %}
+
+<section class="page-container">
+
+    <div class="page-header">
+
+        <h1>
+            <span class="title-glass">
+                {{ user.username }}
+            </span>
+        </h1>
+
+    </div>
+
+    <div class="text-center mb-4">
+        <a href="{% url 'home' %}" class="btn nn-btn">
+            &larr; Back to Home
+        </a>
+    </div>
+
+    <div class="container py-4">
+
+        <div class="glass-content profile-detail">
+
+            <h2>
+                Profile Information
+            </h2>
+
+            <p>
+                <strong>Username:</strong> {{ user.username }}
+            </p>
+
+            <p>
+                <strong>Email:</strong> {{ user.email }}
+            </p>
+
+            <p>
+                <strong>User Type:</strong> 
+                {% if user.is_superuser %}
+                    Admin
+                {% else %}
+                    User
+                {% endif %}
+            </p>
+
+            <div class="d-flex justify-content-center gap-2">
+                <a href="{% url 'change_password' %}" class="btn nn-btn">
+                    Change Password
+                </a>
+
+                <a href="{% url 'logout' %}" class="btn nn-btn">
+                    Log Out
+                </a>
+                
+            </div>
+
+        </div>
+
+
+
+</section>
+
+{% endblock %}

@@ -1,6 +1,10 @@
 {% extends "base.html" %}
 {% load static %}
 
+{% block title %}
+Log In | NodeNexus
+{% endblock %}
+
 {% block content %}
 
 <section class="page-container">
@@ -14,6 +18,12 @@
     </h1>
 
 </div>
+
+    <div class="text-center mb-4">
+        <a href="{% url 'home' %}" class="btn nn-btn">
+            &larr; Back to Home
+        </a>
+    </div>
 
 <div class="auth-form-container">
 
@@ -79,6 +89,15 @@
                 </div>
 
             {% endif %}
+
+            <p class=" text-center mt-2">
+                <a
+                    href="{% url 'password_reset' %}"
+                    class="nn-link"
+                >
+                    Forgot your password?
+                </a>
+            </p>
 
         </div>
 

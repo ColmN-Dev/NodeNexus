@@ -23,7 +23,7 @@ class UserRegisterForm(UserCreationForm):
         if not any(char.isdigit() for char in password):
             raise forms.ValidationError("Password must contain at least one digit.")
         
-        if not any(char.isalnum() for char in password):
+        if not any(not char.isalnum() for char in password):
             raise forms.ValidationError("Password must contain at least one special character.")
         
         return password

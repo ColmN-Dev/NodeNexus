@@ -55,6 +55,11 @@ The application is deployed on Render using Gunicorn and PostgreSQL.
   - `CURRENTS_API_KEY`
   - `DATABASE_URL` (provided automatically by the linked Render PostgreSQL instance)
   - `DEBUG`
+  - `EMAIL_HOST`
+  - `EMAIL_PORT`
+  - `EMAIL_USE_TLS`
+  - `EMAIL_HOST_USER`
+  - `EMAIL_HOST_PASSWORD`
 
 **Database:**
 
@@ -87,6 +92,8 @@ An external scheduled ping (https://cron-job.org) is used to periodically reques
 - Django built-in authentication for user registration, login, and logout
 - Custom Django forms for user registration and email validation
 - Password validation using Django's built-in validators
+- Django password reset and change password functionality
+- SMTP email configuration using environment variables
 - Separation of external API logic from Django views via a dedicated service layer
 - External API integration and response caching
 - PostgreSQL database setup with Django's ORM
@@ -159,8 +166,11 @@ An external scheduled ping (https://cron-job.org) is used to periodically reques
 
 - User registration using Django's built-in authentication system
 - Username, email, password, and password confirmation fields
-- Django's built-in password validation
+- Custom password validation
 - Login and logout functionality
+- Protected user profile page
+- Password reset by email using Django's built-in password reset system
+- Change password for authenticated users
 - Password visibility toggle using JavaScript
 - Inline form validation and error messages provided by Django
 - Authentication links integrated into the desktop and mobile navigation
@@ -173,7 +183,7 @@ The project follows a Django multi-app structure with a separated frontend/backe
 
 - `core` handles general site routing and category page views.
 - `news` handles external API communication, caching, and search logic.
-- `accounts` handles user authentication, including registration, login, and logout.
+- `accounts` handles user registration, login, logout, profile access, password reset, and change password.
 - A dedicated `services` layer within `news` separates Currents API integration from Django views.
 - Reusable template components (navbar, footer, search bar, article cards, mobile navigation) reduce duplication across pages.
 - Django's built-in authentication system handles user accounts and stores users in the PostgreSQL database.
@@ -238,6 +248,11 @@ pip install -r backend/requirements.txt
    - `CURRENTS_API_KEY`
    - `DATABASE_URL`
    - `DEBUG`
+   - `EMAIL_HOST`
+   - `EMAIL_PORT`
+   - `EMAIL_USE_TLS`
+   - `EMAIL_HOST_USER`
+   - `EMAIL_HOST_PASSWORD`
 
 ---
 
@@ -267,35 +282,40 @@ python backend/manage.py collectstatic --noinput
 
 - `backend/config/urls.py` → includes the main application and accounts routes
 - `backend/core/urls.py` → main pages (`/`, `/ai/`, `/cybersecurity/`, `/gaming/`, `/trending/`, `/search/`, `/auto-complete/`, `/article/`)
-- `backend/accounts/urls.py` → authentication routes for registration, login, and logout
+- `backend/accounts/urls.py` → authentication routes for registration, login, logout, profile, password reset, and change password
 
 ---
 
 ## Implemented Routes
 
-| Route                | Purpose                      |
-| -------------------- | ---------------------------- |
-| `/`                  | Homepage                     |
-| `/ai/`               | AI news category             |
-| `/cybersecurity/`    | Cybersecurity news category  |
-| `/gaming/`           | Gaming news category         |
-| `/trending/`         | Trending technology category |
-| `/search/`           | Search results               |
-| `/auto-complete/`    | Search autocomplete          |
-| `/article/`          | Individual article detail    |
-| `/accounts/signup/`  | User registration            |
-| `/accounts/login/`   | User login                   |
-| `/accounts/logout/`  | User logout                  |
+| Route                       | Purpose                        |
+| --------------------------- | ------------------------------ |
+| `/`                         | Homepage                       |
+| `/ai/`                      | AI news category               |
+| `/cybersecurity/`           | Cybersecurity news category    |
+| `/gaming/`                  | Gaming news category           |
+| `/trending/`                | Trending technology category   |
+| `/search/`                  | Search results                 |
+| `/auto-complete/`           | Search autocomplete            |
+| `/article/`                 | Individual article detail      |
+| `/signup/`                  | User registration              |
+| `/login/`                   | User login                     |
+| `/logout/`                  |  User logout                   |
+| `/profile/`                 | User profile                   |
+| `/change_password/`         | Change current password        |
+| `/password_reset/`          | Request password reset email   |
+| `/password_reset_done/`     | Password reset email sent      |
+| `/password_reset_confirm/`  | Set a new password             |
+| `/password_reset_complete/` | Password reset completed       |
 
 ---
 
 ## Planned Features
 
-- User profiles
+- Expand user profiles with profile pictures and additional account information
 - Saved/bookmarked articles
 - Comment system
 - User-to-user direct messaging
-- Password reset/recovery by email
 - React frontend migration
 - Django REST Framework API layer
 

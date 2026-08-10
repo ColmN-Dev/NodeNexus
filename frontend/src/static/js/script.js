@@ -373,5 +373,11 @@
     setupPasswordToggle("togglePassword2", "id_password2", "password-eye2");
     setupPasswordToggle("togglePassword", "id_password", "password-eye");
 
+    // Password reset
+    setupPasswordToggle("togglePassword1", "id_new_password1", "password-eye1");
+    setupPasswordToggle("togglePassword2", "id_new_password2", "password-eye2");
+
+    // Password change
+    setupPasswordToggle("togglePassword", "id_old_password", "password-eye");
 
 })();
