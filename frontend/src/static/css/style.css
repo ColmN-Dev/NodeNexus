@@ -291,7 +291,9 @@ header,
 
 
 
-/* LOGO + TITLE */
+/* ============================
+    LOGO + TITLE 
+   =========================== */
 
 
 .logo-section {
@@ -458,7 +460,9 @@ header,
 
 
 
-/* DARK MODE BUTTON */
+/* ========================================
+    DARK MODE BUTTON 
+   ======================================== */
 
 
 .dark-mode-toggle {
@@ -558,6 +562,52 @@ button.btn.nn-btn:focus {
     text-decoration:none;
 
 }
+
+/* ========================================
+   MESSAGES
+   ======================================== */
+
+.messages-container {
+    max-width: 600px;
+    margin: 1rem auto;
+    padding: 0 1rem;
+}
+
+.alert {
+    padding: 0.75rem 1rem;
+    margin-bottom: 0.5rem;
+    border-radius: 6px;
+    border: 1px solid transparent;
+    font-size: 0.95rem;
+    font-weight: bold;
+    animation: fadeOut 5s forwards;
+}
+
+.alert-success {
+    background-color: rgba(40, 167, 69, 0.70);
+    border-color: rgba(40, 167, 69, 0.4);
+    color: var(--heading-color);
+}
+
+.alert-error {
+    background-color: rgba(220, 53, 69, 0.70);
+    border-color: rgba(220, 53, 69, 0.4);
+    color: var(--heading-color);
+}
+
+.alert-warning {
+    background-color: rgba(255, 193, 7, 0.70);
+    border-color: rgba(255, 193, 7, 0.4);
+    color: var(--heading-color);
+}
+
+@keyframes fadeOut {
+  0% { opacity: 1; }
+  85% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+
 
 /* ========================================
    HERO SECTION
@@ -2168,6 +2218,10 @@ a.btn:hover {
 
     .site-title a {
         font-size: 1.5rem;
+    }
+
+    .alert {
+        text-align: center;
     }
 
     .hero h1 {

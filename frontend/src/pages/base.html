@@ -71,6 +71,22 @@
 
 <main>
 
+    {% if messages %}
+        <div class="messages-container">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}">
+                {% if message.tags == "success" %}
+                    <strong>✅ Success!</strong> {{ message }}
+                {% elif message.tags == "error" %}
+                    <strong>❌ Error!</strong> {{ message }}
+                {% elif message.tags == "warning" %}
+                    <strong>⚠️ Warning!</strong> {{ message }}
+                {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
 
 {% block content %}
 {% endblock %}
