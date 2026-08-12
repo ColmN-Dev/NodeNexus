@@ -136,19 +136,28 @@ def article_detail(request):
     if not article.get("url"):
         return render(request, "article_detail.html", {"error": "Article URL is missing."})
     
-    # Split the article title into words for generating a related query
-    title_words = article["title"].split()
+    # Check if the request is from a Meta crawler to avoid unnecessary API calls
+    user_agent = request.META.get("HTTP_USER_AGENT", "").lower()
+
+    is_meta_crawler = "meta-externalagent" in user_agent
+
+    related_articles = []
     
-    # Generate a related query using the first 3 words of the article title
-    related_query = " ".join(title_words[:3])
+    if not is_meta_crawler:
+    
+        # Split the article title into words for generating a related query
+        title_words = article["title"].split()
+    
+        # Generate a related query using the first 3 words of the article title
+        related_query = " ".join(title_words[:3])
 
-    related_articles, _ = search_articles(related_query)
+        related_articles, _ = search_articles(related_query)
 
-    # Filter out the current article from the related articles
-    related_articles = [
-        item for item in related_articles
-        if item.get("url") != article["url"]
-    ][:12]  # Limit to 12 related articles
+        # Filter out the current article from the related articles
+        related_articles = [
+            item for item in related_articles
+            if item.get("url") != article["url"]
+        ][:12]  # Limit to 12 related articles
 
 
     context = {
