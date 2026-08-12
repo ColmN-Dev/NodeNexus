@@ -13,10 +13,12 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 import os
 import dj_database_url
 from dotenv import load_dotenv
+import cloudinary
 
 # Load the local .env file
 load_dotenv()
 
+cloudinary.config(secure=True)
 
 from pathlib import Path
 
@@ -165,9 +167,7 @@ STATIC_ROOT = BASE_DIR / "staticfiles"
 
 # Media files (User-uploaded content and profile images) handled by Cloudinary
 STORAGES = {
-    "default": {
-        "BACKEND": "cloudinary_storage.storage.MediaCloudinaryStorage",
-    },
+
     "staticfiles": {
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
     },
