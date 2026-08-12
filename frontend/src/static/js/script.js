@@ -11,8 +11,8 @@
     const themeToggles = document.querySelectorAll(".dark-mode-toggle");
     const icons = document.querySelectorAll(".dark-mode-toggle img");
 
-    // The inline script in <head> already set data-theme before paint (FOUC fix).
-    // This just syncs the toggle icon to whatever theme is currently active.
+    // The inline script in <head> already sets data-theme before paint (FOUC fix).
+    // This then syncs the toggle icon to whatever theme is currently active.
     function syncThemeIcon() {
 
         const isDark = document.documentElement.getAttribute("data-theme") === "dark";
@@ -379,5 +379,59 @@
 
     // Password change
     setupPasswordToggle("togglePassword", "id_old_password", "password-eye");
+
+    // ==========================
+    // PROFILE IMAGE PREVIEW
+    // ==========================
+
+    // Get the preset images, preview, file input and selected preset.
+    const profileImageOptions = document.querySelectorAll(".profile-image-option");
+    const profileImagePreview = document.getElementById("profileImagePreview");
+    const imageInput = document.getElementById("id_image");
+    const presetImageInput = document.getElementById("presetImage");
+
+    // Handle preset image selection.
+    profileImageOptions.forEach(option => {
+
+        option.addEventListener("click", () => {
+
+            const image = option.dataset.image;
+            presetImageInput.value = option.dataset.imageName;
+
+            // Show the selected image in the preview.
+            profileImagePreview.src = image;
+
+            // Update which preset appears selected.
+            profileImageOptions.forEach(item => {
+                item.classList.remove("selected");
+            });
+
+            option.classList.add("selected");
+
+        });
+
+    });
+
+    // Preview a custom image before uploading it.
+    if (imageInput) {
+
+        imageInput.addEventListener("change", () => {
+
+            presetImageInput.value = "";
+
+            const file = imageInput.files[0];
+
+            if (!file) return;
+
+            profileImagePreview.src = URL.createObjectURL(file);
+
+            // Remove preset selection when using a custom image.
+            profileImageOptions.forEach(item => {
+                item.classList.remove("selected");
+            });
+
+        });
+
+    }
 
 })();

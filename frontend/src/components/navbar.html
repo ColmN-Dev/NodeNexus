@@ -29,21 +29,25 @@
                     Home
                 </a>
 
+                |
 
                 <a href="{% url 'ai' %}">
                     AI
                 </a>
 
+                |
 
                 <a href="{% url 'cybersecurity' %}">
                     Cybersecurity
                 </a>
 
+                |
 
                 <a href="{% url 'gaming' %}">
                     Gaming
                 </a>
 
+                |
 
                 <a href="{% url 'trending' %}">
                     Trending
@@ -55,13 +59,23 @@
 
                 {% if user.is_authenticated %}
 
-                    <a href="{% url 'profile' %}">
-                        Your Profile
+                    <a href="{% url 'profile' %}" class="profile-nav-link">
+                        <div class="profile-picture-nav">
+                            {% if user.profile.preset_image %}
+                                <img src="{% static 'images/' %}{{ user.profile.preset_image }}.png" alt="Profile picture" title="Your Profile">
+                            {% else %}
+                                <img src="{{ user.profile.image.url }}" alt="Profile picture" title="Your Profile">
+                            {% endif %}
+                        </div>
                     </a>
+
+                    |
 
                     <a href="{% url 'logout' %}">
                         Log Out
                     </a>
+
+                    |
 
                 {% else %}
 
@@ -69,9 +83,13 @@
                         Sign Up
                     </a>
 
-                <a href="{% url 'login' %}">
-                    Log In
-                </a>
+                    |
+
+                    <a href="{% url 'login' %}">
+                        Log In
+                    </a>
+
+                    |
 
                 {% endif %}
 
@@ -109,8 +127,15 @@
 
     {% if user.is_authenticated %}
 
-    <a href="{% url 'profile' %}">
-        Your Profile
+    <a href="{% url 'profile' %}" class="mobile-profile-link">
+        <div class="profile-picture-nav-mobile">
+            {% if user.profile.preset_image %}
+                <img src="{% static 'images/' %}{{ user.profile.preset_image }}.png" alt="Profile picture">
+            {% else %}
+                <img src="{{ user.profile.image.url }}" alt="Profile picture">
+            {% endif %}
+        </div>
+        <span>Your Profile</span>
     </a>
 
     <a href="{% url 'logout' %}">

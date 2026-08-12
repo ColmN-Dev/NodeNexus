@@ -10,13 +10,11 @@ Your Profile | NodeNexus
 <section class="page-container">
 
     <div class="page-header">
-
         <h1>
             <span class="title-glass">
                 {{ user.username }}
             </span>
         </h1>
-
     </div>
 
     <div class="text-center mb-4">
@@ -33,38 +31,299 @@ Your Profile | NodeNexus
                 Profile Information
             </h2>
 
-            <p>
-                <strong>Username:</strong> {{ user.username }}
-            </p>
+            <div class="profile-layout">
 
-            <p>
-                <strong>Email:</strong> {{ user.email }}
-            </p>
+                <div class="profile-picture">
 
-            <p>
-                <strong>User Type:</strong> 
-                {% if user.is_superuser %}
-                    Admin
-                {% else %}
-                    User
-                {% endif %}
-            </p>
+                    {% if user.profile.preset_image %}
+                        <img src="{% static 'images/' %}{{ user.profile.preset_image }}.png" alt="Profile picture">
+                    {% else %}
+                        <img src="{{ user.profile.image.url }}" alt="Profile picture">
+                    {% endif %}
 
-            <div class="d-flex justify-content-center gap-2">
-                <a href="{% url 'change_password' %}" class="btn nn-btn">
-                    Change Password
-                </a>
+                    <form method="POST" enctype="multipart/form-data" id="profilePictureForm">
+                        {% csrf_token %}
 
-                <a href="{% url 'logout' %}" class="btn nn-btn">
-                    Log Out
-                </a>
-                
+                        <input type="hidden" name="preset_image" id="presetImage">
+
+                        <div class="profile-file-input">
+
+                            <h3 class="profile-picture-heading">
+                                Update Profile Picture
+                            </h3>
+
+                            <button
+                                type="button"
+                                class="custom-file-button"
+                                data-bs-toggle="modal"
+                                data-bs-target="#profilePictureModal"
+                            >
+                                Change Profile Picture
+                            </button>
+
+                        </div>
+
+                        <input
+                        type="file"
+                        name="image"
+                        id="id_image"
+                        accept="image/*"
+                        hidden
+                    >
+
+                    </form>
+
+                </div>
+
+                <div class="profile-information">
+
+                    <h3>
+                        <strong>Username:</strong> {{ user.username }}
+                    </h3>
+
+                    <h3>
+                        <strong>Email:</strong> {{ user.email }}
+                    </h3>
+
+                    <h3>
+                        <strong>User Type:</strong>
+
+                        {% if user.is_superuser %}
+                            Admin
+                        {% else %}
+                            User
+                        {% endif %}
+
+                    </h3>
+
+                    <h3>
+                        <strong>Joined:</strong> {{ user.date_joined|date:"F j, Y" }}
+                    </h3>
+
+                    <div class="d-flex justify-content-center gap-2">
+
+                        <a
+                            href="{% url 'change_password' %}"
+                            class="btn nn-btn"
+                        >
+                            Change Password
+                        </a>
+
+                        <a
+                            href="{% url 'logout' %}"
+                            class="btn nn-btn"
+                        >
+                            Log Out
+                        </a>
+
+                    </div>
+
+                </div>
+
             </div>
 
         </div>
 
-
+    </div>
 
 </section>
+
+
+<div
+    class="modal fade"
+    id="profilePictureModal"
+    tabindex="-1"
+    aria-labelledby="profilePictureModalLabel"
+    aria-hidden="true"
+>
+
+    <div class="modal-dialog modal-dialog-centered">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h4
+                    class="modal-title"
+                    id="profilePictureModalLabel"
+                >
+                    Update Profile Picture
+                </h4>
+
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                ></button>
+
+            </div>
+
+            <div class="modal-body">
+
+                <h3>Choose a Profile Picture</h3>
+
+                    <div class="profile-image-options">
+
+                        <button
+                            type="button"
+                            class="profile-image-option"
+                            data-image="{% static 'images/profile1.png' %}"
+                            data-image-name="profile1"
+                        >
+                            <img
+                                src="{% static 'images/profile1.png' %}"
+                                alt="Profile option 1"
+                            >
+                        </button>
+
+                        <button
+                            type="button"
+                            class="profile-image-option"
+                            data-image="{% static 'images/profile2.png' %}"
+                            data-image-name="profile2"
+                        >
+                            <img
+                                src="{% static 'images/profile2.png' %}"
+                                alt="Profile option 2"
+                            >
+                        </button>
+
+                        <button
+                            type="button"
+                            class="profile-image-option"
+                            data-image="{% static 'images/profile3.png' %}"
+                            data-image-name="profile3"
+                        >
+                            <img
+                                src="{% static 'images/profile3.png' %}"
+                                alt="Profile option 3"
+                            >
+                        </button>
+
+                        <button
+                            type="button"
+                            class="profile-image-option"
+                            data-image="{% static 'images/profile4.png' %}"
+                            data-image-name="profile4"
+                        >
+                            <img
+                                src="{% static 'images/profile4.png' %}"
+                                alt="Profile option 4"
+                            >
+                        </button>
+
+                        <button
+                            type="button"
+                            class="profile-image-option"
+                            data-image="{% static 'images/profile5.png' %}"
+                            data-image-name="profile5"
+                        >
+                            <img
+                                src="{% static 'images/profile5.png' %}"
+                                alt="Profile option 5"
+                            >
+                        </button>
+
+                        <button
+                            type="button"
+                            class="profile-image-option"
+                            data-image="{% static 'images/profile6.png' %}"
+                            data-image-name="profile6"
+                        >
+                            <img
+                                src="{% static 'images/profile6.png' %}"
+                                alt="Profile option 6"
+                            >
+                        </button>
+
+                        <button
+                            type="button"
+                            class="profile-image-option"
+                            data-image="{% static 'images/profile7.png' %}"
+                            data-image-name="profile7"
+                        >
+                            <img
+                                src="{% static 'images/profile7.png' %}"
+                                alt="Profile option 7"
+                            >
+                        </button>
+
+                        <button
+                            type="button"
+                            class="profile-image-option"
+                            data-image="{% static 'images/profile8.png' %}"
+                            data-image-name="profile8"
+                        >
+                            <img
+                                src="{% static 'images/profile8.png' %}"
+                                alt="Profile option 8"
+                            >
+                        </button>
+
+                        <button
+                            type="button"
+                            class="profile-image-option"
+                            data-image="{% static 'images/profile9.png' %}"
+                            data-image-name="profile9"
+                        >
+                            <img
+                                src="{% static 'images/profile9.png' %}"
+                                alt="Profile option 9"
+                            >
+                        </button>
+
+                    </div>
+
+                    <div class="profile-image-preview">
+
+                        <h4>Preview:</h4>
+
+                    {% if user.profile.preset_image %}
+                        <img id="profileImagePreview" src="{% static 'images/' %}{{ user.profile.preset_image }}.png" alt="Profile preview">
+                    {% else %}
+                        <img id="profileImagePreview" src="{{ user.profile.image.url }}" alt="Profile preview">
+                    {% endif %}
+
+                    </div>
+
+                <div class="custom-profile-upload">
+
+                    <label
+                        for="id_image"
+                        class="custom-file-button"
+                    >
+                        Upload Custom Image
+                    </label>
+
+                </div>
+
+            </div>
+
+            <div class="modal-footer">
+
+                <button
+                    type="button"
+                    class="btn btn-secondary"
+                    data-bs-dismiss="modal"
+                >
+                    Cancel
+                </button>
+
+                <button
+                    type="submit"
+                    form="profilePictureForm"
+                    class="btn nn-btn"
+                >
+                    Update Profile Picture
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
 
 {% endblock %}
