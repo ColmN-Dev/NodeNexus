@@ -1,6 +1,6 @@
 # NodeNexus Documentation
 
-**Last updated:** August 10, 2026
+**Last updated:** August 13, 2026
 
 ---
 
@@ -24,9 +24,13 @@
 
 # 1. Overview
 
-NodeNexus is a technology news aggregator built with Django. It pulls articles from the Currents API and displays them across category pages (AI, cybersecurity, gaming, trending), plus search and article detail pages.
+NodeNexus is a technology news aggregator built with Django. It pulls articles from the Currents API and displays them across category pages (AI, cybersecurity, gaming, trending), alongside global search, autocomplete, and article detail pages.
 
-The stack is Django, PostgreSQL, and Django Templates with Bootstrap, custom CSS, and vanilla JavaScript. The project is structured so a React frontend and DRF API layer can be added later without a rewrite but currently all pages are plain Django templates.
+The application also includes user authentication and account features, allowing users to register, log in, manage their account, and interact with content. Further user features such as bookmarks, comments, messaging, and account management are being developed as the project progresses.
+
+The stack is Django, PostgreSQL, and Django Templates with Bootstrap, custom CSS, and vanilla JavaScript. The project is structured so a React frontend and DRF API layer can be added later without a rewrite, but currently all pages are plain Django templates.
+
+The application is deployed on Render, with PostgreSQL used for the database and external services used for news data and user-uploaded media.
 
 ---
 
@@ -41,6 +45,7 @@ NodeNexus/
 │   ├── accounts/               # Authentication and account-related views/forms
 │   ├── config/                 # Django settings, urls, wsgi/asgi
 │   ├── core/                   # General site views (ai, cybersecurity, gaming, trending)
+│   ├── media/                  # Contains the `default.png` file for initial profile picture
 │   ├── news/                   # News app: models, views, and services/
 │   │   └── services/
 │   │       ├── currents.py     # Currents API calls + processing
@@ -108,6 +113,9 @@ The authentication system currently provides:
 - User registration
 - Login and logout
 - Protected profile page
+- Profile editing
+- Custom profile picture uploads using Cloudinary
+- Preset profile picture selection
 - Password reset by email
 - Password reset confirmation
 - Password reset completion
@@ -198,11 +206,23 @@ The same `setupPasswordToggle()` function is reused across the authentication pa
 
 ---
 
+## Profile and Profile Pictures
+
+The profile page allows authenticated users to edit their account details, change their password, and manage their profile picture.
+
+Users can either upload a custom profile picture through Cloudinary or select from a set of preset images stored locally in the application's static files. Preset images do not use Cloudinary.
+
+The selected profile picture is displayed on the profile page and throughout the application, including the desktop navbar and mobile navigation.
+
+---
+
 # 5. Database
 
 NodeNexus uses PostgreSQL instead of Django's default SQLite, for a more production-realistic setup and to support future features like user accounts, bookmarks, and comments. Credentials are kept in environment variables rather than in the codebase. Development and production use separate PostgreSQL databases, both accessed through the same Django ORM configuration.
 
-The database currently includes Django's default authentication tables. User accounts created through the NodeNexus signup page are stored in PostgreSQL and can be viewed in pgAdmin.
+The database currently includes Django's default authentication tables and the application's user profile data. User accounts and profile information are stored in PostgreSQL.
+
+Custom profile images are stored through Cloudinary, while preset profile images are stored as static files and referenced by the user's profile.
 
 User features such as bookmarks, comments, and messaging will be added later.
 
@@ -223,9 +243,12 @@ User features such as bookmarks, comments, and messaging will be added later.
 - **Authentication navigation:** Signup, login, and logout links have been added to the desktop and mobile navigation.
 - **Password reset:** Users can request a password reset email, set a new password, and return to the login page.
 - **Change password:** Logged-in users can change their password from their profile.
+- **User profiles:** Authenticated users can view and edit their profile information.
+- **Profile pictures:** Users can upload a custom profile picture through Cloudinary or select from preset images stored locally.
+- **Profile navigation:** The user's profile picture is displayed in the desktop navbar and mobile hamburger menu.
 - **Deployment setup:** Render hosting, PostgreSQL, Gunicorn, WhiteNoise for static files.
 
-Not yet built: user profile pictures, bookmarks, comments, and the inbox/messaging system.
+Not yet built: bookmarks, comments, and the inbox/messaging system.
 
 ---
 
@@ -235,7 +258,7 @@ Not yet built: user profile pictures, bookmarks, comments, and the inbox/messagi
 - Article data from the API isn't perfectly consistent (missing fields, occasional thin category results), so some normalisation and filtering will likely need further tuning.
 - Related-articles matching (first three words of the title) is a simple heuristic, not true topic matching, so results are sometimes only loosely related.
 - Article detail pages currently pass full article metadata (title, description, image, source, published date, URL) through query parameters in the URL, rather than looking articles up by an ID from the database. This works for now but is only temporary until articles are stored with proper IDs once the database models are built.
-- User authentication, profile access, password reset, and change password are implemented. Profile pictures, bookmarking, comments, and messaging have not been built yet.
+- User authentication, profile access, profile editing, profile pictures, password reset, and change password are implemented. Bookmarking, comments, and messaging have not been built.
 
 ---
 
@@ -263,7 +286,9 @@ Static files are handled differently depending on environment:
 - In development (`DEBUG=True`), Django serves static files directly.
 - In production (`DEBUG=False`), WhiteNoise serves collected static files, and `CompressedManifestStaticFilesStorage` generates versioned filenames so updated CSS/JS don't get served from stale browser caches.
 
-Deployment flow: push to GitHub → Render pulls the update → installs dependencies → runs `collectstatic` → Gunicorn starts the app → app connects to the production database. Secrets (Django secret key, database credentials, API keys) are all set as environment variables on Render, not committed to the repo.
+User-uploaded profile images are stored using Cloudinary. Cloudinary configuration is provided through environment variables on Render rather than being stored in the codebase.
+
+Deployment flow: push to GitHub → Render pulls the update → installs dependencies → runs `collectstatic` → Gunicorn starts the app → app connects to the production database. Secrets (Django secret key, database credentials, API keys, and Cloudinary credentials) are all set as environment variables on Render, not committed to the repo.
 
 ---
 
@@ -287,6 +312,22 @@ Deployment flow: push to GitHub → Render pulls the update → installs depende
 
 **Real email setup** — Password reset emails initially used Django's console backend, which printed the email in the terminal. SMTP was later configured so password reset emails could be sent to a real email address. Email credentials are stored in environment variables.
 
+**Initial profile picture implementation** — Profile pictures were initially handled locally through a `media/profile_pics` folder. Both uploaded images and preset images were being stored in this location, with `default.png` used as the initial default profile image. This worked during local development but was not suitable for production on Render because uploaded files should not depend on the application's local filesystem.
+
+**Separating preset and custom profile images** — The profile picture system was redesigned so the two types of images are handled separately. Nine preset images were hand-selected to match the NodeNexus theme and stored in the application's static image files, while custom user uploads are handled by Cloudinary. Two separate fields were added to the `Profile` model to store the selected preset image or custom Cloudinary image.
+
+**Profile picture modal** — The profile picture selection interface required a custom modal allowing users to choose a preset image or upload their own. Initially, placing the modal inside the profile update form caused the form structure and submission behaviour to conflict with the modal. The modal was moved outside the main profile form, which allowed the two interfaces to function independently.
+
+**Profile picture preview and JavaScript integration** — JavaScript was added to control the profile picture modal, handle preset image selection, preview the selected image, and update the displayed profile picture when the user selects a preset or custom upload. This required the frontend to distinguish between the two image sources while keeping the user experience consistent.
+
+**Responsive profile interface** — The profile picture modal and profile editing interface required additional CSS and responsive adjustments to work correctly across desktop, tablet, and mobile screen sizes. The profile picture was also added at a smaller size to the desktop navbar and mobile hamburger menu so the selected image remained visible throughout the application.
+
+**Cloudinary migration** — To make custom profile uploads work reliably in production, the profile image field was changed to `CloudinaryField`. Cloudinary was configured for both development and production, with credentials stored in environment variables. This allowed custom uploads to be stored externally while preset images remained local static assets.
+
+**Cloudinary configuration and Render deployment** — The Cloudinary implementation initially caused deployment problems on Render. The build installed the `cloudinary` package but failed when Django attempted to import `cloudinary_storage`. The unused `cloudinary_storage` configuration was removed and the project was configured to use `CloudinaryField` directly. Cloudinary environment variables were then added to Render so the same profile image system worked in both development and production.
+
+**Development and production consistency** — The profile picture system was tested across both the local development environment and the deployed Render application. The final implementation keeps preset images in static files and custom uploads in Cloudinary, avoiding reliance on the Render filesystem for user-uploaded media.
+
 ---
 
 # 11. What Was Learned
@@ -309,14 +350,24 @@ Deployment flow: push to GitHub → Render pulls the update → installs depende
 - Understanding Django's built-in password reset and change password functionality.
 - Configuring SMTP email so the application can send real password reset emails.
 - Using environment variables to keep email credentials outside the codebase.
+- Building a more complete user profile system with profile editing, password changes, and profile picture management.
+- Understanding the difference between static assets and user-uploaded media and why they should be handled separately.
+- Using Cloudinary to store user-uploaded images instead of relying on the local filesystem in production.
+- Using `CloudinaryField` to connect Django model fields to Cloudinary-hosted images.
+- Designing a profile system that supports both preset images and user-uploaded images through separate model fields.
+- Using JavaScript to control a custom modal, handle image selection, and preview profile images before submission.
+- Understanding how HTML form structure can affect modal behaviour and why separating the modal from the main update form was necessary.
+- Keeping development and production media handling consistent through environment-based Cloudinary configuration.
 
 ---
 
 # 12. Next Steps
 
-- Expand the user profile with profile pictures and additional account information.
 - Bookmarks (saved articles), comments, and the inbox/messaging system required by the assignment brief.
+- Account deletion and additional account management features.
+- Admin functionality and role-based access control.
 - Continued testing and bug fixes on API result consistency (some categories occasionally return fewer than 12 articles).
+- Final UI polish, responsive testing, accessibility improvements, and general application refinement.
 - Eventual migration to a React frontend with a DRF API layer — models and the service layer are expected to carry over largely unchanged.
 
 ---
@@ -334,12 +385,22 @@ Deployment flow: push to GitHub → Render pulls the update → installs depende
 
 **Frontend**
 - Bootstrap Documentation — https://getbootstrap.com/docs/
+- Bootstrap Modal — https://getbootstrap.com/docs/5.3/components/modal/
+- Bootstrap Forms — https://getbootstrap.com/docs/5.3/forms/overview/
 - MDN Web Docs — https://developer.mozilla.org/
+- MDN File Input — https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/input/file
+- MDN File API — https://developer.mozilla.org/en-US/docs/Web/API/File_API
+- MDN URL.createObjectURL() — https://developer.mozilla.org/en-US/docs/Web/API/URL/createObjectURL_static
 - CSS Media Queries — https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_media_queries
 
 **Database**
 - PostgreSQL Documentation — https://www.postgresql.org/docs/
 - Django PostgreSQL Notes — https://docs.djangoproject.com/en/6.0/ref/databases/#postgresql-notes
+
+**Media Storage**
+- Cloudinary Documentation — https://cloudinary.com/documentation
+- Cloudinary Python SDK — https://cloudinary.com/documentation/django_integration
+- Cloudinary Image Upload Documentation — https://cloudinary.com/documentation/image_upload_api_reference
 
 **Deployment**
 - WhiteNoise Documentation — https://whitenoise.readthedocs.io/en/latest/

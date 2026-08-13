@@ -26,7 +26,9 @@
 
 NodeNexus is a full-stack Django web application that aggregates technology news from external APIs, letting users discover the latest developments across AI, cybersecurity, gaming, and trending tech through a unified, searchable platform.
 
-The application uses PostgreSQL for persistent storage and follows a structured Django project layout with separate `core` and `news` applications, keeping general site functionality distinct from news aggregation and API integration logic.
+The application also provides user authentication and account management, including profile editing, password management, and profile picture selection and uploads.
+
+The application uses PostgreSQL for persistent storage and follows a structured Django project layout with separate `core`, `news`, and `accounts` applications, keeping general site functionality, news aggregation, and account functionality separated.
 
 ---
 
@@ -44,7 +46,7 @@ The application uses PostgreSQL for persistent storage and follows a structured 
 
 ## Deployment
 
-The application is deployed on Render using Gunicorn and PostgreSQL.
+The application is deployed on Render using Gunicorn, PostgreSQL, and Cloudinary for user-uploaded profile images.
 
 **Render Web Service configuration:**
 
@@ -60,14 +62,15 @@ The application is deployed on Render using Gunicorn and PostgreSQL.
   - `EMAIL_USE_TLS`
   - `EMAIL_HOST_USER`
   - `EMAIL_HOST_PASSWORD`
+  - `CLOUDINARY_URL`
 
 **Database:**
 
 A Render PostgreSQL instance is linked to the web service.
 
-**Keeping the free web service warm:**
+**Media storage:**
 
-An external scheduled ping (https://cron-job.org) is used to periodically request the live site, reducing cold-start delays caused by Render's free tier spin-down behaviour.
+Cloudinary is used to store custom user-uploaded profile images. Preset profile images are stored locally in the application's static files.
 
 ---
 
@@ -81,6 +84,7 @@ An external scheduled ping (https://cron-job.org) is used to periodically reques
 - CSS
 - JavaScript
 - Currents API
+- Cloudinary
 - WhiteNoise
 - Gunicorn
 
@@ -94,14 +98,18 @@ An external scheduled ping (https://cron-job.org) is used to periodically reques
 - Password validation using Django's built-in validators
 - Django password reset and change password functionality
 - SMTP email configuration using environment variables
+- User profile editing and account management
+- Custom profile picture uploads using Cloudinary
+- Handling preset static images separately from user-uploaded media
+- Using JavaScript to manage profile picture selection, previews, and modal behaviour
 - Separation of external API logic from Django views via a dedicated service layer
 - External API integration and response caching
 - PostgreSQL database setup with Django's ORM
 - Environment-based settings configuration for development and production
 - Responsive frontend development combining Bootstrap and custom CSS
-- Custom authentication page styling using HTML, CSS, and JavaScript
-- Debugging real-world CSS layout, stacking context, and responsive design issues
-- Production deployment and static file management using WhiteNoise and Render
+- Custom authentication and profile interface styling using HTML, CSS, and JavaScript
+- Debugging real-world CSS layout, modal, stacking context, and responsive design issues
+- Production deployment and static/media file management using WhiteNoise, Cloudinary, and Render
 
 ---
 
@@ -169,11 +177,17 @@ An external scheduled ping (https://cron-job.org) is used to periodically reques
 - Custom password validation
 - Login and logout functionality
 - Protected user profile page
+- Profile editing and account information management
 - Password reset by email using Django's built-in password reset system
 - Change password for authenticated users
 - Password visibility toggle using JavaScript
 - Inline form validation and error messages provided by Django
 - Authentication links integrated into the desktop and mobile navigation
+- Profile picture selection through a custom modal
+- Nine preset profile pictures matching the NodeNexus technology theme
+- Custom profile picture uploads stored using Cloudinary
+- JavaScript image preview for selected preset and uploaded profile pictures
+- Profile picture displayed in the desktop navbar and mobile hamburger menu
 
 ---
 
@@ -183,10 +197,11 @@ The project follows a Django multi-app structure with a separated frontend/backe
 
 - `core` handles general site routing and category page views.
 - `news` handles external API communication, caching, and search logic.
-- `accounts` handles user registration, login, logout, profile access, password reset, and change password.
+- `accounts` handles user registration, login, logout, profile access, profile editing, profile pictures, password reset, and change password.
 - A dedicated `services` layer within `news` separates Currents API integration from Django views.
 - Reusable template components (navbar, footer, search bar, article cards, mobile navigation) reduce duplication across pages.
 - Django's built-in authentication system handles user accounts and stores users in the PostgreSQL database.
+- Cloudinary handles custom user-uploaded profile images, while preset profile images remain static assets.
 
 ---
 
@@ -194,7 +209,7 @@ The project follows a Django multi-app structure with a separated frontend/backe
 
 The application uses PostgreSQL, configured through Django's ORM.
 
-Django's built-in authentication tables are currently being used for user accounts. User registration creates users in the PostgreSQL database, and the accounts can be viewed through pgAdmin.
+Django's built-in authentication tables are used for user accounts. The `Profile` model stores additional user profile information, including the selected preset profile image or custom Cloudinary image.
 
 Custom application models for articles, bookmarks, comments, and messaging have not been created yet.
 
@@ -209,6 +224,7 @@ NodeNexus/
 │   ├── accounts/
 │   ├── config/
 │   ├── core/
+│   ├── media/
 │   ├── news/
 │   │   └── services/
 │   ├── manage.py
@@ -253,6 +269,7 @@ pip install -r backend/requirements.txt
    - `EMAIL_USE_TLS`
    - `EMAIL_HOST_USER`
    - `EMAIL_HOST_PASSWORD`
+   - `CLOUDINARY_URL`
 
 ---
 
@@ -282,7 +299,7 @@ python backend/manage.py collectstatic --noinput
 
 - `backend/config/urls.py` → includes the main application and accounts routes
 - `backend/core/urls.py` → main pages (`/`, `/ai/`, `/cybersecurity/`, `/gaming/`, `/trending/`, `/search/`, `/auto-complete/`, `/article/`)
-- `backend/accounts/urls.py` → authentication routes for registration, login, logout, profile, password reset, and change password
+- `backend/accounts/urls.py` → authentication routes for registration, login, logout, profile, profile editing, password reset, and change password
 
 ---
 
@@ -312,10 +329,12 @@ python backend/manage.py collectstatic --noinput
 
 ## Planned Features
 
-- Expand user profiles with profile pictures and additional account information
+
 - Saved/bookmarked articles
 - Comment system
 - User-to-user direct messaging
+- Account deletion
+- Admin functionality and role-based access control
 - React frontend migration
 - Django REST Framework API layer
 
@@ -333,7 +352,7 @@ python backend/manage.py collectstatic --noinput
 
 ### Homepage
 
-![Homepage](frontend/src/static/images/Homepage.png)
+![Homepage](frontend/src/static/images/Home.png)
 
 ### Category Page
 
@@ -354,3 +373,7 @@ python backend/manage.py collectstatic --noinput
 ### Log In
 
 ![Log In](frontend/src/static/images/Login.png)
+
+### Profile
+
+![Profile](frontend/src/static/images/Profile.png)
