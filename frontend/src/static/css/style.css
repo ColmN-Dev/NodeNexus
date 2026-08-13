@@ -1532,7 +1532,7 @@ a.btn:hover {
 
 #profilePictureModal .modal-title {
 
-    color: var(--heading-color);
+    color: var(--content-heading);
 
     font-family: var(--heading-font);
 
@@ -1609,7 +1609,7 @@ a.btn:hover {
 
     font-family: var(--heading-font);
 
-    color: var(--heading-color);
+    color: var(--content-heading);
 
 }
 

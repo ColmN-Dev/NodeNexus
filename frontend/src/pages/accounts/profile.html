@@ -161,7 +161,9 @@ Your Profile | NodeNexus
 
             <div class="modal-body">
 
-                <h3>Choose a Profile Picture</h3>
+                <h3 class="modal-title">
+                    Choose a Profile Picture
+                </h3>
 
                     <div class="profile-image-options">
 
@@ -277,7 +279,9 @@ Your Profile | NodeNexus
 
                     <div class="profile-image-preview">
 
-                        <h4>Preview:</h4>
+                        <h4>
+                            Preview:
+                        </h4>
 
                     {% if user.profile.preset_image %}
                         <img id="profileImagePreview" src="{% static 'images/' %}{{ user.profile.preset_image }}.png" alt="Profile preview">
