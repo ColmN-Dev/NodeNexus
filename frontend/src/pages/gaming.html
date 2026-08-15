@@ -30,39 +30,44 @@ Gaming | NodeNexus
     <div class="article-grid">
 
         {% for article in articles %}
-        <div class="article-card">
 
-            <a 
-                href="{% url 'article_detail' %}?title={{ article.title|urlencode }}&description={{ article.description|urlencode }}&image={{ article.image|urlencode }}&published={{ article.published|urlencode }}&source={{ article.source|urlencode }}&url={{ article.url|urlencode }}&category={{ title|urlencode }}">
-            <img
-                src="{% if article.image and article.image != 'None' %}{{ article.image }}{% else %}{% static 'images/placeholder.png' %}{% endif %}"
-                alt="{{ article.title }}"
-                data-fallback-src="{% static 'images/placeholder.png' %}"
-                onerror="this.onerror=null; this.src=this.dataset.fallback;"
-            >
-            </a>
+            <div class="article-card">
 
-            <a 
-                href="{% url 'article_detail' %}?title={{ article.title|urlencode }}&description={{ article.description|urlencode }}&image={{ article.image|urlencode }}&published={{ article.published|urlencode }}&source={{ article.source|urlencode }}&url={{ article.url|urlencode }}&category={{ title|urlencode }}">
-            <h3>
-                {{ article.title }}
-            </h3>
-            </a>
+                <a href="{% url 'article_detail' %}?title={{ article.title|urlencode }}&description={{ article.description|urlencode }}&image={{ article.image|urlencode }}&published={{ article.published|urlencode }}&source={{ article.source|urlencode }}&url={{ article.url|urlencode }}">
+                    <img
+                        src="{% if article.image and article.image != 'None' %}{{ article.image }}{% else %}{% static 'images/placeholder.png' %}{% endif %}"
+                        alt="{{ article.title }}"
+                        data-fallback-src="{% static 'images/placeholder.png' %}"
+                        onerror="this.onerror=null; this.src=this.dataset.fallback;"
+                    >
+                </a>
 
-            <p>{{ article.description|truncatewords:25 }}</p>
+                <a href="{% url 'article_detail' %}?title={{ article.title|urlencode }}&description={{ article.description|urlencode }}&image={{ article.image|urlencode }}&published={{ article.published|urlencode }}&source={{ article.source|urlencode }}&url={{ article.url|urlencode }}">
+                    <h3>
+                        {{ article.title }}
+                    </h3>
+                </a>
 
-            <span class="published-date">{{ article.published }}</span>
+                <p>{{ article.description|truncatewords:25 }}</p>
 
-            <a 
-                href="{% url 'article_detail' %}?title={{ article.title|urlencode }}&description={{ article.description|urlencode }}&image={{ article.image|urlencode }}&published={{ article.published|urlencode }}&source={{ article.source|urlencode }}&url={{ article.url|urlencode }}&category={{ title|urlencode }}"
-                class="btn btn-primary mt-auto"
-            >
-                View Details
-            </a>
+                <span class="published-date">{{ article.published }}</span>
 
-        </div>
+                <a
+                    href="{% url 'article_detail' %}?title={{ article.title|urlencode }}&description={{ article.description|urlencode }}&image={{ article.image|urlencode }}&published={{ article.published|urlencode }}&source={{ article.source|urlencode }}&url={{ article.url|urlencode }}"
+                    class="btn btn-primary mt-auto"
+                    title="View Article Details"
+                >
+                    View Details
+                </a>
+
+            </div>
+            
         {% empty %}
-        <p>No articles found right now. Try again shortly.</p>
+
+        <h4 class="empty-state-message">
+            No articles found right now. Try again shortly.
+        </h4>
+        
         {% endfor %}
 
     </div>

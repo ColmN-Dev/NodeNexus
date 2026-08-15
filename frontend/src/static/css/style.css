@@ -1717,6 +1717,72 @@ a.btn:hover {
     padding: 0.75rem 1.25rem;
 }
 
+.empty-state-message {
+
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 2rem;
+
+}
+
+/* ========================================
+   DANGER BUTTON
+   ======================================== */
+
+a.btn.nn-btn.btn-danger,
+button.btn.nn-btn.btn-danger {
+
+    background:#dc3545;
+
+    color:#fff !important;
+
+    border:none;
+
+    border-radius:18px;
+
+    min-height:58px;
+
+    padding:.9rem 2rem;
+
+    font-family:var(--heading-font);
+
+    font-weight:600;
+
+    box-shadow:var(--shadow);
+
+    text-decoration:none;
+
+    display:inline-flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    transition:
+        background .25s ease,
+        transform .25s ease,
+        box-shadow .25s ease;
+
+}
+
+a.btn.nn-btn.btn-danger:hover,
+a.btn.nn-btn.btn-danger:focus,
+button.btn.nn-btn.btn-danger:hover,
+button.btn.nn-btn.btn-danger:focus {
+
+    background:#b02a37;
+
+    color:#fff !important;
+
+    transform:translateY(-2px);
+
+    box-shadow:
+        0 0 12px rgba(220,53,69,.35);
+
+    text-decoration:none;
+
+}
+
 /* ========================================
    PAGINATION
    ======================================== */

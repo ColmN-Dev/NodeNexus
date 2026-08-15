@@ -17,34 +17,28 @@
                 <div class="article-card">
 
                     {% if article.image and article.image != "None" %}
-                    <a 
-                        href="{% url 'article_detail' %}?title={{ article.title|urlencode }}&description={{ article.description|urlencode }}&image={{ article.image|urlencode }}&published={{ article.published|urlencode }}&source={{ article.source|urlencode }}&url={{ article.url|urlencode }}&category={{ title|urlencode }}"> 
-                    <img
-                        src="{% if article.image and article.image != 'None' %}{{ article.image }}{% else %}{% static 'images/placeholder.png' %}{% endif %}"
-                        alt="{{ article.title }}"
-                        data-fallback-src="{% static 'images/placeholder.png' %}"
-                        onerror="this.onerror=null; this.src=this.dataset.fallback;"
-                    >
-                    </a>
+                        <a href="{% url 'article_detail' %}?title={{ article.title|urlencode }}&description={{ article.description|urlencode }}&image={{ article.image|urlencode }}&published={{ article.published|urlencode }}&source={{ article.source|urlencode }}&url={{ article.url|urlencode }}">
+                            <img
+                                src="{% if article.image and article.image != 'None' %}{{ article.image }}{% else %}{% static 'images/placeholder.png' %}{% endif %}"
+                                alt="{{ article.title }}"
+                                data-fallback-src="{% static 'images/placeholder.png' %}"
+                                onerror="this.onerror=null; this.src=this.dataset.fallback_src;"
+                            >
+                        </a>
                     {% endif %}
 
-                    <a 
-                        href="{% url 'article_detail' %}?title={{ article.title|urlencode }}&description={{ article.description|urlencode }}&image={{ article.image|urlencode }}&published={{ article.published|urlencode }}&source={{ article.source|urlencode }}&url={{ article.url|urlencode }}&category={{ title|urlencode }}">
-                    <h3>
-                        {{ article.title }}
-                    </h3>
+                    <a href="{% url 'article_detail' %}?title={{ article.title|urlencode }}&description={{ article.description|urlencode }}&image={{ article.image|urlencode }}&published={{ article.published|urlencode }}&source={{ article.source|urlencode }}&url={{ article.url|urlencode }}">
+                        <h3>{{ article.title }}</h3>
                     </a>
 
-                    <p>
-                        {{ article.description }}
-                    </p>
+                    <p>{{ article.description }}</p>
 
                     <small class="published-date">
                         {{ article.published }}
                     </small>
 
-                    <a 
-                        href="{% url 'article_detail' %}?title={{ article.title|urlencode }}&description={{ article.description|urlencode }}&image={{ article.image|urlencode }}&published={{ article.published|urlencode }}&source={{ article.source|urlencode }}&url={{ article.url|urlencode }}&category={{ title|urlencode }}"
+                    <a
+                        href="{% url 'article_detail' %}?title={{ article.title|urlencode }}&description={{ article.description|urlencode }}&image={{ article.image|urlencode }}&published={{ article.published|urlencode }}&source={{ article.source|urlencode }}&url={{ article.url|urlencode }}"
                         class="btn btn-primary mt-auto"
                     >
                         View Details

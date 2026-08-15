@@ -4,8 +4,7 @@ from django.contrib import messages
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from .forms import UserRegisterForm, ProfileUpdateForm
-from pathlib import Path
-from django.conf import settings
+from news.models import Bookmark
 
 
 PRESET_IMAGES = {
@@ -68,8 +67,11 @@ def profile(request):
     else:
         # Display the current profile image when the page loads.
         form = ProfileUpdateForm(instance=request.user.profile)
+        
+    # Fetch the user's bookmarks to display them on the profile page.
+    bookmarks = Bookmark.objects.filter(user=request.user)
 
-    return render(request, 'accounts/profile.html', {'form': form})
+    return render(request, 'accounts/profile.html', {'form': form, 'bookmarks': bookmarks})
 
 
 def login_view(request):

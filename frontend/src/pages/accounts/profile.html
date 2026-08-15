@@ -100,6 +100,10 @@ Your Profile | NodeNexus
                         <strong>Joined:</strong> {{ user.date_joined|date:"F j, Y" }}
                     </h3>
 
+                    <h3>
+                        <strong>Saved Articles:</strong> {{ bookmarks.count }}
+                    </h3>
+
                     <div class="d-flex justify-content-center gap-2">
 
                         <a
@@ -119,6 +123,96 @@ Your Profile | NodeNexus
                     </div>
 
                 </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="container py-4">
+
+        <div class="glass-content profile-detail">
+
+            <h2>
+                Bookmarked Articles
+            </h2>
+
+            <div class="article-grid">
+
+                {% for bookmark in bookmarks %}
+
+                <div class="article-card">
+
+                    <a
+                        href="{% url 'saved_article_detail' bookmark.article.id %}"
+                    >
+                        <img
+                            src="{% if bookmark.article.image and bookmark.article.image != 'None' %}{{ bookmark.article.image }}{% else %}{% static 'images/placeholder.png' %}{% endif %}"
+                            alt="{{ bookmark.article.title }}"
+                            data-fallback-src="{% static 'images/placeholder.png' %}"
+                            onerror="this.onerror=null; this.src=this.dataset.fallback;"
+                        >
+                    </a>
+
+                    <a
+                        href="{% url 'saved_article_detail' bookmark.article.id %}"
+                    >
+                        <h3>
+                            {{ bookmark.article.title }}
+                        </h3>
+                    </a>
+
+                    <p>{{ bookmark.article.description|truncatewords:25 }}</p>
+
+                    <span class="published-date">
+                        {{ bookmark.article.published }}
+                    </span>
+
+                    <a
+                        href="{% url 'saved_article_detail' bookmark.article.id %}"
+                        class="btn btn-primary mt-auto"
+                        title="View Article Details"
+                    >
+                        View Details
+                    </a>
+
+                    <form method="POST" action="{% url 'delete_bookmark' bookmark.article.id %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn nn-btn btn-danger" title="Remove Bookmark">
+
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                width="25"
+                                height="25"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round">
+
+                                <path d="M3 6h18"/>
+                                <path d="M8 6V4h8v2"/>
+                                <path d="M19 6l-1 14H6L5 6"/>
+                                <path d="M10 11v5"/>
+                                <path d="M14 11v5"/>
+
+                            </svg>
+
+                            Remove Bookmark
+                            
+                        </button>
+                    </form>
+
+                </div>
+
+                {% empty %}
+
+                <h4 class="empty-state-message">
+                    You haven't bookmarked any articles yet.
+                </h4>
+
+                {% endfor %}
 
             </div>
 

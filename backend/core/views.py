@@ -1,15 +1,58 @@
-#core/views.py
+# core/views.py
 
 from django.shortcuts import render
 from django.http import HttpResponseRedirect
 from news.services.currents import search_articles, get_category_articles
 
 
-"""
-Helper function to get articles for a specific page, handling cases where the requested page has no articles
-"""
+def home(request):
+    """
+    Featured articles view.
+    Displays curated technology articles for the homepage.
+    """
+
+    # Trending Technology
+    trending_articles, _ = get_category_articles("technology", page=1)
+    trending_articles = trending_articles[:3]
+
+    # Artificial Intelligence
+    ai_articles, _ = search_articles(
+        "'artificial intelligence' OR 'machine learning' OR 'OpenAI' OR 'ChatGPT' OR 'generative AI' OR 'Claude' OR 'Anthropic'"
+    )
+    ai_articles = ai_articles[:3]
+
+    # Cybersecurity
+    cybersecurity_articles, _ = search_articles(
+        "'cybersecurity' OR ransomware OR malware OR 'cyber attacks'"
+    )
+    cybersecurity_articles = cybersecurity_articles[:3]
+
+    # Gaming
+    gaming_articles, _ = search_articles(
+        "videogames OR PlayStation OR Xbox OR Nintendo OR 'PC gaming'"
+    )
+    gaming_articles = gaming_articles[:3]
+
+    context = {
+        "trending_articles": trending_articles,
+        "ai_articles": ai_articles,
+        "cybersecurity_articles": cybersecurity_articles,
+        "gaming_articles": gaming_articles,
+    }
+
+    return render(
+        request,
+        "index.html",
+        context
+    )
+
 
 def get_page_articles(request, query, use_category=False):
+    """
+    Helper function to get articles for a specific page,
+    handling cases where the requested page has no articles.
+    """
+    
     page = int(request.GET.get("page", 1))
     original_page = page
 
@@ -19,7 +62,8 @@ def get_page_articles(request, query, use_category=False):
     else:
         articles, has_next = search_articles(query, page=page)
 
-    # If the requested page has no articles, go back one page until articles are found or redirect to the first page
+    # If the requested page has no articles, go back one page
+    # until articles are found.
     while page > 1 and not articles:
         page -= 1
 
@@ -28,17 +72,20 @@ def get_page_articles(request, query, use_category=False):
         else:
             articles, has_next = search_articles(query, page=page)
 
-    return articles[:12], page, has_next, original_page
+    articles = articles[:12]
+
+    return articles, page, has_next, original_page
 
 
 """
 Core views for the NodeNexus application.
-
 """
+
+
 def ai(request):
-    
+
     query = "'artificial intelligence' OR 'machine learning' OR 'OpenAI' OR 'ChatGPT' OR 'generative AI' OR 'Claude' OR 'Anthropic'"
-    
+
     articles, page, has_next, original_page = get_page_articles(
         request, query
     )
@@ -52,10 +99,11 @@ def ai(request):
         {"articles": articles, "page": page, "has_next": has_next}
     )
 
+
 def cybersecurity(request):
-    
+
     query = "'cybersecurity' OR ransomware OR malware OR 'cyber attacks'"
-    
+
     articles, page, has_next, original_page = get_page_articles(
         request, query
     )
@@ -69,10 +117,11 @@ def cybersecurity(request):
         {"articles": articles, "page": page, "has_next": has_next}
     )
 
+
 def gaming(request):
-    
+
     query = "videogames OR PlayStation OR Xbox OR Nintendo OR 'PC gaming'"
-    
+
     articles, page, has_next, original_page = get_page_articles(
         request, query
     )
@@ -86,9 +135,9 @@ def gaming(request):
         {"articles": articles, "page": page, "has_next": has_next}
     )
 
+
 def trending(request):
-    
-    
+
     articles, page, has_next, original_page = get_page_articles(
         request, "technology", use_category=True
     )
