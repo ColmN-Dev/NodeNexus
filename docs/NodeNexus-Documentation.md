@@ -26,7 +26,7 @@
 
 NodeNexus is a technology news aggregator built with Django. It pulls articles from the Currents API and displays them across category pages (AI, cybersecurity, gaming, trending), alongside global search, autocomplete, and article detail pages.
 
-The application also includes user authentication and account features, allowing users to register, log in, manage their account, and interact with content. Further user features such as bookmarks, comments, messaging, and account management are being developed as the project progresses.
+The application also includes user authentication and account features, allowing users to register, log in, manage their account, manage their profile picture, and save articles using bookmarks.
 
 The stack is Django, PostgreSQL, and Django Templates with Bootstrap, custom CSS, and vanilla JavaScript. The project is structured so a React frontend and DRF API layer can be added later without a rewrite, but currently all pages are plain Django templates.
 
@@ -44,28 +44,31 @@ NodeNexus/
 ├── backend/
 │   ├── accounts/               # Authentication and account-related views/forms
 │   ├── config/                 # Django settings, urls, wsgi/asgi
-│   ├── core/                   # General site views (ai, cybersecurity, gaming, trending)
-│   ├── media/                  # Contains the `default.png` file for initial profile picture
-│   ├── news/                   # News app: models, views, and services/
+│   ├── core/                   # General site views and shared functionality
+│   ├── media/                  # Local media files used during development
+│   ├── news/                   # News, article, and bookmark functionality
 │   │   └── services/
 │   │       ├── currents.py     # Currents API calls + processing
-│   │       └── cache.py        # API response caching
+│   │       ├── cache.py        # API response caching
+│   │       └── articles.py     # Article creation/retrieval service logic
 │   ├── staticfiles/
 │   ├── manage.py
 │   └── requirements.txt
 │
 ├── frontend/
 │   └── src/
-│       ├── components/     # Reusable template partials (navbar, footer, article_card, etc.)
-│       ├── pages/          # Page templates (index, ai, cybersecurity, gaming, trending, search_results)
-│       └── static/         # css, js, images
+│       ├── components/         # Reusable template partials
+│       ├── pages/              # Page templates
+│       └── static/             # CSS, JavaScript, and images
 │
 ├── docs/
 ├── Procfile
 └── README.md
 ```
 
-The `core` app handles general site pages. `news` handles article fetching and category logic. The `news/services` package keeps Currents API calls and caching logic out of the views. The `accounts` app handles user registration, login, logout, profile access, password resets, and password changes.
+The core app handles general site pages and functionality. The news app handles article-related models, views, bookmarks, and external news data. The news/services/ package keeps API, caching, and article creation logic separate from the views.
+
+The accounts app handles user registration, authentication, profiles, password management, and profile pictures.
 
 ---
 
@@ -73,32 +76,57 @@ The `core` app handles general site pages. `news` handles article fetching and c
 
 ## Views and URL routing
 
-Each category page (AI, cybersecurity, gaming, trending) and the search results page has a view that: reads the requested page number from the URL, calls the relevant service function, falls back to a valid page if the requested one is empty, and renders the template.
+Django views handle requests from the frontend and connect the templates to the application's backend logic.
 
-A shared `get_page_articles` helper handles the "requested page has no results, step back until one does" logic so it isn't repeated in every view.
+Each category page (AI, cybersecurity, gaming, trending) and the search results page uses the relevant service functions to retrieve articles, handle pagination, and render the appropriate template.
+
+Article detail pages can display article data returned by the external API. When an article is bookmarked, its data is stored in the database and can then be retrieved using its database ID.
+
+URL routing is split between the main project URL configuration and the individual Django apps, keeping routes organised by responsibility.
 
 ---
 
 ## Currents API service
 
-`currents.py` handles all communication with the Currents API: building the request, processing the response into a consistent article format, and returning `has_next` so views know whether another page exists.
+`currents.py` handles communication with the Currents API, including building requests, processing responses, filtering results, and returning article data in a consistent format.
 
-The Currents API doesn't return a total result count, so pagination can't use a normal "page X of Y" approach — instead, each request returns whether a next page is available, and the app works page-by-page from there. In practice, and from testing, results are capped at five pages per query.
+The Currents API does not return a total result count, so pagination cannot use a normal "page X of Y" approach. Instead, the application checks whether another page of results is available and uses this information to control pagination.
+
+In practice, testing showed that results are capped at five pages per query.
 
 ---
 
 ## Caching
 
-`cache.py` provides a TTL-based cache in front of the Currents API calls, so repeated requests for the same query/page don't hit the external API every time. This reduces API usage and makes the app more resilient to slow or inconsistent API responses.
+`cache.py` provides a TTL-based cache in front of Currents API requests. Repeated requests for the same query and page can therefore use cached data instead of making another external API request.
+
+This reduces API usage and makes the application more resilient to slow or inconsistent API responses.
 
 ---
 
 ## Content filtering
 
-Before articles are shown, low-quality results are filtered out:
-- A domain exclusion list removes known low-value sources (forum threads, raw vulnerability database dumps).
-- Auto-generated CVE announcement titles are filtered out, while genuine articles that reference a CVE number in a proper headline are kept.
-- Duplicate articles are removed.
+Before articles are displayed, low-quality or unsuitable results are filtered out.
+
+This includes:
+
+- A domain exclusion list that removes known low-value sources and raw vulnerability database results.
+- Filtering auto-generated CVE announcement titles while keeping genuine articles that reference CVE numbers in proper headlines.
+- Removing duplicate articles from API results.
+
+---
+
+## Article and bookmark management
+
+Articles returned by the Currents API are initially handled as API response data rather than being stored in the database.
+
+When a user views an article, its data can be displayed directly from the API response. When the user chooses to bookmark an article, the relevant article data is passed to the article service.
+
+The service checks whether the article already exists in the `Article` table. If it does not, the article is created and assigned a database ID. A `Bookmark` record is then created linking the authenticated user to that article.
+
+This keeps the database limited to articles that users have actually saved instead of storing every article returned by the external API.
+
+When a user removes a bookmark, the bookmark is deleted. If the article is no longer bookmarked by any user, the associated article record can also be removed so unused article records do not remain in the database.
 
 ---
 
@@ -186,6 +214,18 @@ The article detail page has a "related articles" section that uses the same hori
 related_query = " ".join(title_words[:3])
 ```
 
+## Bookmarks
+
+Users can bookmark articles from the article detail page and remove them again from their saved articles.
+
+The bookmark interface uses SVG icons rather than text-only controls, keeping the interface compact and consistent with the rest of the NodeNexus design.
+
+When an article is bookmarked, its data is stored in the `Article` table and a `Bookmark` record links it to the user's account. Saved articles are displayed on the user's profile page.
+
+Removing a bookmark deletes the bookmark record. If the article is no longer bookmarked by any user, the associated article record is also removed to keep the database clean.
+
+---
+
 ## Responsive Design
 
 Getting Bootstrap and the custom CSS to work consistently across different screen sizes required ongoing testing and adjustments as new features were added. Components such as the mobile navigation, article carousels, pagination, article cards, and article detail layout each required responsive styling to maintain a consistent appearance and layout across desktop, tablet, and mobile devices.
@@ -218,13 +258,19 @@ The selected profile picture is displayed on the profile page and throughout the
 
 # 5. Database
 
-NodeNexus uses PostgreSQL instead of Django's default SQLite, for a more production-realistic setup and to support future features like user accounts, bookmarks, and comments. Credentials are kept in environment variables rather than in the codebase. Development and production use separate PostgreSQL databases, both accessed through the same Django ORM configuration.
+NodeNexus uses PostgreSQL instead of Django's default SQLite, for a more production-realistic setup and to support relational features such as user accounts, articles, and bookmarks. Credentials are kept in environment variables rather than in the codebase. Development and production use separate PostgreSQL databases, both accessed through the same Django ORM configuration.
 
-The database currently includes Django's default authentication tables and the application's user profile data. User accounts and profile information are stored in PostgreSQL.
+The database includes Django's default authentication tables, the application's user profile data, and the custom `Article` and `Bookmark` models.
+
+The `Article` model stores article information when an article is bookmarked, including its title, description, image, source, published date, and URL. The `Bookmark` model connects saved articles to individual users.
+
+Articles are not stored in the database simply because they were returned by the Currents API. They are only added when a user saves an article. This avoids filling the database with articles that no user has chosen to keep.
+
+When a bookmark is removed, the bookmark record is deleted. If no other user has bookmarked the associated article, the article record is also removed.
 
 Custom profile images are stored through Cloudinary, while preset profile images are stored as static files and referenced by the user's profile.
 
-User features such as bookmarks, comments, and messaging will be added later.
+User features such as comments and messaging will be added later.
 
 ---
 
@@ -235,6 +281,8 @@ User features such as bookmarks, comments, and messaging will be added later.
 - **Content filtering:** domain exclusion list, CVE-title filtering, and deduplication.
 - **Pagination:** five-button numbered pagination with previous/next arrows, responsive layout, applied across category and search pages.
 - **Article detail pages:** full article view with a larger image, a link to the original article, and a related-articles carousel.
+- **Bookmarks:** Users can save articles to their profile, view their saved articles, and remove bookmarks. Articles are only added to the database when bookmarked, and unused article records are removed when no users have them bookmarked.
+- **Article management:** Saved articles are stored using `Article` and `Bookmark` database models, allowing bookmarked content to be associated with individual users.
 - **Responsive frontend:** desktop grid / mobile carousel layouts, mobile bottom nav, off-canvas menu, fallback images.
 - **Theming:** dark/light mode via CSS variables.
 - **Caching:** TTL cache in front of the Currents API to cut down on repeat requests.
@@ -248,7 +296,7 @@ User features such as bookmarks, comments, and messaging will be added later.
 - **Profile navigation:** The user's profile picture is displayed in the desktop navbar and mobile hamburger menu.
 - **Deployment setup:** Render hosting, PostgreSQL, Gunicorn, WhiteNoise for static files.
 
-Not yet built: bookmarks, comments, and the inbox/messaging system.
+Not yet built: comments and the inbox/messaging system.
 
 ---
 
@@ -256,9 +304,11 @@ Not yet built: bookmarks, comments, and the inbox/messaging system.
 
 - The app depends entirely on the Currents API — if it's slow, rate-limited, or changes its response format, that directly affects the site. Caching helps but doesn't remove the dependency.
 - Article data from the API isn't perfectly consistent (missing fields, occasional thin category results), so some normalisation and filtering will likely need further tuning.
-- Related-articles matching (first three words of the title) is a simple heuristic, not true topic matching, so results are sometimes only loosely related.
-- Article detail pages currently pass full article metadata (title, description, image, source, published date, URL) through query parameters in the URL, rather than looking articles up by an ID from the database. This works for now but is only temporary until articles are stored with proper IDs once the database models are built.
-- User authentication, profile access, profile editing, profile pictures, password reset, and change password are implemented. Bookmarking, comments, and messaging have not been built.
+- Related-articles matching (first three words of the title) is a simple approximation, not true topic matching, so results are sometimes only loosely related.
+- Article detail pages currently receive the full article metadata through query parameters rather than looking the article up by a database ID. This is intentional for unsaved articles because API articles are not stored in the database until a user bookmarks them.
+- Bookmarked articles are stored in the database, but the application does not currently store every article returned by the API. This means an article only receives a database ID after it has been saved.
+- Bookmarking currently depends on the article data supplied by the API response. If the API changes or provides incomplete article data, this can affect the information stored when an article is bookmarked.
+- Comments, messaging/inbox functionality, and account deletion have not yet been implemented.
 
 ---
 
@@ -275,6 +325,16 @@ Not yet built: bookmarks, comments, and the inbox/messaging system.
 **Why previous/next pagination instead of numbered totals** — the Currents API doesn't report a total result count, so a traditional "page X of Y" approach wasn't possible. Since results are capped at five pages, a fixed five-button layout was used instead of calculating a page range.
 
 **Why a service layer for the API** — keeping `currents.py` and `cache.py` separate from the views means the views stay focused on handling requests, and the API/caching logic can be tested and changed independently.
+
+**Why articles are not stored immediately** — Articles returned by the Currents API are initially treated as API response data rather than being stored in the database. Storing every article returned by the API would create unnecessary database records for content users may never interact with. An article is only created in the database when a user chooses to bookmark it.
+
+**Why bookmarks use separate Article and Bookmark models** — The `Article` model stores the article data itself, while the `Bookmark` model connects an article to a specific user. This keeps article data separate from the user's saved relationship and allows the same article to be bookmarked by multiple users without duplicating the article record.
+
+**Why the Article record is created when bookmarked** — When a user saves an API article, the application uses the article data already available in the API response to create or retrieve the corresponding `Article` record. The database then assigns the article its own ID, which the bookmark can reference.
+
+**Why unused articles are removed** — When a user removes a bookmark, the bookmark record is deleted. If no other users have bookmarked that article, the associated `Article` record is also removed. This prevents the database from accumulating article records that are no longer being used.
+
+**Why API response data is used for unsaved articles** — The Currents API does not provide a reliable way to retrieve an individual article by its URL or another permanent database identifier. Passing the article data through to the detail page allows unsaved articles to be displayed without unnecessarily storing them in the database.
 
 ---
 
@@ -326,6 +386,26 @@ Deployment flow: push to GitHub → Render pulls the update → installs depende
 
 **Cloudinary configuration and Render deployment** — The Cloudinary implementation initially caused deployment problems on Render. The build installed the `cloudinary` package but failed when Django attempted to import `cloudinary_storage`. The unused `cloudinary_storage` configuration was removed and the project was configured to use `CloudinaryField` directly. Cloudinary environment variables were then added to Render so the same profile image system worked in both development and production.
 
+**Bookmark database design** — Adding bookmarks required deciding how API articles should be represented in the database. Storing every article returned by Currents would create unnecessary database records, so the final design keeps unsaved articles as API response data and only creates an `Article` record when a user bookmarks one.
+
+**Using the API response for unsaved articles** — A major challenge was that an article being viewed does not necessarily exist in the database. The final solution was to continue using the Python dictionary containing the API response while the article is being viewed. When the user chooses to bookmark it, that dictionary provides the data needed to create the database record. This avoids forcing every API result into the database just to support the article detail page.
+
+**Creating articles only when bookmarked** — The bookmarking flow was designed so the application gets or creates the `Article` record from the API data when the user saves an article. The database then assigns the article its own ID, and the `Bookmark` record links that article to the user's account. This provided a much simpler solution than trying to maintain database records for every article returned by the API.
+
+**Separating Article and Bookmark records** — The implementation required understanding that an article and a user's bookmark are two different pieces of data. The `Article` model stores the article itself, while the `Bookmark` model represents the relationship between a user and a saved article. This allows an article to exist once in the database while being bookmarked by multiple users.
+
+**Bookmark removal and unused articles** — Initially, removing a bookmark only removed the bookmark relationship, leaving the associated article in the database. This meant an article could remain in the `Article` table even after no user had saved it. The deletion logic was updated so that after a bookmark is removed, the application checks whether the article is still bookmarked by another user. If it is not, the unused `Article` record is deleted as well, keeping the database clean.
+
+**Bookmark state on article pages** — The article detail page needed to know whether the current authenticated user had already bookmarked the article so that the correct bookmark state could be displayed. This required passing the bookmark state from the backend to the template while still supporting articles that had not yet been stored in the database.
+
+**Bookmark interface and icon design** — The bookmark controls were refined during implementation so the final interface uses SVG icons rather than relying on text-only buttons. The remove-bookmark action was given stronger danger styling because it represents a destructive action, while simpler Bootstrap styling was retained for less significant controls such as cancel actions.
+
+**Bookmark migrations and database changes** — Adding the `Article` and `Bookmark` models required creating and applying Django migrations. Subsequent changes to the `Article` model also required additional migrations so the database structure remained consistent with the Django models.
+
+**Article service layer** — The bookmark implementation introduced a dedicated article service function responsible for getting an existing article or creating it from the supplied API data. This kept database creation logic out of the bookmark view and provided one place for handling the transition from temporary API data to a persistent database article.
+
+**Testing bookmark creation and deletion** — The complete bookmark flow required testing that an article could be saved, appeared in the user's saved articles, could be removed again, and that the corresponding database records were correctly created and cleaned up. Additional testing will continue as further NodeNexus features are added.
+
 **Development and production consistency** — The profile picture system was tested across both the local development environment and the deployed Render application. The final implementation keeps preset images in static files and custom uploads in Cloudinary, avoiding reliance on the Render filesystem for user-uploaded media.
 
 ---
@@ -358,16 +438,26 @@ Deployment flow: push to GitHub → Render pulls the update → installs depende
 - Using JavaScript to control a custom modal, handle image selection, and preview profile images before submission.
 - Understanding how HTML form structure can affect modal behaviour and why separating the modal from the main update form was necessary.
 - Keeping development and production media handling consistent through environment-based Cloudinary configuration.
+- Separating temporary API response data from persistent database data.
+- Why articles should only be stored in the database when a user chooses to bookmark them rather than storing every article returned by the API.
+- Working with relationships between the `Article` and `Bookmark` models to connect users with saved articles.
+- Using `get_or_create()` to prevent duplicate article and bookmark records.
+- Cleaning up unused database records when a bookmark is removed.
+- Passing bookmark state from a Django view to a template so the interface can display the correct action.
+- Reusing an existing bookmark deletion view from multiple parts of the application rather than creating separate deletion logic.
+- Using database IDs when API data is converted into persistent Django model records.
+- Reviewing documentation against the actual application to identify missing functionality and inconsistencies.
 
 ---
 
 # 12. Next Steps
 
-- Bookmarks (saved articles), comments, and the inbox/messaging system required by the assignment brief.
+- Comments and the inbox/messaging system required by the assignment brief.
 - Account deletion and additional account management features.
 - Admin functionality and role-based access control.
 - Continued testing and bug fixes on API result consistency (some categories occasionally return fewer than 12 articles).
 - Final UI polish, responsive testing, accessibility improvements, and general application refinement.
+- Continued testing of existing features as new functionality is added.
 - Eventual migration to a React frontend with a DRF API layer — models and the service layer are expected to carry over largely unchanged.
 
 ---

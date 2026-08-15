@@ -140,6 +140,16 @@ Cloudinary is used to store custom user-uploaded profile images. Preset profile 
 
 ---
 
+### Bookmarks
+
+- Users can bookmark articles while viewing them
+- Bookmarked articles are displayed on the user's profile
+- Users can remove bookmarks from both the profile and article detail pages
+- Articles are only stored in the database when bookmarked
+- Unused article records are removed when the final bookmark is deleted
+
+---
+
 ### Content Quality Filtering
 
 - Duplicate articles removed based on source URL
@@ -198,6 +208,7 @@ The project follows a Django multi-app structure with a separated frontend/backe
 - `core` handles general site routing and category page views.
 - `news` handles external API communication, caching, and search logic.
 - `accounts` handles user registration, login, logout, profile access, profile editing, profile pictures, password reset, and change password.
+- The `Article` and `Bookmark` models separate persistent article data from the user's saved relationship, with articles being created only when bookmarked.
 - A dedicated `services` layer within `news` separates Currents API integration from Django views.
 - Reusable template components (navbar, footer, search bar, article cards, mobile navigation) reduce duplication across pages.
 - Django's built-in authentication system handles user accounts and stores users in the PostgreSQL database.
@@ -211,7 +222,9 @@ The application uses PostgreSQL, configured through Django's ORM.
 
 Django's built-in authentication tables are used for user accounts. The `Profile` model stores additional user profile information, including the selected preset profile image or custom Cloudinary image.
 
-Custom application models for articles, bookmarks, comments, and messaging have not been created yet.
+The `Article` model stores articles when users bookmark them, while the `Bookmark` model links saved articles to individual users. Articles that are no longer bookmarked by any user are removed from the database.
+
+Comment and messaging models have not been created yet.
 
 ---
 
@@ -297,40 +310,42 @@ python backend/manage.py collectstatic --noinput
 
 ## Routing Structure
 
-- `backend/config/urls.py` → includes the main application and accounts routes
-- `backend/core/urls.py` → main pages (`/`, `/ai/`, `/cybersecurity/`, `/gaming/`, `/trending/`, `/search/`, `/auto-complete/`, `/article/`)
+- `backend/config/urls.py` → includes the main application, news, and accounts routes
+- `backend/core/urls.py` → main site pages (`/`, `/ai/`, `/cybersecurity/`, `/gaming/`, `/trending/`)
+- `backend/news/urls.py` → article search, autocomplete, article detail, bookmarking, and bookmark deletion routes
 - `backend/accounts/urls.py` → authentication routes for registration, login, logout, profile, profile editing, password reset, and change password
 
 ---
 
 ## Implemented Routes
 
-| Route                       | Purpose                        |
-| --------------------------- | ------------------------------ |
-| `/`                         | Homepage                       |
-| `/ai/`                      | AI news category               |
-| `/cybersecurity/`           | Cybersecurity news category    |
-| `/gaming/`                  | Gaming news category           |
-| `/trending/`                | Trending technology category   |
-| `/search/`                  | Search results                 |
-| `/auto-complete/`           | Search autocomplete            |
-| `/article/`                 | Individual article detail      |
-| `/signup/`                  | User registration              |
-| `/login/`                   | User login                     |
-| `/logout/`                  |  User logout                   |
-| `/profile/`                 | User profile                   |
-| `/change_password/`         | Change current password        |
-| `/password_reset/`          | Request password reset email   |
-| `/password_reset_done/`     | Password reset email sent      |
-| `/password_reset_confirm/`  | Set a new password             |
-| `/password_reset_complete/` | Password reset completed       |
+| Route                               | Purpose                        |
+| ----------------------------------- | ------------------------------ |
+| `/`                                 | Homepage                       |
+| `/ai/`                              | AI news category               |
+| `/cybersecurity/`                   | Cybersecurity news category    |
+| `/gaming/`                          | Gaming news category           |
+| `/trending/`                        | Trending technology category   |
+| `/search/`                          | Search results                 |
+| `/auto-complete/`                   | Search autocomplete            |
+| `/article/`                         | Individual article detail      |
+| `/article/<int:article_id>/`        | Saved article detail page      |
+| `/article/<int:article_id>/delete/` | Remove a bookmarked article    |
+| `/article/bookmark/`                | Bookmark an article            |
+| `/signup/`                          | User registration              |
+| `/login/`                           | User login                     |
+| `/logout/`                          |  User logout                   |
+| `/profile/`                         | User profile                   |
+| `/change_password/`                 | Change current password        |
+| `/password_reset/`                  | Request password reset email   |
+| `/password_reset_done/`             | Password reset email sent      |
+| `/password_reset_confirm/`          | Set a new password             |
+| `/password_reset_complete/`         | Password reset completed       |
 
 ---
 
 ## Planned Features
 
-
-- Saved/bookmarked articles
 - Comment system
 - User-to-user direct messaging
 - Account deletion
