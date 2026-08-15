@@ -154,40 +154,85 @@
 
             <div class="text-center">
 
-                <form method="POST" action="{% url 'bookmark_article' %}">
-                    {% csrf_token %}
+                {% if is_bookmarked %}
 
-                    <input type="hidden" name="title" value="{{ article.title }}">
-                    <input type="hidden" name="description" value="{{ article.description }}">
-                    <input type="hidden" name="image" value="{{ article.image }}">
-                    <input type="hidden" name="published" value="{{ article.published }}">
-                    <input type="hidden" name="source" value="{{ article.source }}">
-                    <input type="hidden" name="url" value="{{ article.url }}">
+                    <p>
+                        This article is already bookmarked.
+                    </p>
 
-                    <button type="submit" aria-label="Bookmark article" class="btn nn-btn" title="Bookmark this article">
+                    <form method="POST" action="{% url 'delete_bookmark' bookmark.article.id %}">
+                        {% csrf_token %}
 
-                        <svg xmlns="http://www.w3.org/2000/svg"
-                        width="25" height="25" viewBox="0 0 25 25"
-                        fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round">
+                        <button type="submit"
+                                class="btn nn-btn btn-danger"
+                                title="Remove Bookmark">
 
-                            <path d="M6 3h12a2 2 0 0 1 2 2v16l-8-4-8 4V5a2 2 0 0 1 2-2z"/>
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                width="25"
+                                height="25"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round">
 
-                        </svg>
+                                <path d="M3 6h18"/>
+                                <path d="M8 6V4h8v2"/>
+                                <path d="M19 6l-1 14H6L5 6"/>
+                                <path d="M10 11v5"/>
+                                <path d="M14 11v5"/>
 
-                        Bookmark Article
+                            </svg>
 
-                    </button>
+                            Remove Bookmark
 
-                </form>
+                        </button>
+
+                    </form>
+
+                {% else %}
+
+                    <form method="POST" action="{% url 'bookmark_article' %}">
+                        {% csrf_token %}
+
+                        <input type="hidden" name="title" value="{{ article.title }}">
+                        <input type="hidden" name="description" value="{{ article.description }}">
+                        <input type="hidden" name="image" value="{{ article.image }}">
+                        <input type="hidden" name="published" value="{{ article.published }}">
+                        <input type="hidden" name="source" value="{{ article.source }}">
+                        <input type="hidden" name="url" value="{{ article.url }}">
+
+                        <button type="submit"
+                                aria-label="Bookmark article"
+                                class="btn nn-btn"
+                                title="Bookmark this article">
+
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                width="25"
+                                height="25"
+                                viewBox="0 0 25 25"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round">
+
+                                <path d="M6 3h12a2 2 0 0 1 2 2v16l-8-4-8 4V5a2 2 0 0 1 2-2z"/>
+
+                            </svg>
+
+                            Bookmark Article
+
+                        </button>
+
+                    </form>
+
+                {% endif %}
 
             </div>
 
         </div>
-
-
-
-
 
         {% if related_articles %}
 

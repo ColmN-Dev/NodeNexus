@@ -99,6 +99,13 @@ def article_detail(request, article_id=None):
     # Make sure an article URL was provided
     if not article["url"]:
         return render(request, "article_detail.html", {"error": "Article URL is missing."})
+    
+    # Check if the current user has bookmarked this article
+    bookmark = None
+    
+    # Query the database for an existing bookmark
+    if request.user.is_authenticated:
+        bookmark = Bookmark.objects.filter(user=request.user, article__url=article["url"]).first()
 
     # Check if the request is from a Meta crawler
     # to avoid unnecessary API calls
@@ -123,6 +130,8 @@ def article_detail(request, article_id=None):
     context = {
         "article": article,
         "related_articles": related_articles,
+        "bookmark": bookmark,
+        "is_bookmarked": bookmark is not None,
     }
 
     return render(request, "article_detail.html", context)
