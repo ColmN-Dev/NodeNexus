@@ -1,6 +1,6 @@
 # NodeNexus Documentation
 
-**Last updated:** August 13, 2026
+**Last updated:** August 15, 2026
 
 ---
 
