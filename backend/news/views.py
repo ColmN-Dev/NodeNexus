@@ -1,11 +1,14 @@
 from django.contrib import messages
-from django.shortcuts import render, redirect
+from django.shortcuts import get_object_or_404, render, redirect
 from django.http import JsonResponse, HttpResponseRedirect
 from django.contrib.auth.decorators import login_required
 
+from django.utils import timezone
+from datetime import timedelta
+
 from .services.currents import search_articles
 from .services.articles import get_or_create_article
-from .models import Article, Bookmark
+from .models import Article, Bookmark, Comment
 
 
 def search_results(request):
@@ -71,10 +74,13 @@ def article_detail(request, article_id=None):
     Article detail view.
     Displays detailed information about an article.
     """
+    
+    comments = []
 
-    # Load the article from the database if an article_id is provided
+    # Load the article from the database if an article_id is provided and fetch its comments if available
     if article_id:
         saved_article = Article.objects.get(id=article_id)
+        comments = Comment.objects.filter(article=saved_article, parent__isnull=True)
         
         article = {
             "title": saved_article.title,
@@ -132,6 +138,7 @@ def article_detail(request, article_id=None):
         "related_articles": related_articles,
         "bookmark": bookmark,
         "is_bookmarked": bookmark is not None,
+        "comments": comments,
     }
 
     return render(request, "article_detail.html", context)
@@ -162,10 +169,7 @@ def bookmark_article(request):
     article, created = get_or_create_article(article_data)
 
     # Create the bookmark linking the article to the logged-in user
-    bookmark, bookmark_created = Bookmark.objects.get_or_create(
-        user=request.user,
-        article=article
-    )
+    bookmark, bookmark_created = Bookmark.objects.get_or_create(user=request.user, article=article)
 
     messages.success(request, "Article has been bookmarked successfully!")
 
@@ -181,10 +185,7 @@ def delete_bookmark(request, article_id):
     if request.method != "POST":
         return redirect("profile")
 
-    bookmark = Bookmark.objects.filter(
-        user=request.user,
-        article_id=article_id
-    ).first()
+    bookmark = Bookmark.objects.filter(user=request.user, article_id=article_id).first()
 
     if bookmark:
         article = bookmark.article
@@ -197,3 +198,86 @@ def delete_bookmark(request, article_id):
         messages.success(request, "Article removed from your bookmarks.")
 
     return redirect("profile")
+
+@login_required
+def add_comment(request):
+    """
+    Adds a comment to an article.
+    """
+    
+    if request.method != "POST":
+        return redirect("article_detail")
+    
+    
+    article_data = {
+        "title": request.POST.get("title"),
+        "description": request.POST.get("description"),
+        "image": request.POST.get("image"),
+        "published": request.POST.get("published"),
+        "source": request.POST.get("source"),
+        "url": request.POST.get("url"),
+    }
+    
+    # Create the Article database record only when the user comments on it
+    article, created = get_or_create_article(article_data)
+    
+    content = request.POST.get("content")
+    
+    # Handle parent comment for nested comments/replies
+    parent_id = request.POST.get("parent_id")
+    parent_comment = None
+    if parent_id:
+        parent_comment = Comment.objects.filter(id=parent_id).first()
+        
+    comment = Comment.objects.create(user=request.user, article=article, content=content, parent=parent_comment)
+    
+    messages.success(request, "Your comment has been added successfully!")
+    
+    return redirect("saved_article_detail", article_id=article.id)
+
+@login_required
+def edit_comment(request, comment_id):
+    """
+    Allows a user to edit their comment.
+    """
+    
+    comment = get_object_or_404(Comment, id=comment_id, user=request.user)
+    
+    # Allow editing only within 15 minutes of posting
+    edit_window = timedelta(minutes=15)
+    if timezone.now() > comment.created_at + edit_window:
+        messages.error(request, "Comments can only be edited within 15 minutes of posting.")
+        return redirect("saved_article_detail", article_id=comment.article.id)
+    
+    if request.method == "POST":
+        content = request.POST.get("content")
+        
+        if content == comment.content:
+            messages.warning(request, "No changes were made to your comment.")
+            return redirect("saved_article_detail", article_id=comment.article.id)
+        
+        if content:
+            comment.content = content
+            comment.is_edited = True
+            comment.save()
+            messages.success(request, "Your comment has been updated successfully!")
+        return redirect("saved_article_detail", article_id=comment.article.id)
+    
+@login_required
+def delete_comment(request, comment_id):
+    """
+    Deletes a user's comment.
+    """
+
+    comment = get_object_or_404(Comment, id=comment_id)
+
+    if comment.user != request.user:
+        messages.error(request, "You cannot delete this comment.")
+        return redirect("saved_article_detail", article_id=comment.article.id)
+
+    article_id = comment.article.id
+    comment.delete()
+
+    messages.success(request, "Your comment has been deleted successfully!")
+
+    return redirect("saved_article_detail", article_id=article_id)

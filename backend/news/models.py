@@ -38,3 +38,18 @@ class Bookmark(models.Model):
     # returning a string that includes the username of the user and the title of the article they bookmarked.
     def __str__(self):
         return f"{self.user.username} - {self.article.title}"
+
+# Comment model to allow users to comment on articles.    
+class Comment(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    article = models.ForeignKey(Article, on_delete=models.CASCADE)
+    parent = models.ForeignKey('self', null=True, blank=True, related_name='replies', on_delete=models.CASCADE)
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_edited = models.BooleanField(default=False)
+    updated_at = models.DateTimeField(auto_now=True)
+    
+    # String representation of the Comment model,
+    # returning a string that includes the username of the user and the title of the article they commented on.
+    def __str__(self):
+        return f"{self.user.username} - {self.article.title}"

@@ -871,6 +871,20 @@ button.btn.nn-btn:focus {
     max-height: 300px;
 }
 
+#suggestions::-webkit-scrollbar {
+
+    width:12px;
+
+}
+
+#suggestions::-webkit-scrollbar-thumb {
+
+    background:var(--cyan);
+
+    border-radius:10px;
+
+}
+
 [data-theme="dark"] #suggestions {
     background: rgba(20,21,25,.95);
     border: 1px solid var(--content-glass-border);
@@ -1231,6 +1245,192 @@ a.btn:hover {
 .article-detail-section .text-center {
 
     padding:1rem 0 1.5rem;
+
+}
+
+/* ========================================
+   COMMENTS
+   ======================================== */
+
+.comment {
+    padding: 1rem;
+    margin: 1.5rem 1rem;
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.03);
+}
+
+.comment-header {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+}
+
+.comment-pfp img {
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    object-fit: cover;
+    flex-shrink: 0;
+}
+
+.comment-info {
+    text-align: left;
+}
+
+.comment-content {
+    margin-top: 0.75rem;
+    margin-bottom: 0;
+    font-weight: 300;
+}
+
+.comment-date {
+    opacity: 0.7;
+    font-size: 0.85rem;
+    margin-left: 0;
+}
+
+.comment-form {
+    margin: 0 1.5rem;
+}
+
+.comment-form textarea {
+    resize: vertical;
+    min-height: 120px;
+    background: transparent;
+    color: inherit;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.comment-form textarea::placeholder {
+    color: inherit;
+    opacity: 0.6;
+}
+
+.comment-form textarea:focus {
+    border-color: var(--cyan);
+    box-shadow: 0 0 10px rgba(0, 184, 230, .25);
+    background: transparent;
+    color: inherit;
+}
+
+.comment-form textarea:hover {
+    border-color: var(--cyan);
+    box-shadow: 0 0 10px rgba(0, 184, 230, .15);
+}
+
+/* ========================================
+   EDIT COMMENT MODAL
+   ======================================== */
+
+.edit-comment-modal .modal-content {
+
+    background: var(--content-glass-bg);
+
+    backdrop-filter: blur(18px) saturate(140%);
+    -webkit-backdrop-filter: blur(18px) saturate(140%);
+
+    border: 1px solid var(--content-glass-border);
+
+    border-radius: 18px;
+
+    box-shadow: var(--shadow);
+
+    color: var(--content-text);
+
+}
+
+.edit-comment-modal .modal-header {
+
+    border-bottom: 1px solid var(--content-glass-border);
+
+}
+
+.edit-comment-modal .modal-footer {
+
+    border-top: 1px solid var(--content-glass-border);
+
+}
+
+.edit-comment-modal .modal-title {
+
+    color: var(--content-heading);
+
+    font-family: var(--heading-font);
+
+}
+
+.edit-comment-modal .modal-body {
+
+    padding: 2rem;
+
+}
+
+.edit-comment-modal .form-control {
+
+    background: var(--content-glass-bg);
+
+    border: 1px solid var(--content-glass-border);
+
+    color: var(--content-text);
+
+}
+
+.edit-comment-modal .form-control:focus {
+
+    background: var(--content-glass-bg);
+
+    border-color: var(--cyan);
+
+    color: var(--content-text);
+
+    box-shadow: 0 0 0 0.2rem rgba(0, 184, 230, 0.15);
+
+}
+
+/* ========================================
+   DELETE COMMENT MODAL
+   ======================================== */
+
+.delete-comment-modal .modal-content {
+
+    background: var(--content-glass-bg);
+
+    backdrop-filter: blur(18px) saturate(140%);
+    -webkit-backdrop-filter: blur(18px) saturate(140%);
+
+    border: 1px solid var(--content-glass-border);
+
+    border-radius: 18px;
+
+    box-shadow: var(--shadow);
+
+    color: var(--content-text);
+
+}
+
+.delete-comment-modal .modal-header {
+
+    border-bottom: 1px solid var(--content-glass-border);
+
+}
+
+.delete-comment-modal .modal-footer {
+
+    border-top: 1px solid var(--content-glass-border);
+
+}
+
+.delete-comment-modal .modal-title {
+
+    color: var(--content-heading);
+
+    font-family: var(--heading-font);
+
+}
+
+.delete-comment-modal .modal-body {
+
+    padding: 2rem;
 
 }
 
@@ -1722,6 +1922,36 @@ a.btn:hover {
     grid-column: 1 / -1;
     text-align: center;
     padding: 2rem;
+
+}
+
+/* ========================================
+   PROFILE ARTICLE GRID
+   ======================================== */
+
+.profile-article-grid {
+
+    max-height:700px;
+
+    overflow-y:auto;
+
+    overflow-x:hidden;
+
+    scroll-behavior:smooth;
+
+}
+
+.profile-article-grid::-webkit-scrollbar {
+
+    width:12px;
+
+}
+
+.profile-article-grid::-webkit-scrollbar-thumb {
+
+    background:var(--cyan);
+
+    border-radius:10px;
 
 }
 

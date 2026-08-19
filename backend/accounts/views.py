@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from .forms import UserRegisterForm, ProfileUpdateForm
-from news.models import Bookmark
+from news.models import Bookmark, Article
 
 
 PRESET_IMAGES = {
@@ -70,8 +70,11 @@ def profile(request):
         
     # Fetch the user's bookmarks to display them on the profile page.
     bookmarks = Bookmark.objects.filter(user=request.user)
+    
+    # Fetch the user's commented articles to display them on the profile page.
+    commented_articles = Article.objects.filter(comment__user=request.user).distinct()
 
-    return render(request, 'accounts/profile.html', {'form': form, 'bookmarks': bookmarks})
+    return render(request, 'accounts/profile.html', {'form': form, 'bookmarks': bookmarks, 'commented_articles': commented_articles})
 
 
 def login_view(request):

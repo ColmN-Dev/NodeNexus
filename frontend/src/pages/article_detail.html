@@ -305,6 +305,218 @@
 
 </div>
 
+<div class="container py-4">
+
+    <div class="glass-card article-detail-section">
+
+        <h2>
+            Comments
+        </h2>
+
+        <div class="text-center mb-3">
+
+            {% if comments %}
+                {% for comment in comments %}
+                    <div class="comment">
+
+                        <div class="comment-header">
+
+                            <div class="comment-pfp">
+                                {% if comment.user.profile.preset_image %}
+                                    <img src="{% static 'images/' %}{{ comment.user.profile.preset_image }}.png"
+                                        alt="Profile picture">
+                                {% else %}
+                                    <img src="{{ comment.user.profile.image.url }}"
+                                        alt="Profile picture">
+                                {% endif %}
+                            </div>
+
+                            <div class="comment-info">
+
+                                <strong>{{ comment.user.username }}</strong>
+                                <small class="comment-date">•</small>
+                                <small class="comment-date">{{ comment.created_at }}</small>
+
+                                {% if comment.is_edited %}
+                                    <small class="comment-date">•</small>
+                                    <small class="comment-date">Edited {{ comment.updated_at }}</small>
+                                {% endif %}
+
+                                <p class="comment-content">{{ comment.content }}</p>
+
+                                {% if comment.user == user %}
+                                    <button type="button" class="btn nn-btn" data-bs-toggle="modal" data-bs-target="#editCommentModal{{ comment.id }}" aria-label="Edit comment" title="Edit Comment">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M3 21l4.5-1.2L19.2 8.1a2.3 2.3 0 0 0-3.3-3.3L4.2 16.5 3 21z"/>
+                                            <path d="M13.8 6.2l4 4"/>
+                                            <path d="M3 21l1.2-4.5"/>
+                                        </svg>
+                                    </button>
+                                    <button type="button" class="btn nn-btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteCommentModal{{ comment.id }}" aria-label="Delete comment" title="Delete Comment">
+                                        <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round">
+                                            <path d="M3 6h18"/>
+                                            <path d="M8 6V4h8v2"/>
+                                            <path d="M19 6l-1 14H6L5 6"/>
+                                            <path d="M10 11v5"/>
+                                            <path d="M14 11v5"/>
+                                        </svg>
+                                    </button>
+                                {% endif %}
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                {% endfor %}
+            {% else %}
+                <p class="empty-state-message">No comments yet. Be the first to comment!</p>
+            {% endif %}
+
+            {% if user.is_authenticated %}
+                <h3>Add a Comment</h3>
+
+                <form method="POST" action="{% url 'add_comment' %}" class="comment-form">
+                    {% csrf_token %}
+
+                    <input type="hidden" name="title" value="{{ article.title }}">
+                    <input type="hidden" name="description" value="{{ article.description }}">
+                    <input type="hidden" name="image" value="{{ article.image }}">
+                    <input type="hidden" name="published" value="{{ article.published }}">
+                    <input type="hidden" name="source" value="{{ article.source }}">
+                    <input type="hidden" name="url" value="{{ article.url }}">
+
+                    <div class="mb-3">
+                        <textarea name="content"
+                                class="form-control"
+                                rows="4"
+                                placeholder="Write a comment..."
+                                required></textarea>
+                    </div>
+
+                    <button type="submit" class="btn nn-btn">
+                        Add Comment
+                    </button>
+
+                </form>
+
+                {% else %}
+                    <p class="empty-state-message">You must be logged in to add a comment.</p>
+
+                    <a href="{% url 'login' %}" class="btn nn-btn">
+                        Log In
+                    </a>
+
+                {% endif %}
+
+        </div>
+
+    </div>
+
+</div>
+
 </section>
+
+{% for comment in comments %}
+
+    <div class="modal fade edit-comment-modal" id="editCommentModal{{ comment.id }}" tabindex="-1" aria-labelledby="editCommentModalLabel{{ comment.id }}" aria-hidden="true">
+
+        <div class="modal-dialog modal-dialog-centered">
+
+            <div class="modal-content">
+
+                <div class="modal-header">
+
+                    <h4 class="modal-title" id="editCommentModalLabel{{ comment.id }}">
+                        Edit Comment
+                    </h4>
+
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+
+                </div>
+
+                <div class="modal-body">
+
+                    <form method="POST" action="{% url 'edit_comment' comment.id %}" id="editCommentForm{{ comment.id }}">
+
+                        {% csrf_token %}
+
+                        <textarea class="form-control" name="content" rows="5">{{ comment.content }}</textarea>
+
+                    </form>
+
+                </div>
+
+                <div class="modal-footer">
+
+                    <button type="button" class="btn nn-btn btn-secondary" data-bs-dismiss="modal">
+                        Cancel
+                    </button>
+
+                    <button type="submit" form="editCommentForm{{ comment.id }}" class="btn nn-btn">
+                        Save Changes
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+{% endfor %}
+
+{% for comment in comments %}
+
+    <div class="modal fade delete-comment-modal" id="deleteCommentModal{{ comment.id }}" tabindex="-1" aria-labelledby="deleteCommentModalLabel{{ comment.id }}" aria-hidden="true">
+
+        <div class="modal-dialog modal-dialog-centered">
+
+            <div class="modal-content">
+
+                <div class="modal-header">
+
+                    <h4 class="modal-title" id="deleteCommentModalLabel{{ comment.id }}">
+                        Delete Comment
+                    </h4>
+
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+
+                </div>
+
+                <div class="modal-body">
+
+                    <p>Are you sure you want to delete this comment?</p>
+
+                </div>
+
+                <div class="modal-footer">
+
+                    <button type="button" class="btn nn-btn btn-secondary" data-bs-dismiss="modal">
+                        Cancel
+                    </button>
+
+                    <button type="submit" form="deleteCommentForm{{ comment.id }}" class="btn nn-btn btn-danger">
+                        Delete
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+{% endfor %}
+
+{% for comment in comments %}
+
+    <form method="POST" action="{% url 'delete_comment' comment.id %}" id="deleteCommentForm{{ comment.id }}">
+        {% csrf_token %}
+    </form>
+
+{% endfor %}
 
 {% endblock %}
