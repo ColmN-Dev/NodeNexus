@@ -243,6 +243,10 @@ def edit_comment(request, comment_id):
     
     comment = get_object_or_404(Comment, id=comment_id, user=request.user)
     
+    if comment.user != request.user:
+        messages.error(request, "You cannot edit this comment.")
+        return redirect("saved_article_detail", article_id=comment.article.id)
+    
     # Allow editing only within 15 minutes of posting
     edit_window = timedelta(minutes=15)
     if timezone.now() > comment.created_at + edit_window:
