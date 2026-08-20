@@ -1277,6 +1277,10 @@ a.btn:hover {
     text-align: left;
 }
 
+.comment-info .btn {
+    margin-bottom: .5rem;
+}
+
 .comment-content {
     margin-top: 0.75rem;
     margin-bottom: 0;
@@ -1316,6 +1320,32 @@ a.btn:hover {
 .comment-form textarea:hover {
     border-color: var(--cyan);
     box-shadow: 0 0 10px rgba(0, 184, 230, .15);
+}
+
+.comment-reply {
+    position: relative;
+    margin-left: 6rem;
+    padding-left: 1rem;
+}
+
+.comment-reply::before {
+    content: "";
+    position: absolute;
+    left: -2rem;
+    top: -1.5rem;
+    bottom: 0;
+    width: 2px;
+    background: rgba(255, 255, 255, 0.25);
+}
+
+.comment-reply::after {
+    content: "";
+    position: absolute;
+    left: -2rem;
+    top: 2rem;
+    width: 2rem;
+    height: 2px;
+    background: rgba(255, 255, 255, 0.25);
 }
 
 /* ========================================
@@ -2394,7 +2424,7 @@ button.btn.nn-btn.btn-danger:focus {
         gap: 1.25rem;
     }
 
-        .article-carousel {
+    .article-carousel {
         display: flex;
         flex-wrap: nowrap;
         gap: 1rem;
@@ -2432,7 +2462,6 @@ button.btn.nn-btn.btn-danger:focus {
     .article-grid .article-card img {
         height: 180px;
     }
-    
 
     .logo-section {
         display: flex;
@@ -2487,23 +2516,17 @@ button.btn.nn-btn.btn-danger:focus {
         bottom: 60px;
         right: -320px;
         width: min(280px, 85vw);
-
         display: flex;
         flex-direction: column;
-
         padding: 2rem 1.5rem;
         gap: 1.2rem;
-
         background: var(--header-bg);
         backdrop-filter: blur(20px);
         -webkit-backdrop-filter: blur(20px);
-
         z-index: 999;
-
         overflow-y: auto;
         overflow-x: hidden;
         overscroll-behavior: contain;
-
         transition: right .3s ease;
         -webkit-overflow-scrolling: touch;
     }
@@ -2520,7 +2543,6 @@ button.btn.nn-btn.btn-danger:focus {
         font-family: var(--heading-font);
         font-size: 1.2rem;
         font-weight: 600;
-
         padding: .8rem 0;
         transition: .25s ease;
         border-bottom: 1px solid rgba(255, 255, 255, .15);
@@ -2561,16 +2583,12 @@ button.btn.nn-btn.btn-danger:focus {
         right: 0;
         width: auto;
         height: 60px;
-
         justify-content: space-around;
         align-items: center;
-
         background: var(--header-bg);
         backdrop-filter: blur(15px);
         -webkit-backdrop-filter: blur(15px);
-
         border-top: 1px solid rgba(255, 255, 255, .15);
-
         z-index: 998;
     }
 
@@ -2581,7 +2599,6 @@ button.btn.nn-btn.btn-danger:focus {
         width: 48px;
         height: 48px;
         gap: 4px;
-
         color: var(--nav-text);
         text-decoration: none;
         transition: .25s ease;
@@ -2631,6 +2648,19 @@ button.btn.nn-btn.btn-danger:focus {
         text-align: center;
     }
 
+    .comment {
+        margin: 1rem .5rem;
+    }
+
+    .comment-reply {
+        margin-left: 3rem;
+        padding-left: .75rem;
+    }
+
+    .comment-form {
+        margin: 0 1rem;
+    }
+
 }
 
 /* ========================================
@@ -2645,7 +2675,7 @@ button.btn.nn-btn.btn-danger:focus {
     }
 
     .article-detail-header h1 {
-    font-size:2.5rem;
+        font-size:2.5rem;
     }
 
     .article-detail-image img {
@@ -2689,91 +2719,31 @@ button.btn.nn-btn.btn-danger:focus {
         margin-bottom:2rem;
     }
 
-}
-
-@media (max-width: 600px) {
-
-    #suggestions {
-        font-size: 1rem;
+    .comment {
+        padding: .85rem;
+        margin: 1rem .25rem;
     }
 
-    .article-grid {
-        gap: 1rem;
-        border-radius: 12px;
+    .comment-pfp img {
+        width:40px;
+        height:40px;
     }
 
-    .article-grid .article-card img {
-        height: 150px;
+    .comment-header {
+        gap:.6rem;
     }
 
-    .article-section-title {
-        font-size: 2rem;
-        padding-top: 2rem;
+    .comment-reply {
+        margin-left: 2rem;
+        padding-left: .65rem;
     }
 
-    .article-grid .article-card h3 {
-        font-size: 1.1rem;
+    .comment-content {
+        font-size:.95rem;
     }
 
-    .article-grid .article-card p {
-        font-size: .95rem;
-        line-height: 1.5;
-    }
-
-    .published-date {
-        font-size: .8rem;
-        margin-top: .5rem;
-    }
-
-    .article-grid .article-card a.btn {
-        padding: .65rem 1.25rem;
-    }
-
-    .title-glass {
-        padding: 1rem 1.5rem;
-    }
-
-    .article-detail-header h1 {
-        font-size:2rem;
-    }
-
-    .article-detail-section {
-        padding:1rem;
-    }
-
-    .pagination {
-        flex-wrap: wrap;
-    }
-
-    .pagination-link {
-        order: 2;
-        margin:1rem;
-    }
-
-    .pagination-number {
-        order: 1;
-    }
-
-    .profile-picture img {
-        width:220px;
-        height:220px;
-    }
-
-    .profile-file-input {
-        padding:0.75rem;
-        margin-bottom:1.5rem;
-    }
-
-    .custom-file-button {
-        min-height:50px;
-        padding:1rem 1.75rem;
-        font-size:1rem;
-    }
-
-    .profile-information h3 {
-        padding:0.6rem 1rem;
-        font-size:1.25rem;
-        margin-bottom:1.5rem;
+    .comment-form {
+        margin: 0 .5rem;
     }
 
 }
@@ -2848,6 +2818,37 @@ button.btn.nn-btn.btn-danger:focus {
         padding:1rem 0.85rem;
     }
 
+    .comment {
+        padding: .75rem;
+        margin: .75rem 0;
+    }
+
+    .comment-pfp img {
+        width:38px;
+        height:38px;
+    }
+
+    .comment-header {
+        gap:.5rem;
+    }
+
+    .comment-reply {
+        margin-left: 1.25rem;
+        padding-left: .5rem;
+    }
+
+    .comment-info {
+        min-width: 0;
+    }
+
+    .comment-content {
+        overflow-wrap: anywhere;
+    }
+
+    .comment-form {
+        margin: 0;
+    }
+
 }
 
 /* ========================================
@@ -2909,6 +2910,15 @@ button.btn.nn-btn.btn-danger:focus {
         padding:1rem 1.75rem;
     }
 
+    .comment {
+        padding: .65rem;
+    }
+
+    .comment-reply {
+        margin-left: 1rem;
+        padding-left: .4rem;
+    }
+
 }
 
 /* ========================================
@@ -2952,22 +2962,16 @@ button.btn.nn-btn.btn-danger:focus {
     }
 
     .search-form {
-
         padding:1rem;
-
     }
 
     .form-control::placeholder {
-
         font-size:0.83rem;
-
     }
 
     .search-form .btn,
     .search-form .form-control {
-
         min-height:54px;
-
     }
 
     #suggestions {
@@ -2995,6 +2999,11 @@ button.btn.nn-btn.btn-danger:focus {
     .profile-information h3 {
         font-size: 0.9rem;
         padding:1.25rem 0.5rem;
+    }
+
+    .comment-reply {
+        margin-left: .75rem;
+        padding-left: .35rem;
     }
 
 }

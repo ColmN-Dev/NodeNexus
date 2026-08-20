@@ -37,8 +37,10 @@ Your Profile | NodeNexus
 
                     {% if user.profile.preset_image %}
                         <img src="{% static 'images/' %}{{ user.profile.preset_image }}.png" alt="Profile picture">
-                    {% else %}
+                    {% elif user.profile.image %}
                         <img src="{{ user.profile.image.url }}" alt="Profile picture">
+                    {% else %}
+                        <img src="{% static 'images/default.png' %}" alt="Profile picture">
                     {% endif %}
 
                     <form method="POST" enctype="multipart/form-data" id="profilePictureForm">
@@ -442,8 +444,10 @@ Your Profile | NodeNexus
 
                     {% if user.profile.preset_image %}
                         <img id="profileImagePreview" src="{% static 'images/' %}{{ user.profile.preset_image }}.png" alt="Profile preview">
-                    {% else %}
+                    {% elif user.profile.image %}
                         <img id="profileImagePreview" src="{{ user.profile.image.url }}" alt="Profile preview">
+                    {% else %}
+                        <img id="profileImagePreview" src="{% static 'images/default.png' %}" alt="Profile preview">
                     {% endif %}
 
                     </div>

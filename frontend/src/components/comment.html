@@ -1,0 +1,147 @@
+{% load static %}
+
+<div class="comment {% if comment.parent %}comment-reply{% endif %}">
+
+    <div class="comment-header">
+
+        <div class="comment-pfp">
+            {% if comment.user.profile.preset_image %}
+                <img src="{% static 'images/' %}{{ comment.user.profile.preset_image }}.png"
+                    alt="Profile picture">
+            {% elif comment.user.profile.image %}
+                <img src="{{ comment.user.profile.image.url }}"
+                    alt="Profile picture">
+            {% else %}
+                <img src="{% static 'images/default.png' %}"
+                    alt="Profile picture">
+            {% endif %}
+        </div>
+
+        <div class="comment-info">
+
+            <strong>{{ comment.user.username }}</strong>
+
+            <small class="comment-date">•</small>
+
+            <small class="comment-date">{{ comment.created_at }}</small>
+
+            {% if comment.is_edited %}
+                <small class="comment-date">•</small>
+                <small class="comment-date">Edited {{ comment.updated_at }}</small>
+            {% endif %}
+
+            <p class="comment-content">{{ comment.content }}</p>
+
+            {% if user.is_authenticated %}
+
+                <button type="button"
+                        class="btn nn-btn"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#replyForm{{ comment.id }}"
+                        aria-label="Reply to comment"
+                        title="Reply">
+
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                        width="25"
+                        height="25"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round">
+
+                        <path d="M10 9.21468V4.92896L2.92892 12L10 19.0711V14.2392M10 9.22304C10.6432 9.07708 11.3126 9.00002 12 9.00002C16.9706 9.00002 21 13.0295 20.6482 20.5C19.5649 16.7457 16.1031 14 12 14C11.3126 14.0771 10.6432 14.0771 10 14.223"/>
+                    </svg>
+
+                </button>
+
+                <div class="collapse mt-3" id="replyForm{{ comment.id }}">
+
+                    <form method="POST" action="{% url 'add_comment' %}" class="comment-form">
+
+                        {% csrf_token %}
+
+                        <input type="hidden" name="title" value="{{ article.title }}">
+                        <input type="hidden" name="description" value="{{ article.description }}">
+                        <input type="hidden" name="image" value="{{ article.image }}">
+                        <input type="hidden" name="published" value="{{ article.published }}">
+                        <input type="hidden" name="source" value="{{ article.source }}">
+                        <input type="hidden" name="url" value="{{ article.url }}">
+                        <input type="hidden" name="parent_id" value="{{ comment.id }}">
+
+                        <div class="mb-3">
+                            <textarea name="content"
+                                      class="form-control"
+                                      rows="3"
+                                      placeholder="Write a reply..."
+                                      required></textarea>
+                        </div>
+
+                        <button type="submit" class="btn nn-btn mb-3">
+                            Reply
+                        </button>
+
+                    </form>
+
+                </div>
+
+            {% endif %}
+
+            {% if comment.user == user %}
+
+                <button type="button" class="btn nn-btn" data-bs-toggle="modal" data-bs-target="#editCommentModal{{ comment.id }}" aria-label="Edit comment" title="Edit Comment">
+
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                        width="25"
+                        height="25"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="1.8"
+                        stroke-linecap="round"
+                        stroke-linejoin="round">
+
+                        <path d="M3 21l4.5-1.2L19.2 8.1a2.3 2.3 0 0 0-3.3-3.3L4.2 16.5 3 21z"/>
+                        <path d="M13.8 6.2l4 4"/>
+                        <path d="M3 21l1.2-4.5"/>
+
+                    </svg>
+
+                </button>
+
+                <button type="button" class="btn nn-btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteCommentModal{{ comment.id }}" aria-label="Delete comment" title="Delete Comment">
+
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                        width="25"
+                        height="25"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                        stroke-linejoin="round">
+
+                        <path d="M3 6h18"/>
+                        <path d="M8 6V4h8v2"/>
+                        <path d="M19 6l-1 14H6L5 6"/>
+                        <path d="M10 11v5"/>
+                        <path d="M14 11v5"/>
+
+                    </svg>
+
+                </button>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+    {% for reply in comment.replies.all %}
+
+        {% include "comment.html" with comment=reply %}
+
+    {% endfor %}
+
+</div>

@@ -80,7 +80,8 @@ def article_detail(request, article_id=None):
     # Load the article from the database if an article_id is provided and fetch its comments if available
     if article_id:
         saved_article = Article.objects.get(id=article_id)
-        comments = Comment.objects.filter(article=saved_article, parent__isnull=True)
+        comments = Comment.objects.filter(article=saved_article, parent__isnull=True).order_by("-created_at")
+        all_comments = Comment.objects.filter(article=saved_article)
         
         article = {
             "title": saved_article.title,
@@ -139,6 +140,7 @@ def article_detail(request, article_id=None):
         "bookmark": bookmark,
         "is_bookmarked": bookmark is not None,
         "comments": comments,
+        "all_comments": all_comments,
     }
 
     return render(request, "article_detail.html", context)
@@ -270,7 +272,7 @@ def edit_comment(request, comment_id):
 @login_required
 def delete_comment(request, comment_id):
     """
-    Deletes a user's comment.
+    Deletes a user's comment and article if it's ID no longer has any comments or bookmarks.
     """
 
     comment = get_object_or_404(Comment, id=comment_id)

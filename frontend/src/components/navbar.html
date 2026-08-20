@@ -63,8 +63,10 @@
                         <div class="profile-picture-nav">
                             {% if user.profile.preset_image %}
                                 <img src="{% static 'images/' %}{{ user.profile.preset_image }}.png" alt="Profile picture" title="Your Profile">
-                            {% else %}
+                            {% elif user.profile.image %}
                                 <img src="{{ user.profile.image.url }}" alt="Profile picture" title="Your Profile">
+                            {% else %}
+                                <img src="{% static 'images/default.png' %}" alt="Profile picture" title="Your Profile">
                             {% endif %}
                         </div>
                     </a>
@@ -131,8 +133,10 @@
         <div class="profile-picture-nav-mobile">
             {% if user.profile.preset_image %}
                 <img src="{% static 'images/' %}{{ user.profile.preset_image }}.png" alt="Profile picture">
-            {% else %}
+            {% elif user.profile.image %}
                 <img src="{{ user.profile.image.url }}" alt="Profile picture">
+            {% else %}
+                <img src="{% static 'images/default.png' %}" alt="Profile picture" title="Your Profile">
             {% endif %}
         </div>
         <span>Your Profile</span>
