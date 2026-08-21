@@ -207,8 +207,8 @@ def delete_bookmark(request, article_id):
         article = bookmark.article
         bookmark.delete()
 
-        # Delete the article if nobody else has bookmarked it
-        if not Bookmark.objects.filter(article=article).exists():
+        # Delete the article only if it has no bookmarks or comments
+        if (not Bookmark.objects.filter(article=article).exists() and not Comment.objects.filter(article=article).exists()):
             article.delete()
 
         messages.success(request, "Article removed from your bookmarks.")
@@ -295,9 +295,15 @@ def delete_comment(request, comment_id):
         messages.error(request, "You cannot delete this comment.")
         return redirect("saved_article_detail", article_id=comment.article.id)
 
-    article_id = comment.article.id
+    article = comment.article
+    article_id = article.id
+    
     comment.delete()
-
+    
+    # Delete the article only if it has no bookmarks or comments
+    if (not Bookmark.objects.filter(article_id=article_id).exists() and not Comment.objects.filter(article_id=article_id).exists()):
+            article.delete()
+        
     messages.success(request, "Your comment has been deleted successfully!")
 
     return redirect("saved_article_detail", article_id=article_id)
