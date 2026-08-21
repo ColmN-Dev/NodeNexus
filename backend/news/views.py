@@ -128,7 +128,7 @@ def article_detail(request, article_id=None):
         title_words = article["title"].split()
         related_query = " ".join(title_words[:3])
 
-            
+        related_articles, _ = search_articles(related_query)
 
         # Remove the current article and limit results to 12 articles
         related_articles = [

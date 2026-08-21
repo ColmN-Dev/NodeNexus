@@ -446,12 +446,15 @@
         if (!timestamp) return;
 
         // Convert the timestamp to a Date object and format it to the user's local timezone.
-        const date = new Date(timestamp.replace(" ", "T").replace(" +0000", "+00:00"));
+        const date = new Date(timestamp.replace(" ", "T").replace(" +0000", "Z"));
 
-        element.textContent = new Intl.DateTimeFormat(undefined, {
-            dateStyle: "medium",
-            timeStyle: "short"
-        }).format(date);
+        // Check if the date is valid before formatting
+        if (!isNaN(date.getTime())) {
+            element.textContent = new Intl.DateTimeFormat(undefined, {
+                dateStyle: "medium",
+                timeStyle: "short"
+            }).format(date);
+        }
 
     });
 

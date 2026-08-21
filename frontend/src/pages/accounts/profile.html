@@ -165,11 +165,16 @@ Your Profile | NodeNexus
                         </h3>
                     </a>
 
-                    <p>{{ bookmark.article.description|truncatewords:25 }}</p>
+                    <p class="text-center">
+                        {{ bookmark.article.description|truncatewords:25 }}
+                    </p>
 
-                    <span class="published-date">
-                        {{ bookmark.article.published }}
-                    </span>
+                    <p class="published-date">
+                        Published:
+                        <span class="article-timestamp" data-timestamp="{{ bookmark.article.published }}">
+                            {{ bookmark.article.published|date:"d M Y, H:i" }}
+                        </span>
+                    </p>
 
                     <a
                         href="{% url 'saved_article_detail' bookmark.article.id %}"
@@ -257,9 +262,12 @@ Your Profile | NodeNexus
 
                 <p>{{ article.description|truncatewords:25 }}</p>
 
-                <span class="published-date">
-                    {{ article.published }}
-                </span>
+                    <p class="published-date">
+                        Published:
+                        <span class="article-timestamp" data-timestamp="{{ article.published }}">
+                            {{ article.published|date:"d M Y, H:i" }}
+                        </span>
+                    </p>
 
                 <a
                     href="{% url 'saved_article_detail' article.id %}"

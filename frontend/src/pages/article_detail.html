@@ -57,10 +57,10 @@
 
                 {% if article.published %}
 
-                    <p>
+                    <p class="published-date">
                         Published:
                         <span class="article-timestamp" data-timestamp="{{ article.published }}">
-                            {{ article.published }}
+                            {{ article.published|date:"d M Y, H:i" }}
                         </span>
                     </p>
 
@@ -251,16 +251,16 @@
             <div class="related-articles-carousel">
 
 
-                {% for article in related_articles %}
+                {% for related_article in related_articles %}
 
                     <div class="article-card">
 
-                        {% if article.image and article.image != "None" %}
+                        {% if related_article.image and related_article.image != "None" %}
                         <a 
-                            href="{% url 'article_detail' %}?title={{ article.title|urlencode }}&description={{ article.description|urlencode }}&image={{ article.image|urlencode }}&published={{ article.published|urlencode }}&source={{ article.source|urlencode }}&url={{ article.url|urlencode }}">
+                            href="{% url 'article_detail' %}?title={{ related_article.title|urlencode }}&description={{ related_article.description|urlencode }}&image={{ related_article.image|urlencode }}&published={{ related_article.published|urlencode }}&source={{ related_article.source|urlencode }}&url={{ related_article.url|urlencode }}">
                         <img
-                            src="{% if article.image and article.image != 'None' %}{{ article.image }}{% else %}{% static 'images/placeholder.png' %}{% endif %}"
-                            alt="{{ article.title }}"
+                            src="{% if related_article.image and related_article.image != 'None' %}{{ related_article.image }}{% else %}{% static 'images/placeholder.png' %}{% endif %}"
+                            alt="{{ related_article.title }}"
                             data-fallback-src="{% static 'images/placeholder.png' %}"
                             onerror="this.onerror=null; this.src=this.dataset.fallback;"
                         >
@@ -268,22 +268,25 @@
                         {% endif %}
 
                         <a 
-                            href="{% url 'article_detail' %}?title={{ article.title|urlencode }}&description={{ article.description|urlencode }}&image={{ article.image|urlencode }}&published={{ article.published|urlencode }}&source={{ article.source|urlencode }}&url={{ article.url|urlencode }}">
+                            href="{% url 'article_detail' %}?title={{ related_article.title|urlencode }}&description={{ related_article.description|urlencode }}&image={{ related_article.image|urlencode }}&published={{ related_article.published|urlencode }}&source={{ related_article.source|urlencode }}&url={{ related_article.url|urlencode }}">
                         <h3>
-                            {{ article.title }}
+                            {{ related_article.title }}
                         </h3>
                         </a>
 
                         <p>
-                            {{ article.description }}
+                            {{ related_article.description }}
                         </p>
 
-                        <small class="published-date">
-                            {{ article.published }}
-                        </small>
+                        <p class="published-date">
+                            Published:
+                            <span class="article-timestamp" data-timestamp="{{ related_article.published }}">
+                                {{ related_article.published }}
+                            </span>
+                        </p>
 
                         <a 
-                            href="{% url 'article_detail' %}?title={{ article.title|urlencode }}&description={{ article.description|urlencode }}&image={{ article.image|urlencode }}&published={{ article.published|urlencode }}&source={{ article.source|urlencode }}&url={{ article.url|urlencode }}"
+                            href="{% url 'article_detail' %}?title={{ related_article.title|urlencode }}&description={{ related_article.description|urlencode }}&image={{ related_article.image|urlencode }}&published={{ related_article.published|urlencode }}&source={{ related_article.source|urlencode }}&url={{ related_article.url|urlencode }}"
                             class="btn btn-primary mt-auto"
                         >
                             View Details
