@@ -75,11 +75,13 @@ def article_detail(request, article_id=None):
     Displays detailed information about an article.
     """
     
+    # Initialize comments and all_comments lists to populate later based on the article_id
     comments = []
+    all_comments = []
 
     # Load the article from the database if an article_id is provided and fetch its comments if available
     if article_id:
-        saved_article = Article.objects.get(id=article_id)
+        saved_article = get_object_or_404(Article, id=article_id)
         comments = Comment.objects.filter(article=saved_article, parent__isnull=True).order_by("-created_at")
         all_comments = Comment.objects.filter(article=saved_article)
         
@@ -126,13 +128,25 @@ def article_detail(request, article_id=None):
         title_words = article["title"].split()
         related_query = " ".join(title_words[:3])
 
-        related_articles, _ = search_articles(related_query)
+            
 
         # Remove the current article and limit results to 12 articles
         related_articles = [
             item for item in related_articles
             if item.get("url") != article["url"]
-        ][:12]
+        ]
+        
+        # Broaden the search if no related articles are found
+        if not related_articles:
+            related_query = " ".join(title_words[:2])
+            related_articles, _ = search_articles(related_query)
+            
+            related_articles = [
+            item for item in related_articles
+            if item.get("url") != article["url"]
+        ]
+            
+        related_articles = related_articles[:12]
 
     context = {
         "article": article,

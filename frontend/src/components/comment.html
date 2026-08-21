@@ -23,11 +23,16 @@
 
             <small class="comment-date">•</small>
 
-            <small class="comment-date">{{ comment.created_at }}</small>
+            <small class="comment-date comment-timestamp"
+                data-timestamp="{{ comment.created_at|date:'c' }}">
+                {{ comment.created_at|date:"d M Y, H:i" }}
+            </small>
 
             {% if comment.is_edited %}
                 <small class="comment-date">•</small>
-                <small class="comment-date">Edited {{ comment.updated_at }}</small>
+                <small class="comment-date"
+                data-timestamp="{{ comment.updated_at|date:'c' }}">
+                Edited {{ comment.updated_at|date:"d M Y, H:i" }}</small>
             {% endif %}
 
             <p class="comment-content">{{ comment.content }}</p>

@@ -57,9 +57,12 @@
 
                 {% if article.published %}
 
-                <p>
-                    Published: {{ article.published }}
-                </p>
+                    <p>
+                        Published:
+                        <span class="article-timestamp" data-timestamp="{{ article.published }}">
+                            {{ article.published }}
+                        </span>
+                    </p>
 
                 {% endif %}
 

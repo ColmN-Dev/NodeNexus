@@ -434,4 +434,25 @@
 
     }
 
+    // ==========================
+    // LOCAL TIMEZONE
+    // ==========================
+
+    // Convert UTC timestamps to the user's local timezone.
+    document.querySelectorAll(".comment-timestamp, .article-timestamp").forEach(element => {
+
+        const timestamp = element.dataset.timestamp;
+
+        if (!timestamp) return;
+
+        // Convert the timestamp to a Date object and format it to the user's local timezone.
+        const date = new Date(timestamp.replace(" ", "T").replace(" +0000", "+00:00"));
+
+        element.textContent = new Intl.DateTimeFormat(undefined, {
+            dateStyle: "medium",
+            timeStyle: "short"
+        }).format(date);
+
+    });
+
 })();

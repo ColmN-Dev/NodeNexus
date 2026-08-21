@@ -48,9 +48,14 @@ AI | NodeNexus
                     </h3>
                 </a>
 
-                <p>{{ article.description|truncatewords:25 }}</p>
+                <p class="text-center">{{ article.description|truncatewords:25 }}</p>
 
-                <span class="published-date">{{ article.published }}</span>
+                <p class="published-date">
+                    Published:
+                    <span class="article-timestamp" data-timestamp="{{ article.published }}">
+                        {{ article.published }}
+                    </span>
+                </p>
 
                 <a
                     href="{% url 'article_detail' %}?title={{ article.title|urlencode }}&description={{ article.description|urlencode }}&image={{ article.image|urlencode }}&published={{ article.published|urlencode }}&source={{ article.source|urlencode }}&url={{ article.url|urlencode }}"
