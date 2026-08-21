@@ -26,7 +26,7 @@
 
 NodeNexus is a full-stack Django web application that aggregates technology news from external APIs, letting users discover the latest developments across AI, cybersecurity, gaming, and trending tech through a unified, searchable platform.
 
-The application also provides user authentication and account management, including profile editing, password management, and profile picture selection and uploads.
+The application also provides user authentication and account management, including profile editing, password management, profile picture selection and uploads, article bookmarking, comments, and nested replies.
 
 The application uses PostgreSQL for persistent storage and follows a structured Django project layout with separate `core`, `news`, and `accounts` applications, keeping general site functionality, news aggregation, and account functionality separated.
 
@@ -145,8 +145,20 @@ Cloudinary is used to store custom user-uploaded profile images. Preset profile 
 - Users can bookmark articles while viewing them
 - Bookmarked articles are displayed on the user's profile
 - Users can remove bookmarks from both the profile and article detail pages
-- Articles are only stored in the database when bookmarked
-- Unused article records are removed when the final bookmark is deleted
+- Articles are stored in the database when bookmarked or commented on
+- An article remains stored while it has either bookmarks or comments
+- An article is removed only when it has no remaining bookmarks or comments
+
+---
+
+### Comments and Replies
+
+- Authenticated users can add comments to articles
+- Users can reply to existing comments
+- Replies can be nested within other replies
+- Users can edit and delete their own comments
+- Comments are displayed using a reusable template component
+- Commenting on an unsaved article persists the article in the database
 
 ---
 
@@ -206,9 +218,9 @@ Cloudinary is used to store custom user-uploaded profile images. Preset profile 
 The project follows a Django multi-app structure with a separated frontend/backend layout.
 
 - `core` handles general site routing and category page views.
-- `news` handles external API communication, caching, and search logic.
+- `news` handles external API communication, caching, search logic, articles, bookmarks, and comments.
 - `accounts` handles user registration, login, logout, profile access, profile editing, profile pictures, password reset, and change password.
-- The `Article` and `Bookmark` models separate persistent article data from the user's saved relationship, with articles being created only when bookmarked.
+- The `Article`, `Bookmark`, and `Comment` models manage persistent articles, saved relationships, comments, and nested replies.
 - A dedicated `services` layer within `news` separates Currents API integration from Django views.
 - Reusable template components (navbar, footer, search bar, article cards, mobile navigation) reduce duplication across pages.
 - Django's built-in authentication system handles user accounts and stores users in the PostgreSQL database.
@@ -222,9 +234,11 @@ The application uses PostgreSQL, configured through Django's ORM.
 
 Django's built-in authentication tables are used for user accounts. The `Profile` model stores additional user profile information, including the selected preset profile image or custom Cloudinary image.
 
-The `Article` model stores articles when users bookmark them, while the `Bookmark` model links saved articles to individual users. Articles that are no longer bookmarked by any user are removed from the database.
+The `Article` model stores article data when users bookmark or comment on an article. The `Bookmark` model links saved articles to individual users. The `Comment` model links comments to users and articles and supports nested replies through a self-referencing parent relationship.
 
-Comment and messaging models have not been created yet.
+An article remains in the database while it has at least one bookmark or comment. When the final bookmark or comment is removed, the associated article record is deleted.
+
+Messaging models have not been created yet.
 
 ---
 
@@ -237,7 +251,6 @@ NodeNexus/
 │   ├── accounts/
 │   ├── config/
 │   ├── core/
-│   ├── media/
 │   ├── news/
 │   │   └── services/
 │   ├── manage.py
@@ -312,41 +325,43 @@ python backend/manage.py collectstatic --noinput
 
 - `backend/config/urls.py` → includes the main application, news, and accounts routes
 - `backend/core/urls.py` → main site pages (`/`, `/ai/`, `/cybersecurity/`, `/gaming/`, `/trending/`)
-- `backend/news/urls.py` → article search, autocomplete, article detail, bookmarking, and bookmark deletion routes
+- `backend/news/urls.py` → article search, autocomplete, article detail, bookmarking, bookmark deletion, comments, comment editing, and comment deletion routes
 - `backend/accounts/urls.py` → authentication routes for registration, login, logout, profile, profile editing, password reset, and change password
 
 ---
 
 ## Implemented Routes
 
-| Route                               | Purpose                        |
-| ----------------------------------- | ------------------------------ |
-| `/`                                 | Homepage                       |
-| `/ai/`                              | AI news category               |
-| `/cybersecurity/`                   | Cybersecurity news category    |
-| `/gaming/`                          | Gaming news category           |
-| `/trending/`                        | Trending technology category   |
-| `/search/`                          | Search results                 |
-| `/auto-complete/`                   | Search autocomplete            |
-| `/article/`                         | Individual article detail      |
-| `/article/<int:article_id>/`        | Saved article detail page      |
-| `/article/<int:article_id>/delete/` | Remove a bookmarked article    |
-| `/article/bookmark/`                | Bookmark an article            |
-| `/signup/`                          | User registration              |
-| `/login/`                           | User login                     |
-| `/logout/`                          |  User logout                   |
-| `/profile/`                         | User profile                   |
-| `/change_password/`                 | Change current password        |
-| `/password_reset/`                  | Request password reset email   |
-| `/password_reset_done/`             | Password reset email sent      |
-| `/password_reset_confirm/`          | Set a new password             |
-| `/password_reset_complete/`         | Password reset completed       |
+| Route                                         | Purpose                        |
+| --------------------------------------------- | ------------------------------ |
+| `/`                                           | Homepage                       |
+| `/ai/`                                        | AI news category               |
+| `/cybersecurity/`                             | Cybersecurity news category    |
+| `/gaming/`                                    | Gaming news category           |
+| `/trending/`                                  | Trending technology category   |
+| `/search/`                                    | Search results                 |
+| `/auto-complete/`                             | Search autocomplete            |
+| `/article/`                                   | Individual article detail      |
+| `/article/<int:article_id>/`                  | Saved article detail page      |
+| `/article/bookmark/`                          | Bookmark an article            |
+| `/article/<int:article_id>/delete/`           | Delete a bookmarked article    |
+| `/article/comment/`                           | Add a comment                  |
+| `/article/comment/<int:comment_id>/edit/`     | Edit a comment                 |
+| `/article/comment/<int:comment_id>/delete/`   | Delete a comment               |
+| `/signup/`                                    | User registration              |
+| `/login/`                                     | User login                     |
+| `/logout/`                                    | User logout                    |
+| `/profile/`                                   | User profile                   |
+| `/change_password/`                           | Change current password        |
+| `/password_reset/`                            | Request password reset email   |
+| `/password_reset_done/`                       | Password reset email sent      |
+| `/password_reset_confirm/`                    | Set a new password             |
+| `/password_reset_complete/`                   | Password reset completed       |
 
 ---
 
 ## Planned Features
 
-- Comment system
 - User-to-user direct messaging
 - Account deletion
 - Admin functionality and role-based access control
