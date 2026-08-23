@@ -883,6 +883,8 @@ button.btn.nn-btn:focus {
 
     border-radius:10px;
 
+    cursor:pointer;
+
 }
 
 [data-theme="dark"] #suggestions {
@@ -1184,6 +1186,8 @@ a.btn:hover {
     background:var(--cyan);
 
     border-radius:10px;
+
+    cursor:pointer;
 }
 
 /* ========================================
@@ -1992,6 +1996,8 @@ a.btn:hover {
     background:var(--cyan);
 
     border-radius:10px;
+
+    cursor:pointer;
 
 }
 

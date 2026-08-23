@@ -98,7 +98,8 @@
                 <button class="dark-mode-toggle">
 
                     <img src="{% static 'images/moon.png' %}"
-                        alt="Dark Mode">
+                        alt="Dark Mode"
+                        title="Toggle Theme">
 
                 </button>
 
@@ -132,9 +133,9 @@
     <a href="{% url 'profile' %}" class="mobile-profile-link">
         <div class="profile-picture-nav-mobile">
             {% if user.profile.preset_image %}
-                <img src="{% static 'images/' %}{{ user.profile.preset_image }}.png" alt="Profile picture">
+                <img src="{% static 'images/' %}{{ user.profile.preset_image }}.png" alt="Profile picture" title="Your Profile">
             {% elif user.profile.image %}
-                <img src="{{ user.profile.image.url }}" alt="Profile picture">
+                <img src="{{ user.profile.image.url }}" alt="Profile picture" title="Your Profile">
             {% else %}
                 <img src="{% static 'images/default.png' %}" alt="Profile picture" title="Your Profile">
             {% endif %}
@@ -163,7 +164,8 @@
         <button class="dark-mode-toggle">
 
             <img src="{% static 'images/moon.png' %}"
-                 alt="Dark Mode">
+                 alt="Dark Mode"
+                 title="Toggle Theme">
 
         </button>
 
