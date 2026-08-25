@@ -420,16 +420,15 @@ header,
 
     display: flex;
 
-    align-items: center;
+    justify-content: center;
 
-    gap: 1rem;
+    gap: 1.5rem;
 }
 
 .nav-links a {
 
 
     color:var(--nav-text);
-
 
     font-family:var(--heading-font);
 
