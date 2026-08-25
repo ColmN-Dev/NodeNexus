@@ -17,86 +17,92 @@ Users | NodeNexus
         </h1>
     </div>
 
+    <div class="text-center mb-4">
+        <a href="{% url 'home' %}" class="btn nn-btn">
+            &larr; Back to Home
+        </a>
+    </div>
+
     <div class="container py-4">
 
         <div class="users-list">
 
             {% for viewed_user in users %}
 
-            <div class="glass-content user-card">
+                <div class="glass-content user-card">
 
-                <div class="user-card-profile">
+                    <div class="user-card-profile">
 
-                    <a href="{% url 'view_user' viewed_user.id %}" class="user-card-picture" title="View Profile">
+                        <a href="{% url 'view_user' viewed_user.id %}" class="user-card-picture" title="View Profile">
 
-                        {% if viewed_user.profile.preset_image %}
-                            <img src="{% static 'images/' %}{{ viewed_user.profile.preset_image }}.png" alt="{{ viewed_user.username }}'s profile picture">
-                        {% elif viewed_user.profile.image %}
-                            <img src="{{ viewed_user.profile.image.url }}" alt="{{ viewed_user.username }}'s profile picture">
-                        {% else %}
-                            <img src="{% static 'images/default.png' %}" alt="Default profile picture">
-                        {% endif %}
+                            {% if viewed_user.profile.preset_image %}
+                                <img src="{% static 'images/' %}{{ viewed_user.profile.preset_image }}.png" alt="{{ viewed_user.username }}'s profile picture">
+                            {% elif viewed_user.profile.image %}
+                                <img src="{{ viewed_user.profile.image.url }}" alt="{{ viewed_user.username }}'s profile picture">
+                            {% else %}
+                                <img src="{% static 'images/default.png' %}" alt="Default profile picture">
+                            {% endif %}
 
-                    </a>
+                        </a>
 
-                    <a href="{% url 'view_user' viewed_user.id %}" class="user-card-username" title="View Profile">
-                        {{ viewed_user.username }}
-                    </a>
+                        <a href="{% url 'view_user' viewed_user.id %}" class="user-card-username" title="View Profile">
+                            {{ viewed_user.username }}
+                        </a>
+
+                    </div>
+
+                    <div class="user-card-actions">
+
+                        <a href="{% url 'view_user' viewed_user.id %}" class="btn nn-btn">
+
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                width="20"
+                                height="20"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round">
+
+                                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                                <circle cx="12" cy="7" r="4"/>
+
+                            </svg>
+
+                            <span>View Profile</span>
+
+                        </a>
+
+                        <a href="#" class="btn nn-btn">
+
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                width="20"
+                                height="20"
+                                viewBox="0 0 24 24"
+                                fill="none"
+                                stroke="currentColor"
+                                stroke-width="2"
+                                stroke-linecap="round"
+                                stroke-linejoin="round">
+
+                                <path d="M21 11.5a8.38 8.38 0 0 1-9 8.5 8.5 8.5 0 0 1-4.1-1.05L3 21l1.55-4.9A8.45 8.45 0 0 1 3 11.5a8.5 8.5 0 0 1 8.5-8.5 8.5 8.5 0 0 1 9.5 8.5Z"/>
+
+                            </svg>
+
+                            <span>Send Message</span>
+
+                        </a>
+
+                    </div>
 
                 </div>
-
-                <div class="user-card-actions">
-
-                    <a href="{% url 'view_user' viewed_user.id %}" class="btn nn-btn">
-
-                        <svg xmlns="http://www.w3.org/2000/svg"
-                            width="20"
-                            height="20"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                            stroke-linecap="round"
-                            stroke-linejoin="round">
-
-                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
-                            <circle cx="12" cy="7" r="4"/>
-
-                        </svg>
-
-                        <span>View Profile</span>
-
-                    </a>
-
-                    <a href="#" class="btn nn-btn">
-
-                        <svg xmlns="http://www.w3.org/2000/svg"
-                            width="20"
-                            height="20"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                            stroke-linecap="round"
-                            stroke-linejoin="round">
-
-                            <path d="M21 11.5a8.38 8.38 0 0 1-9 8.5 8.5 8.5 0 0 1-4.1-1.05L3 21l1.55-4.9A8.45 8.45 0 0 1 3 11.5a8.5 8.5 0 0 1 8.5-8.5 8.5 8.5 0 0 1 9.5 8.5Z"/>
-
-                        </svg>
-
-                        <span>Send Message</span>
-
-                    </a>
-
-                </div>
-
-            </div>
 
             {% empty %}
 
-            <h4 class="empty-state-message">
-                No users found.
-            </h4>
+                <h4 class="empty-state-message">
+                    No users found.
+                </h4>
 
             {% endfor %}
 
