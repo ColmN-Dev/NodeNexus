@@ -387,13 +387,15 @@ header,
 
     align-items:center;
 
-    gap:2rem;
+    gap:3rem;
 
     flex:1;
 
     justify-content:space-between;
 
-    margin-left:10rem;
+    margin-left:8rem;
+
+    font-size:1rem;
 
 }
 
@@ -1961,6 +1963,13 @@ a.btn:hover {
     padding: 0.75rem 1.25rem;
 }
 
+.profile-information .btn {
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+    gap:.5rem;
+}
+
 .empty-state-message {
 
     grid-column: 1 / -1;
@@ -1999,6 +2008,66 @@ a.btn:hover {
 
     cursor:pointer;
 
+}
+
+/* ========================================
+   USER DISCOVERY PAGE 
+   ======================================== */
+
+.users-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    width: 100%;
+}
+
+.user-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    min-height: 80px;
+    padding: 0.75rem 1.5rem;
+}
+
+.user-card-profile {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    min-width: 0;
+    text-decoration: none;
+}
+
+.user-card-picture {
+    display:flex;
+    flex-shrink:0;
+}
+
+.user-card-picture img {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.user-card-username {
+    font-size: 1.5rem;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.user-card-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-shrink: 0;
+}
+
+.user-card-actions .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
 }
 
 /* ========================================
@@ -2680,7 +2749,7 @@ button.btn.nn-btn.btn-danger:focus {
 }
 
 /* ========================================
-   ARTICLE CAROUSEL & CARD STYLING FOR MOBILE
+   MOBILE LARGE
    ======================================== */
 
 @media (max-width: 768px) {
@@ -2733,6 +2802,48 @@ button.btn.nn-btn.btn-danger:focus {
     .profile-information h3 {
         font-size:1.25rem;
         margin-bottom:2rem;
+    }
+
+    .user-card {
+        padding:.65rem 1rem;
+    }
+
+    .user-card-profile {
+        flex:1;
+        min-width:0;
+    }
+
+    .user-card-picture img {
+        width:42px;
+        height:42px;
+    }
+
+    .user-card-username {
+        min-width:0;
+        white-space:nowrap;
+        overflow:hidden;
+        text-overflow:ellipsis;
+    }
+
+    .user-card-actions {
+        display:flex;
+        align-items:center;
+        gap:.5rem;
+        flex-shrink:0;
+    }
+
+    .user-card-actions .btn {
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+        gap:.5rem;
+        white-space:nowrap;
+    }
+
+    .user-card-actions svg {
+        width:18px;
+        height:18px;
+        flex-shrink:0;
     }
 
     .comment {
@@ -2834,6 +2945,46 @@ button.btn.nn-btn.btn-danger:focus {
         padding:1rem 0.85rem;
     }
 
+    .user-card {
+        padding:.65rem .85rem;
+    }
+
+    .user-card-profile {
+        flex:1;
+        min-width:0;
+        margin-right:1rem;
+    }
+
+    .user-card-picture img {
+        width:40px;
+        height:40px;
+    }
+
+    .user-card-username {
+        font-size:.95rem;
+    }
+
+    .user-card-actions {
+        flex-shrink:0;
+        gap:.5rem;
+    }
+
+    .user-card-actions .btn {
+        width:40px;
+        height:40px;
+        padding:0;
+        gap:0;
+    }
+
+    .user-card-actions .btn span {
+        display:none;
+    }
+
+    .user-card-actions svg {
+        width:18px;
+        height:18px;
+    }
+
     .comment {
         padding: .75rem;
         margin: .75rem 0;
@@ -2924,6 +3075,20 @@ button.btn.nn-btn.btn-danger:focus {
         font-size:1rem;
         min-height:50px;
         padding:1rem 1.75rem;
+    }
+
+    .user-card {
+        padding:.6rem;
+    }
+
+    .user-card-actions .btn {
+        padding:.45rem .5rem;
+        font-size:.75rem;
+    }
+
+    .user-card-actions svg {
+        width:16px;
+        height:16px;
     }
 
     .comment {
@@ -3017,6 +3182,42 @@ button.btn.nn-btn.btn-danger:focus {
         padding:1.25rem 0.5rem;
     }
 
+    .user-card {
+        padding:.5rem;
+    }
+
+    .user-card-profile {
+        gap:.5rem;
+        margin-right:.75rem;
+        min-width:0;
+    }
+
+    .user-card-picture img {
+        width:34px;
+        height:34px;
+    }
+
+    .user-card-username {
+        font-size:.8rem;
+        white-space:nowrap;
+        overflow:visible;
+        text-overflow:clip;
+    }
+
+    .user-card-actions {
+        gap:.25rem;
+    }
+
+    .user-card-actions .btn {
+        width:32px;
+        height:32px;
+    }
+
+    .user-card-actions svg {
+        width:15px;
+        height:15px;
+    }
+    
     .comment-reply {
         margin-left: .75rem;
         padding-left: .35rem;

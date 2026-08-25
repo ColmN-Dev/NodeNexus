@@ -5,21 +5,39 @@
     <div class="comment-header">
 
         <div class="comment-pfp">
-            {% if comment.user.profile.preset_image %}
-                <img src="{% static 'images/' %}{{ comment.user.profile.preset_image }}.png"
-                    alt="Profile picture">
-            {% elif comment.user.profile.image %}
-                <img src="{{ comment.user.profile.image.url }}"
-                    alt="Profile picture">
-            {% else %}
-                <img src="{% static 'images/default.png' %}"
-                    alt="Profile picture">
-            {% endif %}
+
+        {% if comment.user == request.user %}
+            <a href="{% url 'profile' %}">
+        {% else %}
+            <a href="{% url 'view_user' comment.user.id %}">
+        {% endif %}
+
+                {% if comment.user.profile.preset_image %}
+                    <img src="{% static 'images/' %}{{ comment.user.profile.preset_image }}.png"
+                        alt="Profile picture">
+                {% elif comment.user.profile.image %}
+                    <img src="{{ comment.user.profile.image.url }}"
+                        alt="Profile picture">
+                {% else %}
+                    <img src="{% static 'images/default.png' %}"
+                        alt="Default profile picture">
+                {% endif %}
+
+            </a>
+
         </div>
 
         <div class="comment-info">
 
-            <strong>{{ comment.user.username }}</strong>
+        {% if comment.user == request.user %}
+            <a href="{% url 'profile' %}">
+        {% else %}
+            <a href="{% url 'view_user' comment.user.id %}">
+        {% endif %}
+
+                <strong>{{ comment.user.username }}</strong>
+                
+            </a>
 
             <small class="comment-date">•</small>
 
