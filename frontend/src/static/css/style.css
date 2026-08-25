@@ -3016,6 +3016,11 @@ button.btn.nn-btn.btn-danger:focus {
         margin: 0;
     }
 
+    #add-comment {
+        display: block;
+        margin: 0 auto;
+    }
+
 }
 
 /* ========================================
