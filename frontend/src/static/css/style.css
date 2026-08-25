@@ -172,7 +172,9 @@ h1 {
 
     font-size:3rem;
     text-transform:uppercase;
-    text-shadow:0 2px 5px rgba(0,0,0,.3);
+    text-shadow:
+        0 3px 12px rgba(0,0,0,.35),
+        0 0 10px rgba(0,184,230,.2);
     text-align:center;
     margin:1.5rem;
 
@@ -182,7 +184,9 @@ h1 {
 h2 {
 
     font-size:2.25rem;
-    text-shadow:0 2px 5px rgba(0,0,0,.3);
+    text-shadow:
+        0 3px 12px rgba(0,0,0,.35),
+        0 0 10px rgba(0,184,230,.2);
     text-align:center;
     margin:1.5rem 0;
 
@@ -191,7 +195,9 @@ h2 {
 h3 {
 
     font-size:1.75rem;
-    text-shadow:0 2px 5px rgba(0,0,0,.3);
+    text-shadow:
+        0 3px 12px rgba(0,0,0,.35),
+        0 0 10px rgba(0,184,230,.2);
     text-align:center;
 
 }
@@ -636,10 +642,6 @@ button.btn.nn-btn:focus {
     margin-bottom:1rem;
 
     letter-spacing:1px;
-
-    text-shadow:
-        0 3px 10px rgba(255,255,255,.5),
-        0 4px 15px rgba(0,0,0,.35);
 
 }
 
