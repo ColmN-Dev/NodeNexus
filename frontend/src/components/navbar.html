@@ -65,6 +65,12 @@
 
                     |
 
+                    <a href="{% url 'logout' %}">
+                        Log Out
+                    </a>
+
+                    |
+
                     <a href="{% url 'profile' %}" class="profile-nav-link">
                         <div class="profile-picture-nav">
                             {% if user.profile.preset_image %}
@@ -75,12 +81,6 @@
                                 <img src="{% static 'images/default.png' %}" alt="Profile picture" title="Your Profile">
                             {% endif %}
                         </div>
-                    </a>
-
-                    |
-
-                    <a href="{% url 'logout' %}">
-                        Log Out
                     </a>
 
                     |
