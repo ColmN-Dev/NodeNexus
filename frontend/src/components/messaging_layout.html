@@ -1,0 +1,431 @@
+{% load static %}
+
+<div class="glass-content">
+
+    <div class="messaging-layout {% if conversation %}conversation-page{% else %}inbox-page{% endif %}">
+
+        <div class="messaging-inbox glass-content">
+
+            <div class="messaging-inbox-header">
+
+                <h1>
+                    Your Inbox
+                </h1>
+
+            </div>
+
+
+            <div class="d-flex justify-content-between align-items-center p-2">
+
+                <h2 class="inbox-subtitle">
+                    Conversations
+                </h2>
+
+                <button type="button"
+                        class="btn nn-btn"
+                        data-bs-toggle="modal"
+                        data-bs-target="#newChatModal"
+                        title="Start a new chat"
+                        aria-label="Start a new chat">
+
+                    <svg xmlns="http://www.w3.org/2000/svg"
+                         width="25"
+                         height="25"
+                         viewBox="0 0 24 24"
+                         fill="none"
+                         stroke="currentColor"
+                         stroke-width="2"
+                         stroke-linecap="round"
+                         stroke-linejoin="round">
+
+                        <line x1="12" y1="5" x2="12" y2="19"/>
+                        <line x1="5" y1="12" x2="19" y2="12"/>
+
+                    </svg>
+
+                </button>
+
+            </div>
+
+
+            {% if conversations %}
+
+                {% for conversation_item in conversations %}
+
+                    {% if conversation_item.user_one == user %}
+
+                        {% with viewed_user=conversation_item.user_two %}
+
+                            <div class="messaging-conversation-card"
+                                 data-url="{% url 'conversation' conversation_item.id %}"
+                                 onclick="window.location.href=this.dataset.url">
+
+                                <div class="user-card-profile">
+
+                                    <a href="{% url 'view_user' viewed_user.id %}"
+                                       class="user-card-picture"
+                                       onclick="event.stopPropagation()"
+                                       title="View Profile">
+
+                                        {% if viewed_user.profile.preset_image %}
+
+                                            <img src="{% static 'images/' %}{{ viewed_user.profile.preset_image }}.png"
+                                                 alt="{{ viewed_user.username }}'s profile picture">
+
+                                        {% elif viewed_user.profile.image %}
+
+                                            <img src="{{ viewed_user.profile.image.url }}"
+                                                 alt="{{ viewed_user.username }}'s profile picture">
+
+                                        {% else %}
+
+                                            <img src="{% static 'images/default.png' %}"
+                                                 alt="Default profile picture">
+
+                                        {% endif %}
+
+                                    </a>
+
+                                        <span class="user-card-username">
+
+                                            {{ viewed_user.username }}
+
+                                        </span>
+
+                                </div>
+
+                            </div>
+
+                        {% endwith %}
+
+                    {% else %}
+
+                        {% with viewed_user=conversation_item.user_one %}
+
+                            <div class="messaging-conversation-card"
+                                 data-url="{% url 'conversation' conversation_item.id %}"
+                                 onclick="window.location.href=this.dataset.url">
+
+                                <div class="user-card-profile">
+
+                                    <a href="{% url 'view_user' viewed_user.id %}"
+                                       class="user-card-picture"
+                                       onclick="event.stopPropagation()"
+                                       title="View Profile">
+
+                                        {% if viewed_user.profile.preset_image %}
+
+                                            <img src="{% static 'images/' %}{{ viewed_user.profile.preset_image }}.png"
+                                                 alt="{{ viewed_user.username }}'s profile picture">
+
+                                        {% elif viewed_user.profile.image %}
+
+                                            <img src="{{ viewed_user.profile.image.url }}"
+                                                 alt="{{ viewed_user.username }}'s profile picture">
+
+                                        {% else %}
+
+                                            <img src="{% static 'images/default.png' %}"
+                                                 alt="Default profile picture">
+
+                                        {% endif %}
+
+                                    </a>
+
+                                    <span class="user-card-username">
+
+                                        {{ viewed_user.username }}
+
+                                    </span>
+
+                                </div>
+
+                            </div>
+
+                        {% endwith %}
+
+                    {% endif %}
+
+                {% endfor %}
+
+            {% else %}
+
+                <div class="empty-list glass-content m-3">
+
+                    <p class="empty-state-message">
+                        No conversations yet.
+                    </p>
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+
+        <div class="messaging-conversation glass-content">
+
+            {% if conversation %}
+
+                <div class="messaging-conversation-header">
+
+                    {% if conversation.user_one == user %}
+
+                        {% with viewed_user=conversation.user_two %}
+
+                            <a href="{% url 'view_user' viewed_user.id %}"
+                            class="user-card-picture"
+                            title="View Profile">
+
+                                {% if viewed_user.profile.preset_image %}
+
+                                    <img src="{% static 'images/' %}{{ viewed_user.profile.preset_image }}.png"
+                                        alt="{{ viewed_user.username }}'s profile picture">
+
+                                {% elif viewed_user.profile.image %}
+
+                                    <img src="{{ viewed_user.profile.image.url }}"
+                                        alt="{{ viewed_user.username }}'s profile picture">
+
+                                {% else %}
+
+                                    <img src="{% static 'images/default.png' %}"
+                                        alt="Default profile picture">
+
+                                {% endif %}
+
+                            </a>
+
+                            <h2>
+                                {{ conversation.user_two.username }}
+                            </h2>
+
+                        {% endwith %}
+
+                    {% else %}
+
+                        {% with viewed_user=conversation.user_one %}
+
+                            <a href="{% url 'view_user' viewed_user.id %}"
+                            class="user-card-picture"
+                            title="View Profile">
+
+                                {% if viewed_user.profile.preset_image %}
+
+                                    <img src="{% static 'images/' %}{{ viewed_user.profile.preset_image }}.png"
+                                        alt="{{ viewed_user.username }}'s profile picture">
+
+                                {% elif viewed_user.profile.image %}
+
+                                    <img src="{{ viewed_user.profile.image.url }}"
+                                        alt="{{ viewed_user.username }}'s profile picture">
+
+                                {% else %}
+
+                                    <img src="{% static 'images/default.png' %}"
+                                        alt="Default profile picture">
+
+                                {% endif %}
+
+                            </a>
+
+                            <h2>
+                                {{ conversation.user_one.username }}
+                            </h2>
+
+                        {% endwith %}
+
+                    {% endif %}
+
+                </div>
+
+                <div class="messaging-messages">
+
+                    {% if chat_messages %}
+
+                        {% for message in chat_messages %}
+
+                            <div class="message-card {% if message.sender == user %}my-message{% endif %}">
+
+                                {% if message.sender != user %}
+
+                                    <div class="user-card-profile">
+
+                                        <a href="{% url 'view_user' message.sender.id %}"
+                                        class="user-card-picture-message"
+                                        title="View Profile">
+
+                                            {% if message.sender.profile.preset_image %}
+
+                                                <img src="{% static 'images/' %}{{ message.sender.profile.preset_image }}.png"
+                                                    alt="{{ message.sender.username }}'s profile picture">
+
+                                            {% elif message.sender.profile.image %}
+
+                                                <img src="{{ message.sender.profile.image.url }}"
+                                                    alt="{{ message.sender.username }}'s profile picture">
+
+                                            {% else %}
+
+                                                <img src="{% static 'images/default.png' %}"
+                                                    alt="Default profile picture">
+
+                                            {% endif %}
+
+                                        </a>
+
+                                        <a href="{% url 'view_user' message.sender.id %}"
+                                        class="user-card-username-message"
+                                        title="View Profile">
+                                            
+                                            {{ message.sender.username }}
+
+                                        </a>
+
+                                    </div>
+
+                                {% else %}
+
+                                <span class="user-card-username-message">
+                                    {{ message.sender.username }}
+                                </span>
+
+                                {% endif %}
+
+                                <p class="message-content">
+                                    {{ message.content }}
+                                </p>
+
+                                <small class="message-timestamp">
+                                    {{ message.created_at | date:"d M, Y H:i" }}
+                                </small>
+
+                            </div>
+
+                        {% endfor %}
+
+                    {% else %}
+
+                        <p class="empty-state-message">
+                            No messages yet.
+                        </p>
+
+                    {% endif %}
+
+                </div>
+
+
+                <form method="POST" class="messaging-message-form">
+
+                    {% csrf_token %}
+
+                    <input type="text"
+                        name="content"
+                        class="form-control"
+                        placeholder="Message..."
+                        required>
+
+                    <button type="submit" class="btn nn-btn">
+                        Send
+                    </button>
+
+                </form>
+
+
+            {% else %}
+
+                <div class="messaging-empty-state">
+
+                    <p class="empty-state-message">
+                        No conversation selected. Select a conversation from your inbox or start a new chat.
+                    </p>
+
+                </div>
+
+            {% endif %}
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- New Chat Modal -->
+
+<div class="modal fade new-chat-modal"
+     id="newChatModal"
+     tabindex="-1"
+     aria-labelledby="newChatModalLabel"
+     aria-hidden="true">
+
+    <div class="modal-dialog modal-dialog-centered">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h4 class="modal-title" id="newChatModalLabel">
+                    Start a New Chat
+                </h4>
+
+                <button type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close"></button>
+
+            </div>
+
+
+            <div class="modal-body">
+
+                <form method="POST" action="{% url 'new_chat' %}">
+
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+
+                        <label for="user_id" class="form-label">
+                            Select a user
+                        </label>
+
+                        <select name="user_id"
+                                id="user_id"
+                                class="form-select"
+                                required>
+
+                            <option value="" selected disabled>
+                                Choose a user
+                            </option>
+
+                            {% for available_user in users %}
+
+                                <option value="{{ available_user.id }}">
+                                    {{ available_user.username }}
+                                </option>
+
+                            {% endfor %}
+
+                        </select>
+
+                    </div>
+
+                    <div class="text-center">
+
+                        <button type="submit" class="btn nn-btn">
+                            Start Chat
+                        </button>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+

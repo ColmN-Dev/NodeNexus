@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+Your Messages | NodeNexus
+{% endblock %}
+
+{% block content %}
+
+<section class="page-container">
+
+    <div class="page-header">
+
+        <h1> 
+            <span class="title-glass">
+                Your Messages
+            </span>
+        </h1>
+
+    </div>
+
+
+    <div class="text-center mb-4">
+
+        <div class="d-flex justify-content-center gap-2">
+
+            <a href="{% url 'home' %}" class="btn nn-btn">
+                &larr; Back to Home
+            </a>
+
+            <a href="{% url 'inbox' %}" class="btn nn-btn">
+                &larr; Back to Inbox
+            </a>
+
+        </div>
+        
+    </div>
+
+
+    {% include "messaging_layout.html" %}
+
+</section>
+
+{% endblock %}

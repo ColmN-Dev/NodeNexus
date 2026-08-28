@@ -5,6 +5,7 @@ from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from .forms import UserRegisterForm, ProfileUpdateForm
 from news.models import Bookmark, Article
+from django.contrib.auth.models import User
 
 
 PRESET_IMAGES = {
@@ -39,6 +40,28 @@ def signup(request):
 def profile(request):
 
     if request.method == 'POST':
+
+        # Handle username changes.
+        if 'username' in request.POST:
+
+            username = request.POST.get('username', '').strip()
+
+            if not username:
+                messages.error(request, 'Username cannot be empty.')
+
+            elif username == request.user.username:
+                messages.warning(request, 'Your new username is the same as your current username.')
+
+            elif User.objects.filter(username=username).exists():
+                messages.error(request, 'That username is already taken.')
+
+            else:
+                request.user.username = username
+                request.user.save()
+
+                messages.success(request, 'Username changed successfully.')
+
+            return redirect('profile')
 
         # Check if the user selected one of the preset images.
         preset_image = request.POST.get('preset_image')
@@ -100,7 +123,6 @@ def logout_view(request):
     logout(request)
     messages.success(request, 'You have been logged out successfully!')
     return redirect('home')
-
 
 @login_required
 def change_password(request):

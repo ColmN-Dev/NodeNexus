@@ -458,4 +458,27 @@
 
     });
 
+    // ==================================
+    // LOAD NEWEST MESSAGES ON PAGE LOAD
+    // ==================================
+
+    const messages = document.querySelector('.messaging-messages');
+
+    if (messages) {
+        messages.scrollTop = messages.scrollHeight;
+    }
+
+
+    // ===================================
+    // AUTO-DISMISS DJANGO MESSAGE ALERTS
+    // ===================================
+
+    document.querySelectorAll('.alert').forEach(alert => {
+
+    setTimeout(() => {
+        alert.remove();
+    }, 5000);
+
+});
+
 })();
