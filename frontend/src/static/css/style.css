@@ -2194,6 +2194,13 @@ a.btn:hover {
     text-decoration: none;
 }
 
+.user-card-username-unread {
+    font-weight: 700;
+    color: var(--cyan);
+    text-decoration: none;
+    font-size: 1.5rem;
+}
+
 .user-card-username-message {
     font-size: 1rem;
     color: var(--message-text) !important;
@@ -2336,6 +2343,23 @@ a.btn:hover {
 
 }
 
+.unread-dot {
+
+    display: inline-block;
+
+    width: 15px;
+    height: 15px;
+
+    margin-left: auto;
+
+    border-radius: 50%;
+
+    background: var(--cyan);
+
+    flex-shrink: 0;
+
+}
+
 
 /* ========================================
    CONVERSATION
@@ -2444,6 +2468,8 @@ a.btn:hover {
     background:var(--cyan);
 
     border-radius:10px;
+
+    cursor:pointer;
 
 }
 
@@ -2780,6 +2806,18 @@ a.btn:hover {
     margin-top:.5rem;
 
     transition:color .2s ease;
+
+}
+
+.message-date {
+
+    text-align: center;
+
+    margin: 1.5rem 0 1rem;
+
+    font-size: 1rem;
+
+    font-weight: 600;
 
 }
 

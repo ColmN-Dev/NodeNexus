@@ -86,11 +86,25 @@
 
                                     </a>
 
+                                    {% if conversation_item.has_unread %}
+
+                                        <span class="user-card-username-unread">
+
+                                            {{ viewed_user.username }}
+
+                                        </span>
+
+                                        <span class="unread-dot"></span>
+
+                                    {% else %}
+
                                         <span class="user-card-username">
 
                                             {{ viewed_user.username }}
 
                                         </span>
+
+                                    {% endif %}
 
                                 </div>
 
@@ -132,11 +146,25 @@
 
                                     </a>
 
-                                    <span class="user-card-username">
+                                    {% if conversation_item.has_unread %}
 
-                                        {{ viewed_user.username }}
+                                        <span class="user-card-username-unread">
 
-                                    </span>
+                                            {{ viewed_user.username }}
+
+                                        </span>
+
+                                        <span class="unread-dot"></span>
+
+                                    {% else %}
+
+                                        <span class="user-card-username">
+
+                                            {{ viewed_user.username }}
+
+                                        </span>
+
+                                    {% endif %}
 
                                 </div>
 
@@ -245,6 +273,17 @@
 
                         {% for message in chat_messages %}
 
+                            {% ifchanged message.created_at|date:"Y-m-d" %}
+
+                                <div class="message-date">
+
+                                    {{ message.created_at|date:"d M Y" }}
+
+                                </div>
+
+                            {% endifchanged %}
+
+
                             <div class="message-card {% if message.sender == user %}my-message{% endif %}">
 
                                 {% if message.sender != user %}
@@ -277,7 +316,7 @@
                                         <a href="{% url 'view_user' message.sender.id %}"
                                         class="user-card-username-message"
                                         title="View Profile">
-                                            
+
                                             {{ message.sender.username }}
 
                                         </a>
@@ -324,21 +363,29 @@
                                                 <ul class="dropdown-menu">
 
                                                     <li>
+
                                                         <button type="button"
                                                                 class="dropdown-item"
                                                                 data-bs-toggle="modal"
                                                                 data-bs-target="#editMessageModal{{ message.id }}">
+
                                                             Edit
+
                                                         </button>
+
                                                     </li>
 
                                                     <li>
+
                                                         <button type="button"
                                                                 class="dropdown-item text-danger"
                                                                 data-bs-toggle="modal"
                                                                 data-bs-target="#deleteMessageModal{{ message.id }}">
+
                                                             Delete
+
                                                         </button>
+
                                                     </li>
 
                                                 </ul>
@@ -350,6 +397,7 @@
                                     </div>
 
                                 {% endif %}
+
 
                                 {% if message.is_deleted %}
 
@@ -365,19 +413,24 @@
 
                                 {% endif %}
 
+
                                 {% if message.is_edited %}
 
                                     <small class="message-timestamp"
                                         data-timestamp="{{ message.edited_at|date:'c' }}">
+
                                         Edited
-                                        {{ message.edited_at|date:"d M Y, H:i" }}
+                                        {{ message.edited_at|date:"H:i" }}
+
                                     </small>
 
                                 {% else %}
 
                                     <small class="message-timestamp"
                                         data-timestamp="{{ message.created_at|date:'c' }}">
-                                        {{ message.created_at|date:"d M Y, H:i" }}
+
+                                        {{ message.created_at|date:"H:i" }}
+
                                     </small>
 
                                 {% endif %}

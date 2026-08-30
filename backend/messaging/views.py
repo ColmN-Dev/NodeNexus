@@ -30,7 +30,13 @@ def inbox(request):
     """
     # Get all conversations for the logged-in user
     conversations = Conversation.objects.filter(Q(user_one=request.user) | Q(user_two=request.user)).order_by('-updated_at')
+    
+    # Check for unread messages in each conversation
+    for conversation in conversations:
+        conversation.has_unread = conversation.messages.filter(is_read=False).exclude(sender=request.user).exists()
+    
     users = User.objects.exclude(id=request.user.id).order_by('-date_joined')
+    
     return render(request, 'messaging/inbox.html', {'conversations': conversations, 'users': users})
 
 @login_required
@@ -65,6 +71,9 @@ def conversation(request, conversation_id):
     """
     # Get the conversation or return a 404 error
     conversation = get_object_or_404(Conversation.objects.filter(Q(user_one=request.user) | Q(user_two=request.user)), id=conversation_id)
+    
+    # Mark all messages in the conversation from the other user as read
+    Message.objects.filter(conversation=conversation, is_read=False).exclude(sender=request.user).update(is_read=True)
 
     if request.method == 'POST':
         message_content = request.POST.get('content', '').strip()
@@ -76,6 +85,12 @@ def conversation(request, conversation_id):
 
     # Get all conversations for the logged-in user and exclude the logged-in user from the list of users
     conversations = Conversation.objects.filter(Q(user_one=request.user) | Q(user_two=request.user)).order_by('-updated_at')
+    
+    # Check for unread messages
+    for conversation_item in conversations:
+        conversation_item.has_unread = conversation_item.messages.filter(is_read=False).exclude(sender=request.user).exists()
+    
+    # Show all users except the logged-in user for conversation list
     users = User.objects.exclude(id=request.user.id).order_by('-date_joined')
 
     # Get all messages for the conversation
