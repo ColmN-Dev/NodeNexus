@@ -365,17 +365,22 @@
 
                                 {% endif %}
 
-                                <small class="message-timestamp">
-                                    {% if message.is_edited %}
+                                {% if message.is_edited %}
 
-                                        Edited {{ message.edited_at|date:"d M, Y H:i" }}
+                                    <small class="message-timestamp"
+                                        data-timestamp="{{ message.edited_at|date:'c' }}">
+                                        Edited
+                                        {{ message.edited_at|date:"d M Y, H:i" }}
+                                    </small>
 
-                                    {% else %}
+                                {% else %}
 
-                                        {{ message.created_at|date:"d M, Y H:i" }}
+                                    <small class="message-timestamp"
+                                        data-timestamp="{{ message.created_at|date:'c' }}">
+                                        {{ message.created_at|date:"d M Y, H:i" }}
+                                    </small>
 
-                                    {% endif %}
-                                </small>
+                                {% endif %}
 
                             </div>
 

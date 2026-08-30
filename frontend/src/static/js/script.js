@@ -439,7 +439,7 @@
     // ==========================
 
     // Convert UTC timestamps to the user's local timezone.
-    document.querySelectorAll(".comment-timestamp, .article-timestamp").forEach(element => {
+    document.querySelectorAll(".comment-timestamp, .article-timestamp, .message-timestamp").forEach(element => {
 
         const timestamp = element.dataset.timestamp;
 
