@@ -2,6 +2,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.db.models import Q
 from django.shortcuts import get_object_or_404, redirect, render
+from django.utils import timezone
 
 from .models import Conversation, Message
 
@@ -80,3 +81,46 @@ def conversation(request, conversation_id):
     # Get all messages for the conversation
     chat_messages = Message.objects.filter(conversation=conversation).order_by('created_at')
     return render(request, 'messaging/conversation.html', {'conversation': conversation, 'chat_messages': chat_messages, 'conversations': conversations, 'users': users})
+
+@login_required
+def edit_message(request, conversation_id, message_id):
+    """
+    View to edit a specific message.
+    """
+    
+    conversation = get_object_or_404(Conversation.objects.filter(Q(user_one=request.user) | Q(user_two=request.user)), id=conversation_id)
+    
+    message = get_object_or_404(Message, id=message_id, conversation=conversation, sender=request.user)
+
+    if request.method == 'POST':
+        
+        content = request.POST.get('content', '').strip()
+        
+        if not content:
+            return redirect('conversation', conversation_id=conversation_id)
+        
+        if content == message.content:
+            return redirect('conversation', conversation_id=conversation_id)
+
+        if content:
+            message.content = content
+            message.is_edited = True
+            message.edited_at = timezone.now()
+            message.save()
+            
+            return redirect('conversation', conversation_id=conversation_id)
+
+@login_required
+def delete_message(request, conversation_id, message_id):
+    """
+    View to delete a specific message.
+    """
+    conversation = get_object_or_404(Conversation.objects.filter(Q(user_one=request.user) | Q(user_two=request.user)), id=conversation_id)
+    
+    message = get_object_or_404(Message, id=message_id, conversation=conversation, sender=request.user)
+
+    if request.method == 'POST':
+        message.is_deleted = True
+        message.save()
+        
+        return redirect('conversation', conversation_id=conversation_id)
