@@ -150,6 +150,19 @@ def conversation(request, conversation_id):
     return render(request, 'messaging/conversation.html', {'conversation': conversation, 'chat_messages': chat_messages, 'conversations': conversations, 'users': users})
 
 @login_required
+def delete_conversation(request, conversation_id):
+    """
+    View to delete a conversation and all its messages.
+    """
+    conversation = get_object_or_404(Conversation.objects.filter(Q(user_one=request.user) | Q(user_two=request.user)), id=conversation_id)
+
+    if request.method == 'POST':
+        
+        conversation.delete()
+        
+        return redirect('inbox')
+
+@login_required
 def edit_message(request, conversation_id, message_id):
     """
     View to edit a specific message.

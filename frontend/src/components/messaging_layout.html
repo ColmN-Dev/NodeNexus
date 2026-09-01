@@ -323,6 +323,15 @@
 
                             </li>
 
+                            <li>
+                                <button type="button"
+                                        class="dropdown-item text-danger"
+                                        data-bs-toggle="modal"
+                                        data-bs-target="#deleteConversationModal{{ conversation.id }}">
+                                    Delete Chat
+                                </button>
+                            </li>
+
                         </ul>
 
                     </div>
@@ -768,5 +777,70 @@
     {% endfor %}
 
 {% endif %}
+
+<!-- Delete Conversation Modal -->
+
+{% for conversation in conversations %}
+
+    <div class="modal fade delete-conversation-modal"
+         id="deleteConversationModal{{ conversation.id }}"
+         tabindex="-1"
+         aria-labelledby="deleteConversationModalLabel{{ conversation.id }}"
+         aria-hidden="true">
+
+        <div class="modal-dialog modal-dialog-centered">
+
+            <div class="modal-content">
+
+                <div class="modal-header">
+
+                    <h5 class="modal-title"
+                        id="deleteConversationModalLabel{{ conversation.id }}">
+                        Delete Chat
+                    </h5>
+
+                    <button type="button"
+                            class="btn-close"
+                            data-bs-dismiss="modal"
+                            aria-label="Close">
+                    </button>
+
+                </div>
+
+                <div class="modal-body">
+
+                    Are you sure you want to permanently delete this chat for both users?
+
+                </div>
+
+                <div class="modal-footer">
+
+                    <button type="button"
+                            class="btn nn-btn btn-secondary"
+                            data-bs-dismiss="modal">
+                        Cancel
+                    </button>
+
+                    <form method="POST"
+                          action="{% url 'delete_conversation' conversation.id %}">
+
+                        {% csrf_token %}
+
+                        <button type="submit"
+                                class="btn nn-btn btn-danger">
+                            Delete Chat
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+{% endfor %}
 
 

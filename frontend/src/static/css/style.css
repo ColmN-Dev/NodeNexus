@@ -2440,6 +2440,55 @@ a.btn:hover {
 }
 
 /* ========================================
+   DELETE CONVERSATION MODAL
+   ======================================== */
+
+.delete-conversation-modal .modal-content {
+
+    background: var(--content-glass-bg);
+
+    backdrop-filter: blur(18px) saturate(140%);
+    -webkit-backdrop-filter: blur(18px) saturate(140%);
+
+    border: 1px solid var(--content-glass-border);
+
+    border-radius: 18px;
+
+    box-shadow: var(--shadow);
+
+    color: var(--content-text);
+
+}
+
+.delete-conversation-modal .modal-header {
+
+    border-bottom: 1px solid var(--content-glass-border);
+
+}
+
+.delete-conversation-modal .modal-title {
+
+    color: var(--content-heading);
+
+    font-family: var(--heading-font);
+
+}
+
+.delete-conversation-modal .modal-body {
+
+    padding: 2rem;
+
+    color: var(--content-text);
+
+}
+
+.delete-conversation-modal .modal-footer {
+
+    border-top: 1px solid var(--content-glass-border);
+
+}
+
+/* ========================================
    CONVERSATION
    ======================================== */
 
