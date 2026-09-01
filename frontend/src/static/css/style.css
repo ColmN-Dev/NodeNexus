@@ -406,7 +406,7 @@ header,
 
     flex: 1;
 
-    margin-left: 5rem;
+    margin-left: 2.5rem;
 
     font-size: 1.1rem;
 
@@ -2313,6 +2313,22 @@ a.btn:hover {
 
 }
 
+.inbox-buttons .btn {
+
+    width: 100%;
+    
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    gap: 0.25rem;
+
+    margin-bottom: 0.5rem;
+
+}
+
 
 .messaging-inbox::-webkit-scrollbar {
 
@@ -2360,6 +2376,68 @@ a.btn:hover {
 
 }
 
+/* ========================================
+   ARCHIVED CONVERSATIONS
+   ======================================== */
+
+.archived-chats-container {
+
+    width: 100%;
+
+    max-width: 700px;
+
+    margin: 0 auto;
+
+}
+
+/* ========================================
+   UNARCHIVE CONVERSATION MODAL
+   ======================================== */
+
+.unarchive-conversation-modal .modal-content {
+
+    background: var(--content-glass-bg);
+
+    backdrop-filter: blur(18px) saturate(140%);
+    -webkit-backdrop-filter: blur(18px) saturate(140%);
+
+    border: 1px solid var(--content-glass-border);
+
+    border-radius: 18px;
+
+    box-shadow: var(--shadow);
+
+    color: var(--content-text);
+
+}
+
+.unarchive-conversation-modal .modal-header {
+
+    border-bottom: 1px solid var(--content-glass-border);
+
+}
+
+.unarchive-conversation-modal .modal-title {
+
+    color: var(--content-heading);
+
+    font-family: var(--heading-font);
+
+}
+
+.unarchive-conversation-modal .modal-body {
+
+    padding: 2rem;
+
+    color: var(--content-text);
+
+}
+
+.unarchive-conversation-modal .modal-footer {
+
+    border-top: 1px solid var(--content-glass-border);
+
+}
 
 /* ========================================
    CONVERSATION
@@ -2661,6 +2739,76 @@ a.btn:hover {
     padding:3rem;
 
     min-width:0;
+
+}
+
+.conversation-actions {
+
+    margin-left: auto;
+
+}
+
+.conversation-actions .btn {
+
+    display: flex;
+
+    align-items: center;
+
+    justify-content: center;
+
+    width: 32px;
+
+    height: 32px;
+
+    padding: 0;
+
+    border: none;
+
+    border-radius: 50%;
+
+    color: var(--content-text);
+
+    background: transparent;
+
+}
+
+.conversation-actions .btn:hover,
+
+.conversation-actions .btn:focus {
+
+    color: var(--content-text);
+
+    background: rgba(255, 255, 255, 0.2);
+
+    box-shadow: none;
+
+}
+
+.conversation-actions .dropdown-menu {
+
+    min-width: 120px;
+
+    padding: .35rem;
+
+    background: rgba(20, 30, 40, 0.95);
+
+    border: 1px solid rgba(255, 255, 255, 0.15);
+
+}
+
+.conversation-actions .dropdown-item {
+
+    border-radius: 6px;
+
+    padding: .5rem .75rem;
+
+    color: white;
+
+}
+
+.conversation-actions .dropdown-item:hover {
+
+    background: rgba(255, 255, 255, 0.1);
 
 }
 
@@ -3979,7 +4127,11 @@ button.btn.nn-btn.btn-danger:focus {
     }
 
     .user-card-username {
-        font-size:.95rem;
+        font-size:1.25rem;
+    }
+
+    .user-card-username-unread {
+        font-size:1.25rem;
     }
 
     .user-card-actions {
@@ -4221,7 +4373,7 @@ button.btn.nn-btn.btn-danger:focus {
     }
 
     .user-card-username {
-        font-size:.8rem;
+        font-size:1rem;
         white-space:nowrap;
         overflow:visible;
         text-overflow:clip;
@@ -4416,7 +4568,7 @@ button.btn.nn-btn.btn-danger:focus {
 
     .messaging-inbox-header h1 {
 
-        font-size: 2rem;
+        font-size: 2.25rem;
 
     }
 
@@ -4667,7 +4819,7 @@ button.btn.nn-btn.btn-danger:focus {
 
     .messaging-inbox-header h1 {
 
-        font-size: 1.75rem;
+        font-size: 2.25rem;
 
     }
 
@@ -4801,7 +4953,7 @@ button.btn.nn-btn.btn-danger:focus {
 
     .messaging-inbox-header h1 {
 
-        font-size: 1.5rem;
+        font-size: 2rem;
 
     }
 
@@ -4921,7 +5073,7 @@ button.btn.nn-btn.btn-danger:focus {
 
     .messaging-inbox-header h1 {
 
-        font-size: 1.35rem;
+        font-size: 2rem;
 
     }
 

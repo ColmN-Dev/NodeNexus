@@ -7,6 +7,8 @@ class Conversation(models.Model):
     user_two = models.ForeignKey(User, related_name='conversations_as_user_two', on_delete=models.CASCADE)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    user_one_archived = models.BooleanField(default=False)
+    user_two_archived = models.BooleanField(default=False)
     
     # String representation of the Conversation model
     def __str__(self):

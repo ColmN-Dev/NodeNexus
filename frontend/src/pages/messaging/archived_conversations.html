@@ -1,0 +1,239 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}
+Archived Chats | NodeNexus
+{% endblock %}
+
+{% block content %}
+
+<section class="page-container">
+
+    <div class="page-header">
+
+        <h1> 
+            <span class="title-glass">
+                Archived Chats
+            </span>
+        </h1>
+
+    </div>
+
+    <div class="text-center mb-4">
+
+        <div class="d-flex justify-content-center gap-2">
+
+            <a href="{% url 'home' %}" class="btn nn-btn">
+                &larr; Back to Home
+            </a>
+
+            <a href="{% url 'inbox' %}" class="btn nn-btn">
+                &larr; Back to Inbox
+            </a>
+
+        </div>
+    
+    </div>
+
+    <div class="glass-content archived-chats-container">
+
+            {% if conversations %}
+
+                {% for conversation in conversations %}
+
+                    {% if conversation.user_one == user %}
+
+                        {% with viewed_user=conversation.user_two %}
+
+                            <div class="messaging-conversation-card"
+                                data-bs-toggle="modal"
+                                data-bs-target="#unarchiveConversationModal{{ conversation.id }}">
+
+                                <div class="user-card-profile">
+
+                                    <a href="{% url 'view_user' viewed_user.id %}"
+                                    class="user-card-picture"
+                                    title="View Profile">
+
+                                        {% if viewed_user.profile.preset_image %}
+
+                                            <img src="{% static 'images/' %}{{ viewed_user.profile.preset_image }}.png"
+                                                alt="{{ viewed_user.username }}'s profile picture">
+
+                                        {% elif viewed_user.profile.image %}
+
+                                            <img src="{{ viewed_user.profile.image.url }}"
+                                                alt="{{ viewed_user.username }}'s profile picture">
+
+                                        {% else %}
+
+                                            <img src="{% static 'images/default.png' %}"
+                                                alt="Default profile picture">
+
+                                        {% endif %}
+
+                                    </a>
+
+
+                                    {% if conversation.has_unread %}
+
+                                        <span class="user-card-username-unread">
+                                            {{ viewed_user.username }}
+                                        </span>
+
+                                        <span class="unread-dot"></span>
+
+                                    {% else %}
+
+                                        <span class="user-card-username">
+                                            {{ viewed_user.username }}
+                                        </span>
+
+                                    {% endif %}
+
+                                </div>
+
+                            </div>
+
+                        {% endwith %}
+
+                    {% else %}
+
+                        {% with viewed_user=conversation.user_one %}
+
+                            <div class="messaging-conversation-card"
+                                data-bs-toggle="modal"
+                                data-bs-target="#unarchiveConversationModal{{ conversation.id }}">
+
+                                <div class="user-card-profile">
+
+                                    <a href="{% url 'view_user' viewed_user.id %}"
+                                    class="user-card-picture"
+                                    title="View Profile">
+
+                                        {% if viewed_user.profile.preset_image %}
+
+                                            <img src="{% static 'images/' %}{{ viewed_user.profile.preset_image }}.png"
+                                                alt="{{ viewed_user.username }}'s profile picture">
+
+                                        {% elif viewed_user.profile.image %}
+
+                                            <img src="{{ viewed_user.profile.image.url }}"
+                                                alt="{{ viewed_user.username }}'s profile picture">
+
+                                        {% else %}
+
+                                            <img src="{% static 'images/default.png' %}"
+                                                alt="Default profile picture">
+
+                                        {% endif %}
+
+                                    </a>
+
+
+                                    {% if conversation.has_unread %}
+
+                                        <span class="user-card-username-unread">
+                                            {{ viewed_user.username }}
+                                        </span>
+
+                                        <span class="unread-dot"></span>
+
+                                    {% else %}
+
+                                        <span class="user-card-username">
+                                            {{ viewed_user.username }}
+                                        </span>
+
+                                    {% endif %}
+
+                                </div>
+
+                            </div>
+
+                        {% endwith %}
+
+                    {% endif %}
+
+                {% endfor %}
+
+            {% else %}
+
+                <div class="empty-list glass-content m-3">
+
+                    <p class="empty-state-message">
+                        No archived chats.
+                    </p>
+
+                </div>
+
+            {% endif %}
+
+    </div>
+
+    {% for conversation in conversations %}
+
+        <div class="modal fade unarchive-conversation-modal"
+            id="unarchiveConversationModal{{ conversation.id }}"
+            tabindex="-1"
+            aria-labelledby="unarchiveConversationModalLabel{{ conversation.id }}"
+            aria-hidden="true">
+
+            <div class="modal-dialog modal-dialog-centered">
+
+                <div class="modal-content">
+
+                    <div class="modal-header">
+
+                        <h5 class="modal-title"
+                            id="unarchiveConversationModalLabel{{ conversation.id }}">
+                            Unarchive Chat
+                        </h5>
+
+                        <button type="button"
+                                class="btn-close"
+                                data-bs-dismiss="modal"
+                                aria-label="Close">
+                        </button>
+
+                    </div>
+
+                    <div class="modal-body">
+
+                        Are you sure you want to unarchive this chat?
+
+                    </div>
+
+                    <div class="modal-footer">
+
+                        <button type="button"
+                                class="btn nn-btn btn-secondary"
+                                data-bs-dismiss="modal">
+                            Cancel
+                        </button>
+
+                        <form method="POST"
+                            action="{% url 'unarchive_conversation' conversation.id %}">
+
+                            {% csrf_token %}
+
+                            <button type="submit"
+                                    class="btn nn-btn">
+                                Unarchive
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    {% endfor %}
+
+</section>
+
+{% endblock %}

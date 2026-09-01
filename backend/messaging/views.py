@@ -28,8 +28,8 @@ def inbox(request):
     """
     View to display the inbox of the logged-in user, showing all conversations.
     """
-    # Get all conversations for the logged-in user
-    conversations = Conversation.objects.filter(Q(user_one=request.user) | Q(user_two=request.user)).order_by('-updated_at')
+    # Get all conversations for the logged-in user and handle archive logic
+    conversations = Conversation.objects.filter(Q(user_one=request.user, user_one_archived=False) | Q(user_two=request.user, user_two_archived=False )).order_by('-updated_at')
     
     # Check for unread messages in each conversation
     for conversation in conversations:
@@ -62,7 +62,59 @@ def new_chat(request):
 
     # Display a list of users to start a new chat with, excluding the logged-in user
     users = User.objects.exclude(id=request.user.id).order_by('-date_joined')
+    
     return render(request, 'messaging/conversation.html', {'users': users})
+
+@login_required
+def archive_conversation(request, conversation_id):
+    """
+    View to archive a conversation.
+    """
+    conversation = get_object_or_404(Conversation.objects.filter(Q(user_one=request.user) | Q(user_two=request.user)), id=conversation_id)
+    
+    if request.method == 'POST':
+        
+        if conversation.user_one == request.user:
+            conversation.user_one_archived = True
+        else:
+            conversation.user_two_archived = True
+        
+        conversation.save()
+        
+        return redirect('inbox')
+    
+@login_required
+def archived_conversations(request):
+    """
+    View to display all archived conversations for the logged-in user.
+    """
+    conversations = Conversation.objects.filter((Q(user_one=request.user, user_one_archived=True)) | (Q(user_two=request.user, user_two_archived=True))).order_by('-updated_at')
+    
+    # Check for unread messages in each archived conversation
+    for conversation in conversations:
+        conversation.has_unread = conversation.messages.filter(is_read=False).exclude(sender=request.user).exists()
+    
+    users = User.objects.exclude(id=request.user.id).order_by('-date_joined')
+    
+    return render(request, 'messaging/archived_conversations.html', {'conversations': conversations, 'users': users})
+
+@login_required
+def unarchive_conversation(request, conversation_id):
+    """
+    View to unarchive a conversation.
+    """
+    conversation = get_object_or_404(Conversation.objects.filter(Q(user_one=request.user) | Q(user_two=request.user)), id=conversation_id)
+    
+    if request.method == 'POST':
+        
+        if conversation.user_one == request.user:
+            conversation.user_one_archived = False
+        else:
+            conversation.user_two_archived = False
+        
+        conversation.save()
+        
+        return redirect('inbox')
 
 @login_required
 def conversation(request, conversation_id):
@@ -70,7 +122,7 @@ def conversation(request, conversation_id):
     View to display a specific conversation and its messages.
     """
     # Get the conversation or return a 404 error
-    conversation = get_object_or_404(Conversation.objects.filter(Q(user_one=request.user) | Q(user_two=request.user)), id=conversation_id)
+    conversation = get_object_or_404(Conversation.objects.filter(Q(user_one=request.user, user_one_archived=False) | Q(user_two=request.user, user_two_archived=False)), id=conversation_id)
     
     # Mark all messages in the conversation from the other user as read
     Message.objects.filter(conversation=conversation, is_read=False).exclude(sender=request.user).update(is_read=True)
