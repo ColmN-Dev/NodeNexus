@@ -1,8 +1,10 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.db.models import Q
+from django.contrib import messages
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
+from datetime import timedelta
 
 from .models import Conversation, Message
 
@@ -171,6 +173,12 @@ def edit_message(request, conversation_id, message_id):
     conversation = get_object_or_404(Conversation.objects.filter(Q(user_one=request.user) | Q(user_two=request.user)), id=conversation_id)
     
     message = get_object_or_404(Message, id=message_id, conversation=conversation, sender=request.user)
+    
+    # Allow editing only within 15 minutes of sending
+    edit_window = timedelta(minutes=15)
+    if timezone.now() > message.created_at + edit_window:
+        messages.error(request, "Messages can only be edited within 15 minutes of sending.")
+        return redirect('conversation', conversation_id=conversation_id)
 
     if request.method == 'POST':
         
