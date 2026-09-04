@@ -2,11 +2,14 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.models import User
 from django.db.models import Q
 from django.contrib import messages
+from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
 from datetime import timedelta
+from channels.layers import get_channel_layer
+from asgiref.sync import async_to_sync
 
-from .models import Conversation, Message
+from .models import Conversation, Message, Notification
 
 @login_required
 def users(request):
@@ -24,6 +27,37 @@ def view_user(request, user_id):
     """
     viewed_user = get_object_or_404(User, id=user_id)
     return render(request, "messaging/view_user.html", {"viewed_user": viewed_user})
+
+@login_required
+def notifications(request):
+    """
+    View to retrieve unread notifications for the logged-in user.
+    """
+    notifications = Notification.objects.filter(user=request.user, is_read=False).select_related('message__sender').order_by('-created_at')
+
+    data = [
+        {
+            'id': notification.id,
+            'message': f"New message from {notification.message.sender.username}",
+            'url': f"/messages/{notification.message.conversation.id}/",
+            'created_at': notification.created_at.isoformat(),
+        }
+        for notification in notifications
+    ]
+
+    return JsonResponse(data, safe=False)
+
+@login_required
+def viewed_notification(request, notification_id):
+    """
+    View to mark a notification as viewed.
+    """
+    notification = get_object_or_404(Notification, id=notification_id, user=request.user)
+
+    notification.is_read = True
+    notification.save()
+
+    return JsonResponse({'success': True})
 
 @login_required
 def inbox(request):
@@ -132,21 +166,40 @@ def conversation(request, conversation_id):
     
     # Mark all messages in the conversation from the other user as read
     Message.objects.filter(conversation=conversation, is_read=False).exclude(sender=request.user).update(is_read=True)
+    
+    # Mark all notifications related to the conversation as read
+    Notification.objects.filter(user=request.user, message__conversation=conversation, is_read=False).update(is_read=True)
 
     if request.method == 'POST':
         message_content = request.POST.get('content', '').strip()
 
         if message_content:
-            Message.objects.create(conversation=conversation, sender=request.user, content=message_content)
+            
+            message = Message.objects.create(conversation=conversation, sender=request.user, content=message_content)
+            
+            receiver = conversation.user_two if conversation.user_one == request.user else conversation.user_one
+            
+            receiver_archived = conversation.user_two_archived if conversation.user_one == request.user else conversation.user_one_archived
+            
+            if not receiver_archived:
+                Notification.objects.create(user=receiver, message=message)
+                
+                channel_layer = get_channel_layer()
+                async_to_sync(channel_layer.group_send)(
+                    f'notifications_{receiver.id}',
+                    {
+                        'type': 'notification',
+                        'message': f'New message from {request.user.username}',
+                        'url': f'/messages/{conversation.id}/',
+                        'created_at': message.created_at.isoformat(),
+                    }
+                )
+            
             conversation.save()
             return redirect('conversation', conversation_id=conversation.id)
 
     # Get all conversations for the logged-in user and exclude the logged-in user from the list of users
     conversations = Conversation.objects.filter(Q(user_one=request.user) | Q(user_two=request.user)).order_by('-updated_at')
-    
-    # Check for unread messages
-    for conversation_item in conversations:
-        conversation_item.has_unread = conversation_item.messages.filter(is_read=False).exclude(sender=request.user).exists()
     
     # Show all users except the logged-in user for conversation list
     users = User.objects.exclude(id=request.user.id).order_by('-date_joined')

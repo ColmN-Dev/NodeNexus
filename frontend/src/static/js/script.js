@@ -481,4 +481,137 @@
 
 });
 
+    // ========================
+    // NOTIFICATIONS
+    // ========================
+
+    const notificationBell = document.querySelectorAll('.notification-bell');
+    const notificationList = document.querySelectorAll('.notification-dropdown-menu');
+    const notificationBadge = document.querySelectorAll('.notification-badge');
+
+    if (notificationBell && notificationList) {
+
+        let notificationCount = 0;
+
+        // Update the notification number on the bell.
+        function updateNotificationBadge() {
+
+            notificationBadge.forEach(badge => {
+
+                if (notificationCount > 0) {
+                    badge.textContent = notificationCount;
+                    badge.style.display = 'flex';
+                } else {
+                    badge.style.display = 'none';
+                }
+
+            });
+        }
+
+        // Remove the "No new notifications" message when there are notifications.
+        function removeEmptyMessage() {
+
+            notificationList.forEach(list => {
+
+                const emptyMessage = list.querySelector('.notification-empty');
+
+                if (emptyMessage) {
+                    emptyMessage.parentElement.remove();
+                }
+
+            });
+
+        }
+
+        // Add a notification to the dropdown.
+        function addNotification(data, prepend = false) {
+
+            removeEmptyMessage();
+
+            notificationList.forEach(list => {
+
+                const notification = document.createElement('li');
+                const link = document.createElement('a');
+
+                link.className = 'dropdown-item';
+                link.href = data.url;
+
+                const message = document.createElement('div');
+                const timestamp = document.createElement('small');
+
+                message.textContent = data.message;
+
+                // Calculate the time difference between now and the notification's creation time in seconds.
+                const difference = Math.floor((Date.now() - new Date(data.created_at).getTime()) / 1000);
+
+                // Display the time difference (seconds, minutes, hours or days).
+                if (difference < 60) {
+                    timestamp.textContent = `${difference} seconds ago`;
+                } else if (difference < 3600) {
+                    const minutes = Math.floor(difference / 60);
+                    timestamp.textContent = `${minutes} minute${minutes === 1 ? '' : 's'} ago`;
+                } else if (difference < 86400) {
+                    const hours = Math.floor(difference / 3600);
+                    timestamp.textContent = `${hours} hour${hours === 1 ? '' : 's'} ago`;
+                } else {
+                    const days = Math.floor(difference / 86400);
+                    timestamp.textContent = `${days} day${days === 1 ? '' : 's'} ago`;
+                }
+
+                timestamp.className = 'notification-timestamp';
+
+                link.onclick = function() {
+                    fetch(`/messages/notifications/${data.id}/viewed/`);
+
+                    notificationCount--;
+                    updateNotificationBadge();
+
+                };
+
+                link.appendChild(message);
+                link.appendChild(timestamp);
+                notification.appendChild(link);
+
+                    if (prepend) {
+                        list.prepend(notification);
+                    } else {
+                        list.appendChild(notification);
+                    }
+
+            });
+
+            notificationCount++;
+            updateNotificationBadge();
+
+        }
+
+        // Load notifications that are already saved in the database.
+        fetch('/messages/notifications/')
+            .then(response => response.json())
+            .then(notifications => {
+
+                notifications.forEach(data => {
+                    addNotification(data);
+                });
+
+            });
+
+        // Connect to the WebSocket for new notifications.
+        const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
+
+        const socket = new WebSocket(
+            `${protocol}://${window.location.host}/ws/notifications/`
+        );
+
+        // Add new notifications without needing to refresh the page.
+        socket.onmessage = function(event) {
+
+            const data = JSON.parse(event.data);
+
+            addNotification(data, true);
+
+        };
+
+    }
+
 })();

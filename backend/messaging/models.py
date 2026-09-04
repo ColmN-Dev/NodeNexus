@@ -29,3 +29,12 @@ class Message(models.Model):
     # String representation of the Message model, ending with a preview of the content
     def __str__(self):
         return f"Message from {self.sender.username}: {self.content[:50]}"
+
+class Notification(models.Model):
+    user = models.ForeignKey(User, related_name='notifications', on_delete=models.CASCADE)
+    message = models.ForeignKey(Message, related_name='notifications', on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+    is_read = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"Notification for {self.user.username} for message {self.message.id}"
