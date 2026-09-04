@@ -33,9 +33,13 @@ def inbox(request):
     # Get all conversations for the logged-in user and handle archive logic
     conversations = Conversation.objects.filter(Q(user_one=request.user, user_one_archived=False) | Q(user_two=request.user, user_two_archived=False )).order_by('-updated_at')
     
-    # Check for unread messages in each conversation
     for conversation in conversations:
+        
+        # Check for unread messages in each conversation
         conversation.has_unread = conversation.messages.filter(is_read=False).exclude(sender=request.user).exists()
+        
+        # Get the latest message for each conversation to display a preview in the inbox
+        conversation.latest_message = conversation.messages.order_by('-created_at').first()
     
     users = User.objects.exclude(id=request.user.id).order_by('-date_joined')
     

@@ -402,11 +402,11 @@ header,
 
     align-items: center;
 
-    gap: 1.5rem;
+    gap: 2rem;
 
     flex: 1;
 
-    margin-left: 2.5rem;
+    margin-left: 5rem;
 
     font-size: 1.1rem;
 
@@ -2373,6 +2373,22 @@ a.btn:hover {
     background: var(--cyan);
 
     flex-shrink: 0;
+
+}
+
+.conversation-preview {
+
+    margin-left:1rem;
+
+    margin-top:1rem;
+
+    text-align:left;
+
+    white-space:nowrap;
+
+    overflow:hidden;
+
+    text-overflow:ellipsis;
 
 }
 

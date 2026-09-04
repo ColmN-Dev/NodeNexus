@@ -118,6 +118,12 @@
 
                                 </div>
 
+                                {% if conversation_item.latest_message %}
+                                    <p class="conversation-preview">
+                                        {{ conversation_item.latest_message.content }}
+                                    </p>
+                                {% endif %}
+
                             </div>
 
                         {% endwith %}
@@ -177,6 +183,12 @@
                                     {% endif %}
 
                                 </div>
+
+                                {% if conversation_item.latest_message %}
+                                    <p class="conversation-preview">
+                                        {{ conversation_item.latest_message.content }}
+                                    </p>
+                                {% endif %}
 
                             </div>
 
