@@ -38,7 +38,8 @@ The project is structured around Django's server-side architecture, with the dat
 
 # 2. Project Structure
 
-The project splits backend and frontend into separate top-level folders, so Django logic and frontend resources aren't mixed together, and so a React frontend can slot into `frontend/` later without restructuring the backend.
+The project splits the backend and frontend into separate top-level folders, so Django logic and frontend resources aren't mixed together. React was considered for this project however due to time constraints and possible additional complexity, it wasn't used for NodeNexus.
+
 
 ```text
 NodeNexus/
@@ -193,17 +194,6 @@ The bookmark view first passes the submitted API article data to the article ser
 NodeNexus supports comments on articles, including nested replies. When an authenticated user adds a comment to an article that has not yet been persisted, the article data is first stored in the `Article` table and assigned an article ID. The new `Comment` record is then associated with that article.
 
 Comments are stored in the database and associated with the corresponding `Article` and `User` records. A self-referencing parent relationship allows a comment to act as a reply to another comment and supports replies being nested further.
-
-```python
-class Comment(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    article = models.ForeignKey(Article, on_delete=models.CASCADE)
-    parent = models.ForeignKey('self', null=True, blank=True, related_name='replies', on_delete=models.CASCADE)
-    content = models.TextField()
-    created_at = models.DateTimeField(auto_now_add=True)
-    is_edited = models.BooleanField(default=False)
-    updated_at = models.DateTimeField(auto_now=True)
-```
 
 The article detail view retrieves top-level comments separately from all comments. Top-level comments are used for the main comment display, while the complete collection is used for actions such as editing and deleting the current user's comments.
 
@@ -573,7 +563,7 @@ The `Notification` model stores persistent notifications for users and links eac
 
 **Why PostgreSQL** — more production-realistic than SQLite, and better suited to the relational data used by users, articles, bookmarks, comments, conversations, messages, and notifications.
 
-**Why separate `backend/` and `frontend/`** — keeps Django logic and frontend templates/assets cleanly split, so a future React frontend can be added without reorganising the backend.
+**Why separate `backend/` and `frontend/`** — keeps Django logic and frontend templates/assets cleanly organised. React wasn't used for NodeNexus due to time constraints and added complexity; it's planned for the next project, where the frontend architecture will be designed around React from the beginning.
 
 **Why previous/next pagination instead of numbered totals** — the Currents API doesn't report a total result count, so a traditional "page X of Y" approach wasn't possible. Since results are capped at five pages, a fixed five-button layout was used instead of calculating a page range.
 
@@ -611,15 +601,23 @@ The `Notification` model stores persistent notifications for users and links eac
 
 # 9. Deployment
 
-NodeNexus is deployed on Render, with Gunicorn as the WSGI server and PostgreSQL as the database, both hosted on Render.
+NodeNexus is deployed on Render, with Daphne as the ASGI server and PostgreSQL as the database, both hosted on Render. Daphne is used because NodeNexus uses Django Channels and WebSockets for real-time notifications. WSGI and Gunicorn are no longer used after migrating to Daphne.
 
 Static files are handled differently depending on environment:
+
 - In development (`DEBUG=True`), Django serves static files directly.
+
 - In production (`DEBUG=False`), WhiteNoise serves collected static files, and `CompressedManifestStaticFilesStorage` generates versioned filenames so updated CSS/JS don't get served from stale browser caches.
 
 User-uploaded profile images are stored using Cloudinary. Cloudinary configuration is provided through environment variables on Render rather than being stored in the codebase.
 
-Deployment flow: push to GitHub → Render pulls the update → installs dependencies → runs `collectstatic` → Gunicorn starts the app → app connects to the production database. Secrets (Django secret key, database credentials, API keys, and Cloudinary credentials) are all set as environment variables on Render, not committed to the repo.
+Deployment flow: updates are pushed to GitHub, Render pulls the latest changes, installs the dependencies, runs `collectstatic`, starts Daphne, and connects the application to the production database. Secrets (Django secret key, database credentials, API keys, and Cloudinary credentials) are all set as environment variables on Render, not committed to the repo.
+
+The production service uses the Django ASGI application so that both normal HTTP requests and WebSocket connections can be handled:
+
+```bash
+cd backend && daphne -b 0.0.0.0 -p $PORT config.asgi:application
+```
 
 ---
 
@@ -755,13 +753,13 @@ Deployment flow: push to GitHub → Render pulls the update → installs depende
 
 - Admin functionality and role-based access control.
 
+- Automated testing using Django's built-in `TestCase` framework, covering authentication, articles, bookmarks, comments, messaging, and notifications.
+
+- Database backup strategy for the production PostgreSQL instance.
+
 - Continued testing and bug fixes on API result consistency (some categories occasionally return fewer than 12 articles).
 
 - Final UI polish, responsive testing, accessibility improvements, and general application refinement.
-
-- Continued testing of existing features as new functionality is added.
-
-- Eventual migration to a React frontend with a DRF API layer — models and the service layer are expected to carry over largely unchanged.
 
 ---
 

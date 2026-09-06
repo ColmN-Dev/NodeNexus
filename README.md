@@ -26,9 +26,9 @@
 
 NodeNexus is a full-stack Django web application that aggregates technology news from external APIs, letting users discover the latest developments across AI, cybersecurity, gaming, and trending tech through a unified, searchable platform.
 
-The application also provides user authentication and account management, including profile editing, password management, profile picture selection and uploads, article bookmarking, comments, and nested replies.
+The application also provides user authentication and account management, including profile editing, password management, profile picture selection and uploads, article bookmarking, comments, and nested replies. Authenticated users can also discover other users and communicate through a database-backed messaging system with conversations, message editing and deletion, conversation archiving, and persistent, real-time notifications delivered using Django Channels and WebSockets.
 
-The application uses PostgreSQL for persistent storage and follows a structured Django project layout with separate `core`, `news`, and `accounts` applications, keeping general site functionality, news aggregation, and account functionality separated.
+The application uses PostgreSQL for persistent storage and follows a structured Django project layout with separate `core`, `news`, `accounts`, and `messaging` applications, keeping general site functionality, news aggregation, account functionality, and messaging cleanly separated.
 
 ---
 
@@ -46,12 +46,12 @@ The application uses PostgreSQL for persistent storage and follows a structured 
 
 ## Deployment
 
-The application is deployed on Render using Gunicorn, PostgreSQL, and Cloudinary for user-uploaded profile images.
+The application is deployed on Render using Daphne, PostgreSQL, and Cloudinary for user-uploaded profile images. Daphne is used as the ASGI server as NodeNexus uses Django Channels and WebSockets for real-time notifications.
 
 **Render Web Service configuration:**
 
 - Build command: `pip install -r backend/requirements.txt && cd backend && python manage.py collectstatic --no-input && python manage.py migrate`
-- Start command: `cd backend && gunicorn config.wsgi:application`
+- Start command: `cd backend && daphne -b 0.0.0.0 -p $PORT config.asgi:application`
 - Environment variables set in the Render dashboard:
   - `SECRET_KEY`
   - `CURRENTS_API_KEY`
@@ -78,6 +78,8 @@ Cloudinary is used to store custom user-uploaded profile images. Preset profile 
 
 - Python
 - Django
+- Django Channels
+- Daphne
 - PostgreSQL
 - Bootstrap
 - HTML
@@ -86,7 +88,6 @@ Cloudinary is used to store custom user-uploaded profile images. Preset profile 
 - Currents API
 - Cloudinary
 - WhiteNoise
-- Gunicorn
 
 ---
 
@@ -109,6 +110,8 @@ Cloudinary is used to store custom user-uploaded profile images. Preset profile 
 - Responsive frontend development combining Bootstrap and custom CSS
 - Custom authentication and profile interface styling using HTML, CSS, and JavaScript
 - Debugging real-world CSS layout, modal, stacking context, and responsive design issues
+- Designing database-backed messaging with per-user conversation states
+- Building persistent notifications with real-time delivery using Django Channels and WebSockets
 - Production deployment and static/media file management using WhiteNoise, Cloudinary, and Render
 
 ---
@@ -162,6 +165,27 @@ Cloudinary is used to store custom user-uploaded profile images. Preset profile 
 
 ---
 
+### Messaging
+
+- User discovery page for finding and starting conversations with other users
+- Send and receive messages within a conversation
+- Edit sent messages within a 15-minute window
+- Delete messages, retained in the database and displayed as deleted rather than removed
+- Archive conversations independently per user, without affecting the other participant's inbox
+- Delete an entire conversation, removing it and its messages for both participants
+- Responsive messaging layout across desktop and mobile
+
+---
+
+### Notifications
+
+- Persistent, database-backed notifications created for new messages
+- Real-time delivery using Django Channels and WebSockets
+- Unread/read state with notification badges and dropdown
+- Notifications link directly to the relevant conversation
+
+---
+
 ### Content Quality Filtering
 
 - Duplicate articles removed based on source URL
@@ -201,7 +225,7 @@ Cloudinary is used to store custom user-uploaded profile images. Preset profile 
 - Protected user profile page
 - Profile editing and account information management
 - Password reset by email using Django's built-in password reset system
-- Change password for authenticated users
+- Change username and password for authenticated users
 - Password visibility toggle using JavaScript
 - Inline form validation and error messages provided by Django
 - Authentication links integrated into the desktop and mobile navigation
@@ -220,10 +244,13 @@ The project follows a Django multi-app structure with a separated frontend/backe
 - `core` handles general site routing and category page views.
 - `news` handles external API communication, caching, search logic, articles, bookmarks, and comments.
 - `accounts` handles user registration, login, logout, profile access, profile editing, profile pictures, password reset, and change password.
+- `messaging` handles user discovery, conversations, messages, conversation archiving, and real-time notifications.
 - The `Article`, `Bookmark`, and `Comment` models manage persistent articles, saved relationships, comments, and nested replies.
+- The `Conversation`, `Message`, and `Notification` models manage messaging data and persistent, real-time notifications.
 - A dedicated `services` layer within `news` separates Currents API integration from Django views.
-- Reusable template components (navbar, footer, search bar, article cards, mobile navigation) reduce duplication across pages.
+- Reusable template components (navbar, footer, search bar, article cards, mobile navigation, messaging layout) reduce duplication across pages.
 - Django's built-in authentication system handles user accounts and stores users in the PostgreSQL database.
+- Django Channels and Daphne provide real-time WebSocket delivery for notifications.
 - Cloudinary handles custom user-uploaded profile images, while preset profile images remain static assets.
 
 ---
@@ -238,7 +265,7 @@ The `Article` model stores article data when users bookmark or comment on an art
 
 An article remains in the database while it has at least one bookmark or comment. When the final bookmark or comment is removed, the associated article record is deleted.
 
-Messaging models have not been created yet.
+The `Conversation` and `Message` models store messaging data, including participants, timestamps, and per-user archive states. Deleting a conversation removes it and its associated messages for both participants. The `Notification` model stores persistent notifications linked to the recipient and the message that triggered them, including an unread state.
 
 ---
 
@@ -251,6 +278,7 @@ NodeNexus/
 │   ├── accounts/
 │   ├── config/
 │   ├── core/
+│   ├── messaging/
 │   ├── news/
 │   │   └── services/
 │   ├── manage.py
@@ -307,10 +335,10 @@ Local development:
 python backend/manage.py runserver
 ```
 
-Gunicorn deployment:
+Daphne deployment:
 
 ```bash
-cd backend && gunicorn config.wsgi:application
+cd backend && daphne -b 0.0.0.0 -p $PORT config.asgi:application
 ```
 
 Collect static files for production:
@@ -327,46 +355,57 @@ python backend/manage.py collectstatic --noinput
 - `backend/core/urls.py` → main site pages (`/`, `/ai/`, `/cybersecurity/`, `/gaming/`, `/trending/`)
 - `backend/news/urls.py` → article search, autocomplete, article detail, bookmarking, bookmark deletion, comments, comment editing, and comment deletion routes
 - `backend/accounts/urls.py` → authentication routes for registration, login, logout, profile, profile editing, password reset, and change password
+- `backend/messaging/urls.py` → user discovery, conversation creation, messaging, message editing/deletion, conversation archiving/deletion, and notification routes
 
 ---
 
 ## Implemented Routes
 
-| Route                                         | Purpose                        |
-| --------------------------------------------- | ------------------------------ |
-| `/`                                           | Homepage                       |
-| `/ai/`                                        | AI news category               |
-| `/cybersecurity/`                             | Cybersecurity news category    |
-| `/gaming/`                                    | Gaming news category           |
-| `/trending/`                                  | Trending technology category   |
-| `/search/`                                    | Search results                 |
-| `/auto-complete/`                             | Search autocomplete            |
-| `/article/`                                   | Individual article detail      |
-| `/article/<int:article_id>/`                  | Saved article detail page      |
-| `/article/bookmark/`                          | Bookmark an article            |
-| `/article/<int:article_id>/delete/`           | Delete a bookmarked article    |
-| `/article/comment/`                           | Add a comment                  |
-| `/article/comment/<int:comment_id>/edit/`     | Edit a comment                 |
-| `/article/comment/<int:comment_id>/delete/`   | Delete a comment               |
-| `/signup/`                                    | User registration              |
-| `/login/`                                     | User login                     |
-| `/logout/`                                    | User logout                    |
-| `/profile/`                                   | User profile                   |
-| `/change_password/`                           | Change current password        |
-| `/password_reset/`                            | Request password reset email   |
-| `/password_reset_done/`                       | Password reset email sent      |
-| `/password_reset_confirm/`                    | Set a new password             |
-| `/password_reset_complete/`                   | Password reset completed       |
+| Route                                                               | Purpose                         |
+| ------------------------------------------------------------------- | ------------------------------- |
+| `/`                                                                 | Homepage                        |
+| `/ai/`                                                              | AI news category                |
+| `/cybersecurity/`                                                   | Cybersecurity news category     |
+| `/gaming/`                                                          | Gaming news category            |
+| `/trending/`                                                        | Trending technology category    |
+| `/search/`                                                          | Search results                  |
+| `/auto-complete/`                                                   | Search autocomplete             |
+| `/article/`                                                         | Individual article detail       |
+| `/article/<int:article_id>/`                                        | Saved article detail page       |
+| `/article/bookmark/`                                                | Bookmark an article             |
+| `/article/<int:article_id>/delete/`                                 | Delete a bookmarked article     |
+| `/article/comment/`                                                 | Add a comment                   |
+| `/article/comment/<int:comment_id>/edit/`                           | Edit a comment                  |
+| `/article/comment/<int:comment_id>/delete/`                         | Delete a comment                |
+| `/signup/`                                                          | User registration               |
+| `/login/`                                                           | User login                      |
+| `/logout/`                                                          | User logout                     |
+| `/profile/`                                                         | User profile                    |
+| `/change_password/`                                                 | Change current password         |
+| `/password_reset/`                                                  | Request password reset email    |
+| `/password_reset_done/`                                             | Password reset email sent       |
+| `/password_reset_confirm/`                                          | Set a new password              |
+| `/password_reset_complete/`                                         | Password reset completed        |
+| `/users/`                                                           | User discovery page             |
+| `/users/<int:user_id>/`                                             | View another user's profile     |
+| `/messages/`                                                        | Inbox / conversation list       |
+| `/messages/new/`                                                    | Start a new conversation        |
+| `/messages/<int:conversation_id>/`                                  | Conversation view               |
+| `/messages/<int:conversation_id>/archive/`                          | Archive a conversation          |
+| `/messages/archived/`                                               | View archived conversations     |
+| `/messages/<int:conversation_id>/unarchive/`                        | Unarchive a conversation        |
+| `/messages/<int:conversation_id>/delete/`                           | Delete a conversation           |
+| `/messages/<int:conversation_id>/edit_message/<int:message_id>/`    | Edit a message                  |
+| `/messages/<int:conversation_id>/delete_message/<int:message_id>/`  | Delete a message                |
+| `/messages/notifications/`                                          | View notifications              |
+| `/messages/notifications/<int:notification_id>/viewed/`             | Mark a notification as viewed   |
 
 ---
 
 ## Planned Features
 
-- User-to-user direct messaging
 - Account deletion
 - Admin functionality and role-based access control
-- React frontend migration
-- Django REST Framework API layer
 
 ---
 
@@ -407,3 +446,7 @@ python backend/manage.py collectstatic --noinput
 ### Profile
 
 ![Profile](frontend/src/static/images/Profile.png)
+
+### Inbox
+
+![Inbox](frontend/src/static/images/Inbox.png)
