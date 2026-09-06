@@ -225,7 +225,7 @@ header,
     display:flex;
     justify-content:space-between;
     align-items:center;
-    padding:0 0.25rem;
+    padding:0 0.5rem;
 }
 
 /* ============================
@@ -278,21 +278,20 @@ header,
     align-items:center;
     gap:2rem;
     flex:1;
-    margin-left:4rem;
+    margin-left:2.5rem;
     font-size:1.1rem;
 }
 
 .main-nav-links {
     display:flex;
     align-items:center;
-    gap:1rem;
-    margin:0 auto;
+    gap:1.25rem;
 }
 
 .auth-nav-links {
     display:flex;
     align-items:center;
-    gap:1rem;
+    gap:1.25rem;
     margin-left:auto;
 }
 
