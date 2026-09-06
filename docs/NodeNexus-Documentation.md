@@ -687,6 +687,8 @@ cd backend && daphne -b 0.0.0.0 -p $PORT config.asgi:application
 
 **Development and production consistency** — Features involving external storage and deployment were tested in both local development and the Render environment. Environment variables were used for secrets and external services, while static assets remained part of the application and user-uploaded media was stored externally through Cloudinary.
 
+**CSRF errors after switching to Daphne** — After moving from Gunicorn to Daphne for WebSocket support, login started returning a 403 error in production while working normally in development. Django's CSRF protection checks the origin of incoming requests, and no trusted origins had been configured for production, a gap that Gunicorn's setup had not exposed. Render also forwards HTTPS requests to the application internally as plain HTTP, so Django could not correctly recognise the connection as secure without being told to trust the forwarded protocol header. The fix was adding `CSRF_TRUSTED_ORIGINS` for the production domain and `SECURE_PROXY_SSL_HEADER` so Django trusts Render's forwarded protocol header.
+
 ---
 
 # 11. What Was Learned
@@ -788,6 +790,8 @@ cd backend && daphne -b 0.0.0.0 -p $PORT config.asgi:application
 - [Django Email](https://docs.djangoproject.com/en/6.0/topics/email/)
 
 - [Django Forms](https://docs.djangoproject.com/en/6.0/topics/forms/)
+
+- [Django Settings](https://docs.djangoproject.com/en/6.0/ref/settings/)
 
 ## Django Channels and WebSockets
 
