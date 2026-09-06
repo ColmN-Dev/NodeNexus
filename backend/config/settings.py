@@ -34,11 +34,20 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 # Use the DEBUG environment variable to control the debug mode
 DEBUG = os.getenv('DEBUG', 'False') == 'True'
 
+# Hosts allowed to serve this Django app
 ALLOWED_HOSTS = [
     'nodenexus-htnu.onrender.com',
     'localhost',
     '127.0.0.1',
 ]
+
+# Origins trusted for CSRF checks
+CSRF_TRUSTED_ORIGINS = [
+    'https://nodenexus-htnu.onrender.com',
+]
+
+# Tells Django the request came in over HTTPS
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
 
 # Application definition
@@ -99,6 +108,7 @@ WSGI_APPLICATION = 'config.wsgi.application'
 
 ASGI_APPLICATION = 'config.asgi.application'
 
+# In-memory channel layer for WebSocket notifications
 CHANNEL_LAYERS = {
     'default': {
         'BACKEND': 'channels.layers.InMemoryChannelLayer',
