@@ -211,26 +211,18 @@ Comment timestamps are displayed using the same local-time formatting system as 
 
 NodeNexus uses Django's built-in authentication system for user registration, password hashing, validation, login, logout, sessions, password resets, and password changes.
 
-The registration form extends Django's `UserCreationForm` and adds an email field. Additional validation requires passwords to contain at least one uppercase letter, lowercase letter, digit, and special character.
+The registration form extends Django's `UserCreationForm` and adds an email field. Password requirements are handled through a custom `PasswordCharacterValidator` in `accounts/validators.py`, which is registered in Django's `AUTH_PASSWORD_VALIDATORS` setting. This centralises the password policy so the same requirements are applied across the application's password validation processes.
 
-```python
-    def clean_password1(self):
-        password = self.cleaned_data.get('password1')
-        
-        if not any(char.isupper() for char in password):
-            raise forms.ValidationError("Password must contain at least one uppercase letter.")
-        
-        if not any(char.islower() for char in password):
-            raise forms.ValidationError("Password must contain at least one lowercase letter.")
+The custom validator requires passwords to contain:
 
-        if not any(char.isdigit() for char in password):
-            raise forms.ValidationError("Password must contain at least one digit.")
-        
-        if not any(not char.isalnum() for char in password):
-            raise forms.ValidationError("Password must contain at least one special character.")
-        
-        return password
-```
+- At least one uppercase letter
+- At least one lowercase letter
+- At least one digit
+- At least one special character
+
+Django's other built-in password validators remain enabled alongside the custom validator, providing additional checks for password length, common passwords, numeric-only passwords, and similarity to user attributes.
+
+The registration form therefore does not contain its own password validation logic. Instead, it relies on Django's configured password validators, avoiding duplicated validation code and ensuring the password policy is applied consistently.
 
 The authentication system currently provides:
 
@@ -245,6 +237,14 @@ The authentication system currently provides:
 - Password reset confirmation
 - Password reset completion
 - Change password for authenticated users
+
+When an authenticated user changes their password, the application also checks whether the submitted new password matches their current password. Django's `check_password()` method is used for this comparison rather than comparing passwords directly, because Django stores passwords as secure hashes.
+
+```python
+if request.user.check_password(request.POST.get('new_password1')):
+    messages.error(request, 'New password cannot be the same as the old password.')
+```
+The password policy is handled centrally through Django's validation system, while the additional current-password check is specific to the authenticated change-password process.
 
 Django handles the security-sensitive password hashing and authentication logic rather than implementing these systems manually.
 
@@ -647,6 +647,8 @@ cd backend && daphne -b 0.0.0.0 -p $PORT config.asgi:application
 
 **Authentication frontend integration** — Django's authentication system handled account creation, password validation, login, logout, sessions, and password management, while the frontend required custom integration into the NodeNexus design. This included custom forms, validation errors, responsive navigation links, password visibility controls, password reset pages, change-password functionality, and username editing.
 
+**Password validation consistency** — Testing the change-password functionality revealed that its password validation was less strict than the registration form `UserRegisterForm`. The custom password requirements were therefore moved into a dedicated `PasswordCharacterValidator` within `accounts/validators.py` and added to `AUTH_PASSWORD_VALIDATORS` in `settings.py` so they could be applied consistently across password workflows. Further testing also identified that users could reuse their current password, so a `check_password()` check was added to prevent this.
+
 **Password reset email setup** — Password reset initially used Django's console email backend, which displayed emails in the development terminal. SMTP was later configured so real password reset emails could be sent. Email credentials were kept in environment variables and the complete reset process was tested using a real email account.
 
 **Profile picture storage and Cloudinary** — Profile pictures initially used the local filesystem for both uploads and preset images. This was unsuitable for production on Render because uploaded files should not depend on the application's local filesystem. The system was redesigned so nine preset images remain permanent static assets while custom uploads use Cloudinary through `CloudinaryField`. Separate profile fields distinguish between the two sources.
@@ -706,6 +708,8 @@ cd backend && daphne -b 0.0.0.0 -p $PORT config.asgi:application
 - Debugging by tracing the actual execution path, checking console and server errors, and identifying which part of the application is responsible instead of repeatedly changing unrelated code.
 
 - Using Django's built-in authentication and form systems for registration, validation, password hashing, login, logout, sessions, password resets, and password changes.
+
+- Understanding how Django's `AUTH_PASSWORD_VALIDATORS` can centralise password requirements across registration, password changes, and password resets, and how `check_password()` can safely check a new password against the existing password hash.
 
 - Integrating Django authentication into a custom frontend and extending it with JavaScript functionality such as password visibility controls.
 
