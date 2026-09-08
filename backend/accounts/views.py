@@ -29,6 +29,8 @@ def signup(request):
             form.save()
             messages.success(request, 'Account created successfully! You can now log in.')
             return redirect('login')
+        else:
+            messages.error(request, 'Please review the information below and try again.')
 
     else:
         form = UserRegisterForm()
@@ -129,7 +131,9 @@ def change_password(request):
     if request.method == 'POST':
         form = PasswordChangeForm(request.user, request.POST)
 
-        if form.is_valid():
+        if request.user.check_password(request.POST.get('new_password1')):
+            messages.error(request, 'New password cannot be the same as the old password.')
+        elif form.is_valid():
             form.save()
             messages.success(request, 'Your password has been changed successfully!')
             return redirect('profile')
