@@ -45,6 +45,24 @@ def home(request):
         "index.html",
         context
     )
+    
+def get_page_number(request):
+    """
+    Safely get the page number from the URL, defaulting to 1
+    if it's missing, invalid, or less than 1.
+    """
+
+    page_param = request.GET.get("page", 1)
+
+    try:
+        page = int(page_param)
+    except ValueError:
+        page = 1
+
+    if page < 1:
+        page = 1
+
+    return page
 
 
 def get_page_articles(request, query, use_category=False):
@@ -53,7 +71,7 @@ def get_page_articles(request, query, use_category=False):
     handling cases where the requested page has no articles.
     """
     
-    page = int(request.GET.get("page", 1))
+    page = get_page_number(request)
     original_page = page
 
     # Get articles based on whether to use category or search

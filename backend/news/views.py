@@ -10,6 +10,24 @@ from .services.currents import search_articles
 from .services.articles import get_or_create_article
 from .models import Article, Bookmark, Comment
 
+def get_page_number(request):
+    """
+    Safely get the page number from the URL, defaulting to 1
+    if it's missing, invalid, or less than 1.
+    """
+
+    page_param = request.GET.get("page", 1)
+
+    try:
+        page = int(page_param)
+    except ValueError:
+        page = 1
+
+    if page < 1:
+        page = 1
+
+    return page
+
 
 def search_results(request):
     """
@@ -18,7 +36,7 @@ def search_results(request):
     """
 
     query = request.GET.get("q", "").strip()
-    page = int(request.GET.get("page", 1))
+    page = get_page_number(request)
 
     articles = []
     has_next = False
@@ -125,7 +143,7 @@ def article_detail(request, article_id=None):
 
     if not is_meta_crawler:
         # Use the first three words of the title to find related articles
-        title_words = article["title"].split()
+        title_words = (article["title"] or "").split()
         related_query = " ".join(title_words[:3])
 
         related_articles, _ = search_articles(related_query)
@@ -301,9 +319,15 @@ def delete_comment(request, comment_id):
     comment.delete()
     
     # Delete the article only if it has no bookmarks or comments
+    article_was_deleted = False
     if (not Bookmark.objects.filter(article_id=article_id).exists() and not Comment.objects.filter(article_id=article_id).exists()):
+            
             article.delete()
+            article_was_deleted = True
         
     messages.success(request, "Your comment has been deleted successfully!")
+    
+    if article_was_deleted:
+        return redirect("profile")
 
     return redirect("saved_article_detail", article_id=article_id)
