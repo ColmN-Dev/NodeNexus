@@ -493,6 +493,12 @@
 
         let notificationCount = 0;
 
+        // Function to get the CSRF token from the cookie.
+        function getCSRFToken() {
+            const match = document.cookie.match(/csrftoken=([^;]+)/);
+            return match ? match[1] : '';
+        }
+
         // Update the notification number on the bell.
         function updateNotificationBadge() {
 
@@ -560,8 +566,14 @@
 
                 timestamp.className = 'notification-timestamp';
 
+                // Mark the notification as viewed when clicked and update the notification count.
                 link.onclick = function() {
-                    fetch(`/messages/notifications/${data.id}/viewed/`);
+                    fetch(`/messages/notifications/${data.id}/viewed/`, {
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': getCSRFToken(),
+                        },
+                    });
 
                     notificationCount--;
                     updateNotificationBadge();
@@ -585,7 +597,7 @@
 
         }
 
-        // Load notifications that are already saved in the database.
+        // Load any notifications from the database that haven't been read yet.
         fetch('/messages/notifications/')
             .then(response => response.json())
             .then(notifications => {
@@ -596,7 +608,7 @@
 
             });
 
-        // Connect to the WebSocket for new notifications.
+        // Open a WebSocket connection to receive new notifications in real time.
         const protocol = window.location.protocol === 'https:' ? 'wss' : 'ws';
 
         const socket = new WebSocket(

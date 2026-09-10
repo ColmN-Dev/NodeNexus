@@ -54,10 +54,12 @@ def viewed_notification(request, notification_id):
     """
     notification = get_object_or_404(Notification, id=notification_id, user=request.user)
 
-    notification.is_read = True
-    notification.save()
+    if request.method == 'POST':
+        notification.is_read = True
+        notification.save()
+        return JsonResponse({'success': True})
 
-    return JsonResponse({'success': True})
+    return JsonResponse({'success': False}, status=405)
 
 @login_required
 def inbox(request):
