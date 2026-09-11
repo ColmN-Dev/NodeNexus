@@ -1,6 +1,6 @@
 # NodeNexus Documentation
 
-**Last updated:** September 5, 2026
+**Last updated:** September 11, 2026
 
 ---
 
@@ -26,7 +26,7 @@
 
 NodeNexus is a technology intelligence hub built with Django. It retrieves technology news from the Currents API and provides category pages, global search, autocomplete, pagination, article details, and related articles.
 
-The application includes user authentication, account management, profiles, profile pictures, bookmarks, comments and nested replies. Users can also discover other users and communicate through a database-backed messaging system with conversations, message editing and deletion, conversation archiving, and real-time notifications using Django Channels and WebSockets.
+The application includes user authentication, account management, profiles, profile pictures, password management, account deletion, bookmarks, comments and nested replies. Users can also discover other users and communicate through a database-backed messaging system with conversations, message editing and deletion, conversation archiving, and real-time notifications using Django Channels and WebSockets.
 
 The stack consists of Django, PostgreSQL, Django Templates, Bootstrap, custom CSS, vanilla JavaScript, and Django Channels. The application is deployed on Render, with Cloudinary used for profile images and SMTP used for password reset emails.
 
@@ -54,17 +54,18 @@ NodeNexus/
 │   │       ├── currents.py     # Currents API calls + processing
 │   │       ├── cache.py        # API response caching
 │   │       └── articles.py     # Article creation/retrieval service logic
-│   ├── staticfiles/
+|   |
 │   ├── manage.py
 │   └── requirements.txt
 │
 ├── frontend/
 │   └── src/
 │       ├── components/         # Reusable template partials
-│       ├── pages/              # Page templates
+│       ├── pages/              # Page templates, accounts and messaging
 │       └── static/             # CSS, JavaScript, and images
 │
 ├── docs/
+├── build.sh
 ├── Procfile
 └── README.md
 ```
@@ -205,6 +206,8 @@ The article detail view initializes the comment collections before checking whet
 
 Comment timestamps are displayed using the same local-time formatting system as article publication dates. UTC timestamps are converted into the user's local timezone in JavaScript before being displayed in a human-readable format.
 
+When a user deletes their account, their comments and replies are retained rather than deleted. The `user` relationship is set to `NULL`, allowing the comment content and reply structure to remain available. Deleted users are displayed as "Deleted User" with a default profile image and without a profile link.
+
 ---
 
 ## Authentication
@@ -237,6 +240,8 @@ The authentication system currently provides:
 - Password reset confirmation
 - Password reset completion
 - Change password for authenticated users
+- Permanent account deletion with password confirmation
+- Deleted-user handling for persistent comments and replies
 
 When an authenticated user changes their password, the application also checks whether the submitted new password matches their current password. Django's `check_password()` method is used for this comparison rather than comparing passwords directly, because Django stores passwords as secure hashes.
 
@@ -394,7 +399,7 @@ The article detail page has a "related articles" section that uses the same hori
 
 ```python
         # Use the first three words of the title to find related articles
-        title_words = article["title"].split()
+        title_words = (article["title"] or "").split()
         related_query = " ".join(title_words[:3])
 
         related_articles, _ = search_articles(related_query)
@@ -509,7 +514,7 @@ The `Notification` model stores persistent notifications for users and links eac
 
 - **Bookmarks:** Users can save articles to their profile, view their saved articles, and remove bookmarks. Articles are persisted in the database when bookmarked, and unused article records are removed when they no longer have relevant user interactions. Saved articles can also be commented on and replied to.
 
-- **Comments and replies:** Authenticated users can add comments to articles, reply to comments, create nested replies, edit their own comments, and delete their own comments. Adding a comment to an unsaved API article persists the article in the database before creating the associated `Comment` record. Comments are rendered recursively through a reusable template component.
+- **Comments and replies:** Authenticated users can add comments to articles, reply to comments, create nested replies, edit their own comments, and delete their own comments. Adding a comment to an unsaved API article persists the article in the database before creating the associated *`Comment`* record. Comments are rendered recursively through a reusable template component. Comments are preserved after a user deletes their account and are displayed as belonging to a "Deleted User".
 
 - **Article management:** Saved articles are stored using `Article` and `Bookmark` database models, allowing bookmarked content to be associated with individual users. Comments are associated with persisted articles through the `Comment` model, with support for nested replies.
 
@@ -519,7 +524,7 @@ The `Notification` model stores persistent notifications for users and links eac
 
 - **Caching:** TTL cache in front of the Currents API to cut down on repeat requests.
 
-- **User authentication:** Django's built-in authentication system is used for signup, login, logout, password hashing, validation, and sessions.
+- **User authentication:** Django's built-in authentication system is used for signup, login, logout, account deletion, password hashing, validation, and sessions.
 
 - **Authentication forms:** Custom signup and login pages with Django form validation, inline errors, and password visibility toggles.
 
@@ -529,7 +534,7 @@ The `Notification` model stores persistent notifications for users and links eac
 
 - **Change password:** Logged-in users can change their password from their profile.
 
-- **User profiles:** Authenticated users can view and edit their profile information, including their username.
+- **User profiles:** Authenticated users can view and edit their profile information, including their username, and permanently delete their account.
 
 - **Profile pictures:** Users can upload a custom profile picture through Cloudinary or select from preset images stored locally.
 
@@ -611,7 +616,7 @@ Static files are handled differently depending on environment:
 
 User-uploaded profile images are stored using Cloudinary. Cloudinary configuration is provided through environment variables on Render rather than being stored in the codebase.
 
-Deployment flow: updates are pushed to GitHub, Render pulls the latest changes, installs the dependencies, runs `collectstatic`, starts Daphne, and connects the application to the production database. Secrets (Django secret key, database credentials, API keys, and Cloudinary credentials) are all set as environment variables on Render, not committed to the repo.
+Deployment flow: updates are pushed to GitHub, Render pulls the latest changes, runs `build.sh` to install dependencies, apply database migrations, and collect static files, then starts Daphne and connects the application to the production database. Secrets (Django secret key, database credentials, API keys, and Cloudinary credentials) are all set as environment variables on Render, not committed to the repo.
 
 The production service uses the Django ASGI application so that both normal HTTP requests and WebSocket connections can be handled:
 
@@ -754,8 +759,6 @@ cd backend && daphne -b 0.0.0.0 -p $PORT config.asgi:application
 ---
 
 # 12. Next Steps
-
-- Account deletion and additional account management features.
 
 - Admin functionality and role-based access control.
 
