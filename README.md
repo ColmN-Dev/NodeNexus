@@ -50,8 +50,11 @@ The application is deployed on Render using Daphne, PostgreSQL, and Cloudinary f
 
 **Render Web Service configuration:**
 
-- Build command: `pip install -r backend/requirements.txt && cd backend && python manage.py collectstatic --no-input && python manage.py migrate`
+- Build command: `./build.sh`
 - Start command: `cd backend && daphne -b 0.0.0.0 -p $PORT config.asgi:application`
+
+The `build.sh` script installs the backend dependencies, runs database migrations, and collects static files before deployment.
+
 - Environment variables set in the Render dashboard:
   - `SECRET_KEY`
   - `CURRENTS_API_KEY`
@@ -162,6 +165,8 @@ Cloudinary is used to store custom user-uploaded profile images. Preset profile 
 - Users can edit and delete their own comments
 - Comments are displayed using a reusable template component
 - Commenting on an unsaved article persists the article in the database
+- Comments remain available when their author deletes their account
+- Deleted users are displayed as "Deleted User" with a default profile image
 
 ---
 
@@ -234,6 +239,8 @@ Cloudinary is used to store custom user-uploaded profile images. Preset profile 
 - Custom profile picture uploads stored using Cloudinary
 - JavaScript image preview for selected preset and uploaded profile pictures
 - Profile picture displayed in the desktop navbar and mobile hamburger menu
+- Permanent account deletion with password confirmation
+- Deleted-user handling for persistent comments and replies
 
 ---
 
@@ -295,6 +302,7 @@ NodeNexus/
 │
 ├── docs/
 │
+├── build.sh
 ├── Procfile
 └── README.md
 ```
@@ -304,9 +312,13 @@ NodeNexus/
 ## Setup
 
 1. Open a terminal in the `NodeNexus` folder.
+
 2. Activate the virtual environment:
+
    - PowerShell: `.\.venv\Scripts\Activate.ps1`
    - Command Prompt: `.\.venv\Scripts\activate.bat`
+   - Bash / Git Bash: `source .venv/Scripts/activate`
+
 3. Install dependencies:
 
 ```bash
@@ -335,16 +347,16 @@ Local development:
 python backend/manage.py runserver
 ```
 
-Daphne deployment:
+Production build:
+
+```bash
+./build.sh
+```
+
+Production server:
 
 ```bash
 cd backend && daphne -b 0.0.0.0 -p $PORT config.asgi:application
-```
-
-Collect static files for production:
-
-```bash
-python backend/manage.py collectstatic --noinput
 ```
 
 ---
@@ -354,7 +366,7 @@ python backend/manage.py collectstatic --noinput
 - `backend/config/urls.py` → includes the main application, news, and accounts routes
 - `backend/core/urls.py` → main site pages (`/`, `/ai/`, `/cybersecurity/`, `/gaming/`, `/trending/`)
 - `backend/news/urls.py` → article search, autocomplete, article detail, bookmarking, bookmark deletion, comments, comment editing, and comment deletion routes
-- `backend/accounts/urls.py` → authentication routes for registration, login, logout, profile, profile editing, password reset, and change password
+- `backend/accounts/urls.py` → authentication routes for registration, login, logout, profile, delete account, profile editing, password reset, and change password
 - `backend/messaging/urls.py` → user discovery, conversation creation, messaging, message editing/deletion, conversation archiving/deletion, and notification routes
 
 ---
@@ -381,6 +393,7 @@ python backend/manage.py collectstatic --noinput
 | `/login/`                                                           | User login                      |
 | `/logout/`                                                          | User logout                     |
 | `/profile/`                                                         | User profile                    |
+| `/delete-account/`                                                  | Permanently delete user account |
 | `/change_password/`                                                 | Change current password         |
 | `/password_reset/`                                                  | Request password reset email    |
 | `/password_reset_done/`                                             | Password reset email sent       |
@@ -404,8 +417,8 @@ python backend/manage.py collectstatic --noinput
 
 ## Planned Features
 
-- Account deletion
 - Admin functionality and role-based access control
+- Django testing and project review
 
 ---
 
