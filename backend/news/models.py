@@ -41,7 +41,7 @@ class Bookmark(models.Model):
 
 # Comment model to allow users to comment on articles.    
 class Comment(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, null=True, blank=True, on_delete=models.SET_NULL)
     article = models.ForeignKey(Article, on_delete=models.CASCADE)
     parent = models.ForeignKey('self', null=True, blank=True, related_name='replies', on_delete=models.CASCADE)
     content = models.TextField()

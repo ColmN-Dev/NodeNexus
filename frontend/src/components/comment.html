@@ -6,38 +6,55 @@
 
         <div class="comment-pfp">
 
-        {% if comment.user == request.user %}
-            <a href="{% url 'profile' %}">
-        {% else %}
-            <a href="{% url 'view_user' comment.user.id %}">
-        {% endif %}
-
-                {% if comment.user.profile.preset_image %}
-                    <img src="{% static 'images/' %}{{ comment.user.profile.preset_image }}.png"
-                        alt="Profile picture">
-                {% elif comment.user.profile.image %}
-                    <img src="{{ comment.user.profile.image.url }}"
-                        alt="Profile picture">
+            {% if comment.user %}
+                {% if comment.user == request.user %}
+                    <a href="{% url 'profile' %}">
                 {% else %}
-                    <img src="{% static 'images/default.png' %}"
-                        alt="Default profile picture">
+                    <a href="{% url 'view_user' comment.user.id %}">
                 {% endif %}
 
-            </a>
+                    {% if comment.user.profile.preset_image %}
+                        <img
+                            src="{% static 'images/' %}{{ comment.user.profile.preset_image }}.png"
+                            alt="Profile picture"
+                        >
+                    {% elif comment.user.profile.image %}
+                        <img
+                            src="{{ comment.user.profile.image.url }}"
+                            alt="Profile picture"
+                        >
+                    {% else %}
+                        <img
+                            src="{% static 'images/default.png' %}"
+                            alt="Default profile picture"
+                        >
+                    {% endif %}
+
+                    </a>
+            {% else %}
+                <img
+                    src="{% static 'images/default.png' %}"
+                    alt="Deleted user profile picture"
+                >
+            {% endif %}
 
         </div>
 
         <div class="comment-info">
 
-        {% if comment.user == request.user %}
-            <a href="{% url 'profile' %}">
-        {% else %}
-            <a href="{% url 'view_user' comment.user.id %}">
-        {% endif %}
+            {% if comment.user %}
+                {% if comment.user == request.user %}
+                    <a href="{% url 'profile' %}">
+                {% else %}
+                    <a href="{% url 'view_user' comment.user.id %}">
+                {% endif %}
 
                 <strong>{{ comment.user.username }}</strong>
                 
-            </a>
+                </a>
+            {% else %}
+                <strong>Deleted User</strong>
+            {% endif %}
 
             <small class="comment-date">•</small>
 

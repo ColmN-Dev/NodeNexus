@@ -238,69 +238,96 @@ Your Profile | NodeNexus
 
     <div class="container py-4">
 
-    <div class="glass-content profile-detail">
+        <div class="glass-content profile-detail">
 
-        <h2>
-            Commented Articles
-        </h2>
+            <h2>
+                Commented Articles
+            </h2>
 
-        <div class="article-grid profile-article-grid">
+            <div class="article-grid profile-article-grid">
 
-            {% for article in commented_articles %}
+                {% for article in commented_articles %}
 
-            <div class="article-card">
+                <div class="article-card">
 
-                <a
-                    href="{% url 'saved_article_detail' article.id %}"
-                >
-                    <img
-                        src="{% if article.image and article.image != 'None' %}{{ article.image }}{% else %}{% static 'images/placeholder.png' %}{% endif %}"
-                        alt="{{ article.title }}"
-                        data-fallback-src="{% static 'images/placeholder.png' %}"
-                        onerror="this.onerror=null; this.src=this.dataset.fallback;"
+                    <a
+                        href="{% url 'saved_article_detail' article.id %}"
                     >
-                </a>
+                        <img
+                            src="{% if article.image and article.image != 'None' %}{{ article.image }}{% else %}{% static 'images/placeholder.png' %}{% endif %}"
+                            alt="{{ article.title }}"
+                            data-fallback-src="{% static 'images/placeholder.png' %}"
+                            onerror="this.onerror=null; this.src=this.dataset.fallback;"
+                        >
+                    </a>
 
-                <a
-                    href="{% url 'saved_article_detail' article.id %}"
-                >
-                    <h3>
-                        {{ article.title }}
-                    </h3>
-                </a>
+                    <a
+                        href="{% url 'saved_article_detail' article.id %}"
+                    >
+                        <h3>
+                            {{ article.title }}
+                        </h3>
+                    </a>
 
-                <p>{{ article.description|truncatewords:25 }}</p>
+                    <p>{{ article.description|truncatewords:25 }}</p>
 
-                    <p class="published-date">
-                        Published:
-                        <span class="article-timestamp" data-timestamp="{{ article.published }}">
-                            {{ article.published|date:"d M Y, H:i" }}
-                        </span>
-                    </p>
+                        <p class="published-date">
+                            Published:
+                            <span class="article-timestamp" data-timestamp="{{ article.published }}">
+                                {{ article.published|date:"d M Y, H:i" }}
+                            </span>
+                        </p>
 
-                <a
-                    href="{% url 'saved_article_detail' article.id %}"
-                    class="btn btn-primary mt-auto"
-                    title="View Article Details"
-                >
-                    View Details
-                </a>
+                    <a
+                        href="{% url 'saved_article_detail' article.id %}"
+                        class="btn btn-primary mt-auto"
+                        title="View Article Details"
+                    >
+                        View Details
+                    </a>
+
+                </div>
+
+                {% empty %}
+
+                <h4 class="empty-state-message glass-content m-4">
+                    You haven't commented on any articles yet.
+                </h4>
+
+                {% endfor %}
 
             </div>
-
-            {% empty %}
-
-            <h4 class="empty-state-message glass-content m-4">
-                You haven't commented on any articles yet.
-            </h4>
-
-            {% endfor %}
 
         </div>
 
     </div>
 
-</div>
+    <!-- Danger Zone -->
+
+    <div class="container py-4">
+
+        <div class="glass-content profile-detail">
+
+            <h2>
+                Danger Zone
+            </h2>
+
+            <p>
+                Deleting your account is permanent and cannot be undone.
+            </p>
+
+            <button
+                type="button"
+                class="btn nn-btn btn-danger"
+                data-bs-toggle="modal"
+                data-bs-target="#deleteAccountModal"
+            >
+                Delete Account
+            </button>
+
+        </div>
+
+    </div>
 
 </section>
 
@@ -580,6 +607,114 @@ Your Profile | NodeNexus
                         class="btn nn-btn"
                     >
                         Change Username
+                    </button>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- Delete Account Modal -->
+
+<div
+    class="modal fade delete-account-modal"
+    id="deleteAccountModal"
+    tabindex="-1"
+    aria-labelledby="deleteAccountModalLabel"
+    aria-hidden="true"
+>
+
+    <div class="modal-dialog modal-dialog-centered">
+
+        <div class="modal-content">
+
+            <div class="modal-header">
+
+                <h4
+                    class="modal-title"
+                    id="deleteAccountModalLabel"
+                >
+                    Delete Your Account?
+                </h4>
+
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="modal"
+                    aria-label="Close"
+                ></button>
+
+            </div>
+
+            <form method="POST" action="{% url 'delete_account' %}">
+
+                {% csrf_token %}
+
+                <div class="modal-body">
+
+                    <p>
+                        This action cannot be undone. Your account and personal data will be permanently deleted.
+                    </p>
+
+                    <label
+                        for="id_password"
+                        class="form-label"
+                    >
+                        Password
+                    </label>
+
+                    <div class="password-field">
+
+                        <input
+                            type="password"
+                            name="password"
+                            id="id_password"
+                            class="form-control"
+                            placeholder="Enter your password"
+                            required
+                        >
+
+                        <button
+                            type="button"
+                            id="togglePassword"
+                            class="password-toggle"
+                            data-open="{% static 'images/eye-open.svg' %}"
+                            data-closed="{% static 'images/eye-closed.svg' %}"
+                            aria-label="Show password"
+                            aria-pressed="false"
+                            title="Show password"
+                        >
+                            <img
+                                id="password-eye"
+                                src="{% static 'images/eye-open.svg' %}"
+                                alt=""
+                            >
+                        </button>
+
+                    </div>
+
+                </div>
+
+                <div class="modal-footer">
+
+                    <button
+                        type="button"
+                        class="btn nn-btn btn-secondary"
+                        data-bs-dismiss="modal"
+                    >
+                        Cancel
+                    </button>
+
+                    <button
+                        type="submit"
+                        class="btn nn-btn btn-danger"
+                    >
+                        Delete Account
                     </button>
 
                 </div>

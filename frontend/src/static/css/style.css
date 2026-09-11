@@ -1592,6 +1592,62 @@ a.btn:hover {
 }
 
 /* ========================================
+   DELETE ACCOUNT MODAL
+   ======================================== */
+
+.delete-account-modal .modal-content {
+    background: var(--content-glass-bg);
+    backdrop-filter: blur(18px) saturate(140%);
+    -webkit-backdrop-filter: blur(18px) saturate(140%);
+    border: 1px solid var(--content-glass-border);
+    border-radius: 18px;
+    box-shadow: var(--shadow);
+    color: var(--content-text);
+}
+
+.delete-account-modal .modal-header {
+    border-bottom: 1px solid var(--content-glass-border);
+}
+
+.delete-account-modal .modal-footer {
+    border-top: 1px solid var(--content-glass-border);
+}
+
+.delete-account-modal .modal-title {
+    color: var(--content-heading);
+    font-family: var(--heading-font);
+}
+
+.delete-account-modal .modal-body {
+    padding: 2rem;
+}
+
+.delete-account-modal .form-label {
+    color: var(--content-text);
+    font-family: var(--heading-font);
+    font-weight: 600;
+}
+
+.delete-account-modal .form-control {
+    background: var(--content-glass-bg);
+    border: 1px solid var(--content-glass-border);
+    border-radius: 10px;
+    color: var(--content-text);
+}
+
+.delete-account-modal .form-control:focus {
+    background: var(--content-glass-bg);
+    border-color: var(--cyan);
+    color: var(--content-text);
+    box-shadow: 0 0 0 .2rem rgba(0, 184, 230, .15);
+}
+
+.delete-account-modal .form-control::placeholder {
+    color: var(--content-text);
+    opacity: .7;
+}
+
+/* ========================================
    PROFILE ARTICLE GRID
    ======================================== */
 

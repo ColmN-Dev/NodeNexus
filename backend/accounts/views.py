@@ -145,3 +145,25 @@ def change_password(request):
         form = PasswordChangeForm(request.user)
 
     return render(request, 'accounts/change_password.html', {'form': form})
+
+@login_required
+def delete_account(request):
+    """
+    Deletes the logged-in user's account after verifying their password.
+    """
+    if request.method == "POST":
+        
+        password = request.POST.get("password")
+        
+        if request.user.check_password(password):
+        
+            user = request.user
+            logout(request)
+            user.delete()
+            messages.success(request, "Your account has been deleted.")
+            return redirect("home")
+        
+        messages.error(request, "Incorrect password. Please try again.")
+        return redirect("profile")
+
+    return redirect("profile")
