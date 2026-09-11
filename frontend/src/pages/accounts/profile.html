@@ -88,22 +88,15 @@ Your Profile | NodeNexus
                     </h3>
 
                     <h3>
-                        <strong>User Type:</strong>
-
-                        {% if user.is_superuser %}
-                            Admin
-                        {% else %}
-                            User
-                        {% endif %}
-
-                    </h3>
-
-                    <h3>
                         <strong>Joined:</strong> {{ user.date_joined|date:"F j, Y" }}
                     </h3>
 
                     <h3>
-                        <strong>Saved Articles:</strong> {{ bookmarks.count }}
+                        <strong>Bookmarks:</strong> {{ bookmarked_articles.count }}
+                    </h3>
+
+                    <h3>
+                        <strong>Comments:</strong> {{ comments.count }}
                     </h3>
 
                     <div class="profile-actions">
@@ -151,7 +144,7 @@ Your Profile | NodeNexus
 
             <div class="article-grid profile-article-grid">
 
-                {% for bookmark in bookmarks %}
+                {% for bookmark in bookmarked_articles %}
 
                 <div class="article-card">
 

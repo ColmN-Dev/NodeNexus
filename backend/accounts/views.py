@@ -4,7 +4,7 @@ from django.contrib import messages
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from .forms import UserRegisterForm, ProfileUpdateForm
-from news.models import Bookmark, Article
+from news.models import Bookmark, Article, Comment
 from django.contrib.auth.models import User
 
 
@@ -94,12 +94,15 @@ def profile(request):
         form = ProfileUpdateForm(instance=request.user.profile)
         
     # Fetch the user's bookmarks to display them on the profile page.
-    bookmarks = Bookmark.objects.filter(user=request.user)
+    bookmarked_articles = Bookmark.objects.filter(user=request.user)
     
     # Fetch the user's commented articles to display them on the profile page.
     commented_articles = Article.objects.filter(comment__user=request.user).distinct()
+    
+    # Fetch the user's comments to display them on the profile page.
+    comments = Comment.objects.filter(user=request.user)
 
-    return render(request, 'accounts/profile.html', {'form': form, 'bookmarks': bookmarks, 'commented_articles': commented_articles})
+    return render(request, 'accounts/profile.html', {'form': form, 'bookmarked_articles': bookmarked_articles, 'commented_articles': commented_articles, 'comments': comments})
 
 
 def login_view(request):
