@@ -52,4 +52,5 @@ class Comment(models.Model):
     # String representation of the Comment model,
     # returning a string that includes the username of the user and the title of the article they commented on.
     def __str__(self):
-        return f"{self.user.username} - {self.article.title}"
+        username = self.user.username if self.user else "Deleted User"
+        return f"{username} - {self.article.title}"
