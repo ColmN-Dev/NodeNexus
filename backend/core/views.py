@@ -168,3 +168,17 @@ def trending(request):
         "trending.html",
         {"articles": articles, "page": page, "has_next": has_next}
     )
+    
+def error_404(request, exception):
+    """
+    Custom 404 error view.
+    Renders a user-friendly 404 error page when a page is not found.
+    """
+    return render(request, "errors/404.html", status=404)
+
+def error_500(request):
+    """
+    Custom 500 error view.
+    Renders a user-friendly 500 error page when an internal server error occurs.
+    """
+    return render(request, "errors/500.html", status=500)

@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block title %}
+
+Page Not Found | NodeNexus
+
+{% endblock %}
+
+{% block content %}
+
+<section class="page-container">
+
+    <div class="page-header">
+        <h1>
+            <span class="title-glass">
+                Page Not Found
+            </span>
+        </h1>
+    </div>
+
+    <div class="text-center">
+        <p>
+            The page you're looking for doesn't exist or may have been moved.
+        </p>
+
+        <a href="{% url 'home' %}" class="btn nn-btn">
+            &larr; Back to Home
+        </a>
+    </div>
+
+</section>
+
+{% endblock %}
