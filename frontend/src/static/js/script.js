@@ -323,6 +323,17 @@
 
     }
 
+    // Hide loading overlay when navigating back to the page using the browser's back button.
+    window.addEventListener("pageshow", () => {
+    const overlay = document.getElementById("loading-overlay");
+
+
+        if (overlay) {
+            overlay.classList.add("hidden");
+        }
+
+    });
+
     // ==========================
     // PASSWORD VISIBILITY TOGGLE
     // ==========================

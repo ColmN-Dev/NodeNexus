@@ -676,6 +676,8 @@ cd backend && daphne -b 0.0.0.0 -p $PORT config.asgi:application
 
 **Date and timestamp handling** — Article and comment timestamps could arrive in formats that JavaScript did not always parse consistently. The frontend converts the UTC timestamp into a JavaScript `Date` and validates it before formatting it using `Intl.DateTimeFormat`. Invalid values are ignored rather than causing the entire timestamp script to fail with an `Invalid time value` error.
 
+**Loading overlay and browser back/forward navigation** — The loading overlay worked correctly during normal navigation but could remain visible when returning to a previous page using the browser's Back or Forward buttons. This occurred because browsers can restore pages from the back-forward cache without performing a full page reload. A *`pageshow`* event listener was added to reset the loading overlay whenever a page is displayed, including when a page is restored from the browser cache. This ensured the loading indicator was hidden correctly after browser navigation.
+
 **Messaging model and conversation access** — Building the messaging system required separate `Conversation` and `Message` models while ensuring users could only access conversations they participated in. Participant checks were added to conversation views, and separate archive states allow each participant to manage their own inbox independently.
 
 **Messaging conversation creation** — During development, creating a conversation successfully created the database record but could still be followed by a server error. This required tracing the conversation creation flow and checking the model, view, URL, and template interactions. Incorrect test records were removed during development while the conversation flow was corrected and retested.
@@ -760,13 +762,9 @@ cd backend && daphne -b 0.0.0.0 -p $PORT config.asgi:application
 
 # 12. Next Steps
 
-- Admin functionality and role-based access control.
-
 - Automated testing using Django's built-in `TestCase` framework, covering authentication, articles, bookmarks, comments, messaging, and notifications.
 
-- Database backup strategy for the production PostgreSQL instance.
-
-- Continued testing and bug fixes on API result consistency (some categories occasionally return fewer than 12 articles).
+- Continued testing and bug fixes on API result consistency.
 
 - Final UI polish, responsive testing, accessibility improvements, and general application refinement.
 
@@ -839,6 +837,8 @@ cd backend && daphne -b 0.0.0.0 -p $PORT config.asgi:application
 - [WebSocket API](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket)
 
 - [CSS Media Queries](https://developer.mozilla.org/en-US/docs/Web/CSS/Guides/Media_queries)
+
+- [Window pageshow event](https://developer.mozilla.org/en-US/docs/Web/API/Window/pageshow_event)
 
 ## PostgreSQL
 
