@@ -83,9 +83,18 @@
     box-sizing:border-box;
 }
 
-*,
-*::before,
-*::after {
+body,
+body::before,
+body::after,
+a,
+button,
+input,
+textarea,
+select,
+.glass-content,
+.glass-card,
+.nn-navbar,
+footer {
     transition:
     background-color .3s ease,
     background .3s ease,
@@ -171,7 +180,12 @@ h3 {
     text-align:center;
 }
 
-[data-theme="dark"] h1,h2,h3,h4,h5,h6 {
+[data-theme="dark"] h1,
+[data-theme="dark"] h2,
+[data-theme="dark"] h3,
+[data-theme="dark"] h4,
+[data-theme="dark"] h5,
+[data-theme="dark"] h6 {
     text-shadow:
         0 3px 12px rgba(0,0,0,.35),
         0 0 8px rgba(0,184,230,.2);
@@ -2123,6 +2137,17 @@ a.btn:hover {
         background .3s ease,
         border-color .3s ease,
         transform .3s ease;
+}
+
+.messaging-conversation-card .user-card-profile {
+    width: 100%;
+}
+
+.messaging-conversation-card .user-card-username-unread {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .messaging-conversation-card:hover {
