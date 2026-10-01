@@ -54,14 +54,14 @@ class ArticleDetailTests(TestCase):
     def test_article_detail(self, mock_search_articles):
         mock_search_articles.return_value = ([], False)
 
-        response = self.client.get("/article/?title=Test+Article&description=Test+description&image=test.jpg&published=2026-09-30&source=Test+Source&url=https://example.com")
+        response = self.client.get("/article/?title=Test+Article&description=Test+description&image=test.jpg&published=2026-10-01&source=Test+Source&url=https://example.com")
 
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "article_detail.html")
         self.assertEqual(response.context["article"]["title"], "Test Article")
         self.assertEqual(response.context["article"]["description"], "Test description")
         self.assertEqual(response.context["article"]["image"], "test.jpg")
-        self.assertEqual(response.context["article"]["published"], "2026-09-30")
+        self.assertEqual(response.context["article"]["published"], "2026-10-01")
         self.assertEqual(response.context["article"]["source"], "Test Source")
         self.assertEqual(response.context["article"]["url"], "https://example.com")
     
@@ -79,7 +79,7 @@ class ArticleDetailTests(TestCase):
             title="Saved Article",
             description="Saved description",
             image="saved.jpg",
-            published=timezone.make_aware(datetime(2026, 9, 30)),
+            published=timezone.make_aware(datetime(2026, 10, 1)),
             source="Saved Source",
             url="https://example.com/saved",
         )
@@ -90,7 +90,7 @@ class ArticleDetailTests(TestCase):
         self.assertEqual(response.context["article"]["title"], "Saved Article")
         self.assertEqual(response.context["article"]["description"], "Saved description")
         self.assertEqual(response.context["article"]["image"], "saved.jpg")
-        self.assertEqual(response.context["article"]["published"].date().isoformat(), "2026-09-30")
+        self.assertEqual(response.context["article"]["published"].date().isoformat(), "2026-10-01")
         self.assertEqual(response.context["article"]["source"], "Saved Source")
         self.assertEqual(response.context["article"]["url"], "https://example.com/saved")
         
@@ -108,7 +108,7 @@ class ArticleDetailTests(TestCase):
             title="Bookmarked Article",
             description="Bookmarked description",
             image="https://example.com/image.jpg",
-            published=timezone.make_aware(datetime(2026, 9, 30)),
+            published=timezone.make_aware(datetime(2026, 10, 1)),
             source="Bookmarked Source",
             url="https://example.com/bookmarked",
         )
