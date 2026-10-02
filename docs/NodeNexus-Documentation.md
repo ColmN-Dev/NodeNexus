@@ -1,6 +1,6 @@
 # NodeNexus Documentation
 
-**Last updated:** September 11, 2026
+**Last updated:** October 1, 2026
 
 ---
 
@@ -15,9 +15,9 @@
 7. [Current Limitations](#7-current-limitations)
 8. [Key Design Decisions](#8-key-design-decisions)
 9. [Deployment](#9-deployment)
-10. [Challenges and Solutions](#10-challenges-and-solutions)
-11. [What Was Learned](#11-what-was-learned)
-12. [Next Steps](#12-next-steps)
+10. [Testing](#10-testing)
+11. [Challenges and Solutions](#11-challenges-and-solutions)
+12. [What Was Learned](#12-what-was-learned)
 13. [References](#13-references)
 
 ---
@@ -46,7 +46,7 @@ NodeNexus/
 │
 ├── backend/
 │   ├── accounts/               # Authentication and account-related views/forms
-│   ├── config/                 # Django settings, urls, wsgi/asgi
+│   ├── config/                 # Django settings, urls, and ASGI configuration
 │   ├── core/                   # General site views and shared functionality
 │   ├── messaging/              # User discovery, conversations, messages and notifications
 │   ├── news/                   # News, articles, bookmarks, and comments
@@ -544,7 +544,7 @@ The `Notification` model stores persistent notifications for users and links eac
 
 - **Notifications:** Persistent notifications are created for new messages and delivered in real time using Django Channels and WebSockets. Notifications can be marked as read.
 
-- **Deployment setup:** Render hosting, PostgreSQL, Gunicorn, WhiteNoise for static files.
+- **Deployment setup:** Render hosting, PostgreSQL, Daphne, and WhiteNoise for static files.
 
 ---
 
@@ -626,7 +626,50 @@ cd backend && daphne -b 0.0.0.0 -p $PORT config.asgi:application
 
 ---
 
-# 10. Challenges and Solutions
+# 10. Testing
+
+Testing was carried out throughout development to verify that NodeNexus functions correctly across different features, user states and environments. Testing included both manual testing of the deployed application and automated unit testing of the Django backend.
+
+## Manual Testing
+
+Manual testing was used to verify complete user flows, frontend behaviour, responsive layouts and production functionality. Features were tested while logged in and logged out where applicable, including valid and invalid inputs, permissions, error handling and different device sizes.
+
+| Area | Manual Testing |
+|---|---|
+| Authentication | Registration, login, logout and invalid credentials |
+| Password Management | Password change, validation, forgotten password and reset by email |
+| Profiles | Profile details, preset images, custom image uploads and account deletion |
+| News | Categories, article loading, pagination, search and autocomplete |
+| Articles | Article details, related articles, external links and unsaved articles |
+| Bookmarks | Adding, removing and viewing bookmarked articles |
+| Comments | Creating, editing, deleting, replies and nested replies |
+| Messaging | Creating conversations, sending, editing and deleting messages |
+| Notifications | Unread notifications, notification badges and opening conversations |
+| Conversations | Archiving, unarchiving and deleting conversations |
+| Responsive Design | Desktop, tablet and mobile layouts, including landscape views |
+| Production | Deployed application, database connectivity, static files, Cloudinary and email functionality |
+
+## Automated Unit Testing
+
+Django's `TestCase` framework was used to create automated unit tests for the main application functionality. External services and API calls were mocked where required so that tests could focus on application behaviour without depending on live external services.
+
+A total of **69 automated tests** were created:
+
+| Application | Tests |
+|---|---:|
+| Core | 14 |
+| News | 15 |
+| Accounts | 18 |
+| Messaging | 22 |
+| **Total** | **69** |
+
+The tests cover views, authentication, permissions, database operations, forms, helper functions, article and bookmark behaviour, comments, messaging, notifications and different valid and invalid application states.
+
+The complete test suite was run locally after the individual application test suites had been completed, with all **69 tests passing successfully**.
+
+---
+
+# 11. Challenges and Solutions
 
 **Bootstrap and custom CSS integration** — Bootstrap's grid and component styles sometimes conflicted with the custom NodeNexus design. The solution was to use Bootstrap mainly for layout and component structure while keeping branding, spacing, responsive behaviour, and visual styling in custom CSS.
 
@@ -698,9 +741,17 @@ cd backend && daphne -b 0.0.0.0 -p $PORT config.asgi:application
 
 **CSRF errors after switching to Daphne** — After moving from Gunicorn to Daphne for WebSocket support, login started returning a 403 error in production while working normally in development. Django's CSRF protection checks the origin of incoming requests, and no trusted origins had been configured for production, a gap that Gunicorn's setup had not exposed. Render also forwards HTTPS requests to the application internally as plain HTTP, so Django could not correctly recognise the connection as secure without being told to trust the forwarded protocol header. The fix was adding `CSRF_TRUSTED_ORIGINS` for the production domain and `SECURE_PROXY_SSL_HEADER` so Django trusts Render's forwarded protocol header.
 
+**Cloudinary configuration and testing** — Several account and profile tests involved Cloudinary-backed profile images, which meant the test environment needed a valid Cloudinary configuration even though no real uploads should take place. A test Cloudinary configuration using `cloud_name="test-cloud"` was added where required, while actual uploads were mocked using `unittest.mock.patch`. `SimpleUploadedFile` was used to simulate uploaded images, and the mock response needed to include `public_id`, `version`, `type`, and `resource_type` to match the installed Cloudinary implementation. This kept the tests isolated from the external service while still exercising the application's profile image logic.
+
+**Testing pagination helpers in isolation** — The pagination helper functions were tested through the Django test client, but this routed through the homepage view and interacted with the mocked API calls. This caused the mocks to be consumed by unrelated requests and made the helper tests unreliable. `RequestFactory` was then used to construct requests directly, allowing the pagination helpers to be tested independently from the view and external API behaviour.
+
+**Django password reset flow** — Testing the complete password reset process required accounting for the way Django's built-in `PasswordResetConfirmView` handles reset tokens. The generated reset link first validates the token and redirects to Django's internal `set-password` URL before displaying the password form. The test therefore follows this redirect, submits the new password and verifies that the user's password has been successfully changed.
+
+**Django test email backend** — The password reset email flow was tested using Django's automatic test email backend. The generated messages could be accessed through `mail.outbox`, so the tests could verify the email content and reset process without requiring a separate email backend configuration.
+
 ---
 
-# 11. What Was Learned
+# 12. What Was Learned
 
 - Structuring a Django application using separate apps, views, templates, models, and services while keeping API and caching logic outside the views.
 
@@ -760,16 +811,6 @@ cd backend && daphne -b 0.0.0.0 -p $PORT config.asgi:application
 
 ---
 
-# 12. Next Steps
-
-- Automated testing using Django's built-in `TestCase` framework, covering authentication, articles, bookmarks, comments, messaging, and notifications.
-
-- Continued testing and bug fixes on API result consistency.
-
-- Final UI polish, responsive testing, accessibility improvements, and general application refinement.
-
----
-
 # 13. References
 
 ## Django
@@ -807,8 +848,6 @@ cd backend && daphne -b 0.0.0.0 -p $PORT config.asgi:application
 - [Channels Consumers](https://channels.readthedocs.io/en/stable/topics/consumers.html)
 
 - [Channels Channel Layers](https://channels.readthedocs.io/en/stable/topics/channel_layers.html)
-
-- [WebSocket Documentation](https://channels.readthedocs.io/en/stable/topics/channel_layers.html)
 
 ## Bootstrap
 
@@ -854,7 +893,7 @@ cd backend && daphne -b 0.0.0.0 -p $PORT config.asgi:application
 
 - [Render Documentation](https://render.com/docs)
 
-- [Gunicorn Documentation](https://docs.gunicorn.org/)
+- [Daphne Documentation](https://docs.djangoproject.com/en/6.0/howto/deployment/asgi/daphne/)
 
 - [WhiteNoise Documentation](https://whitenoise.readthedocs.io/)
 
@@ -863,6 +902,20 @@ cd backend && daphne -b 0.0.0.0 -p $PORT config.asgi:application
 - [Currents API Documentation](https://currentsapi.services/en/docs/)
 
 - [Requests Documentation](https://requests.readthedocs.io/)
+
+## Testing
+
+- [Django Testing](https://docs.djangoproject.com/en/6.0/topics/testing/)
+
+- [Django TestCase](https://docs.djangoproject.com/en/6.0/topics/testing/tools/)
+
+- [Django RequestFactory](https://docs.djangoproject.com/en/6.0/topics/testing/advanced/)
+
+- [Django Uploaded Files](https://docs.djangoproject.com/en/6.0/topics/http/file-uploads/)
+
+- [Python unittest](https://docs.python.org/3/library/unittest.html)
+
+- [Python unittest.mock](https://docs.python.org/3/library/unittest.mock.html)
 
 ## Version Control
 
