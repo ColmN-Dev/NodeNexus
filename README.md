@@ -7,6 +7,7 @@
 - [Application Link](#application-link)
 - [Deployment](#deployment)
 - [Technologies Used](#technologies-used)
+- [Testing](#testing)
 - [Key Skills Demonstrated](#key-skills-demonstrated)
 - [Features](#features)
 - [Architecture](#architecture)
@@ -34,7 +35,7 @@ The application uses PostgreSQL for persistent storage and follows a structured 
 
 ## Site Logo
 
-![NodeNexus Logo](frontend/src/static/images/NodeNexusLogo.png)
+![NodeNexus Logo](frontend/src/static/images/NodeNexusLogo.webp)
 
 ---
 
@@ -91,6 +92,71 @@ Cloudinary is used to store custom user-uploaded profile images. Preset profile 
 - Currents API
 - Cloudinary
 - WhiteNoise
+
+---
+
+## Testing
+
+NodeNexus was tested through automated Django unit tests and manual testing.
+
+### Automated Testing
+
+| Application | Tests |
+| --- | ---: |
+| Core | 14 |
+| News | 15 |
+| Accounts | 18 |
+| Messaging | 22 |
+| **Total** | **69** |
+
+All 69 automated tests pass successfully.
+
+```bash
+$ python manage.py test
+Found 69 test(s).
+Creating test database for alias 'default'...
+System check identified no issues (0 silenced).
+.........................................Not Found: /messages/new/
+..........Not Found: /users/9999/
+..Not Found: /messages/notifications/7/viewed/
+................
+----------------------------------------------------------------------
+Ran 69 tests in 138.251s
+
+OK
+Destroying test database for alias 'default'...
+```
+
+---
+
+### Manual Testing
+
+| Area | Tests |
+| --- | --- |
+| Authentication | Registration, login, logout and invalid credentials |
+| Password Management | Password change, validation, reset and recovery |
+| Profiles | Editing, preset images, uploads and account deletion |
+| News | Categories, articles, search, autocomplete and pagination |
+| Bookmarks | Add, remove and view saved articles |
+| Comments | Create, edit, delete and nested replies |
+| Messaging | Conversations, sending, editing and deleting messages |
+| Notifications | Unread states, badges and notification links |
+| Responsive Design | Desktop, tablet and mobile layouts |
+| Production | Deployment, database, static files, Cloudinary and email |
+
+---
+
+### Continuous Integration
+
+GitHub Actions automatically runs the Django test suite in `django-tests.yml` using a temporary PostgreSQL database whenever changes are pushed or submitted as pull requests to `main`.
+
+---
+
+### Lighthouse
+
+Lighthouse was used to assess performance, accessibility, best practices and SEO. Testing in an incognito window produced **green results across all Lighthouse categories**. Performance scores varied slightly between runs due to testing conditions.
+
+![Lighthouse Score](frontend/src/static/images/NodeNexus_Lighthouse.png)
 
 ---
 
@@ -281,6 +347,10 @@ The `Conversation` and `Message` models store messaging data, including particip
 ```text
 NodeNexus/
 │
+├── .github/
+│   └── workflows/
+│       └── django-tests.yml
+│
 ├── backend/
 │   ├── accounts/
 │   ├── config/
@@ -412,13 +482,6 @@ cd backend && daphne -b 0.0.0.0 -p $PORT config.asgi:application
 | `/messages/<int:conversation_id>/delete_message/<int:message_id>/`  | Delete a message                |
 | `/messages/notifications/`                                          | View notifications              |
 | `/messages/notifications/<int:notification_id>/viewed/`             | Mark a notification as viewed   |
-
----
-
-## Planned Features
-
-- Admin functionality and role-based access control
-- Django testing and project review
 
 ---
 
