@@ -17,7 +17,6 @@
 - [Run](#run)
 - [Routing Structure](#routing-structure)
 - [Implemented Routes](#implemented-routes)
-- [Planned Features](#planned-features)
 - [Documentation](#documentation)
 - [Screenshots](#screenshots)
 

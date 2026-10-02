@@ -1,6 +1,6 @@
 # NodeNexus Documentation
 
-**Last updated:** October 1, 2026
+**Last updated:** October 02, 2026
 
 ---
 
@@ -32,17 +32,21 @@ The stack consists of Django, PostgreSQL, Django Templates, Bootstrap, custom CS
 
 Article data is initially treated as API response data rather than permanent database content. When a user bookmarks or comments on an article, the article is persisted in the database and receives an Article ID, allowing bookmarks and comments to reference the stored record.
 
-The project is structured around Django's server-side architecture, with the database handling persistent user and article interactions while JavaScript and WebSockets provide client-side interactivity and real-time notification functionality.
+The project uses Django for the main server-side architecture, with PostgreSQL handling persistent data and JavaScript and WebSockets providing frontend interactivity and real-time notifications.
 
 ---
 
 # 2. Project Structure
 
-The project splits the backend and frontend into separate top-level folders, so Django logic and frontend resources aren't mixed together. React was considered for this project however due to time constraints and possible additional complexity, it wasn't used for NodeNexus.
+The project splits the backend and frontend into separate top-level folders, so Django logic and frontend resources aren't mixed together. React was considered for the project, but due to time constraints and added complexity, it was not used.
 
 
 ```text
 NodeNexus/
+│
+├── .github/
+│   └── workflows/
+│       └── django-tests.yml    # GitHub Actions CI workflow
 │
 ├── backend/
 │   ├── accounts/               # Authentication and account-related views/forms
@@ -100,29 +104,6 @@ The Currents API does not return a total result count, so pagination cannot use 
 
 In practice, testing showed that results are capped at five pages per query.
 
-```python
-        response = requests.get(
-            BASE_URL,
-            headers={
-                "Authorization": API_KEY
-            },
-            params=params,
-            timeout=30
-        )
-
-        response.raise_for_status()
-
-        data = response.json()
-
-        # Extract articles from the response
-        articles = data.get(
-            "news",
-            []
-        )
-```
-
-The service sends the request to the Currents API using the API key, query parameters, and a timeout. `raise_for_status()` ensures HTTP errors are detected before the response is processed, while `data.get("news", [])` safely extracts the returned articles.
-
 ---
 
 ## Caching
@@ -145,48 +126,15 @@ This includes:
 
 ---
 
-## Article and bookmark management
+## Article and Bookmark Management
 
-Articles returned by the Currents API are initially handled as API response data rather than being stored in the database.
+Article data returned directly from the API is initially treated as temporary data. When a user bookmarks an article or interacts with it through comments, the article is persisted in the database.
 
-When a user views an article, its data can be displayed directly from the API response. When the user chooses to bookmark an article, the relevant article data is passed to the article service.
+The article service checks whether an `Article` already exists using the article URL. If it does not exist, a new record is created using the API data.
 
-The service checks whether the article already exists in the `Article` table. If it does not, the article is created and assigned a database ID. A `Bookmark` record is then created linking the authenticated user to that article.
+Bookmarks are stored separately from articles and link a user to an `Article`. This allows multiple users to bookmark the same article without duplicating the article record.
 
-This keeps the database focused on articles that users have interacted with rather than storing every article returned by the external API.
-
-When a user removes a bookmark, the bookmark is deleted. Article records are only removed when they no longer have any relevant user interactions, such as bookmarks or comments.
-
-```python
-def get_or_create_article(article_data):
-    article, created = Article.objects.get_or_create(
-        url=article_data.get("url"),
-        defaults={
-            "title": article_data.get("title", ""),
-            "description": article_data.get("description", ""),
-            "image": article_data.get("image", ""),
-            "published": article_data.get("published"),
-            "source": article_data.get("source", ""),
-        },
-    )
-
-    return article, created
-```
-
-The article service uses the API article URL to find an existing database record or create one from the supplied API data. This keeps the conversion from temporary API data to a persistent `Article` record in one place.
-
-```python
-# Create the Article database record only when the user bookmarks it
-article, created = get_or_create_article(article_data)
-
-# Create the bookmark linking the article to the logged-in user
-bookmark, bookmark_created = Bookmark.objects.get_or_create(
-    user=request.user,
-    article=article
-)
-```
-
-The bookmark view first passes the submitted API article data to the article service, which creates or retrieves the persistent `Article` record. The bookmark is then created using `get_or_create()`, linking the article to the authenticated user without creating duplicate bookmark records.
+When a bookmark is removed, the article is only deleted if it has no remaining bookmarks or comments. This prevents article data from being removed while it is still referenced by another user or feature.
 
 ---
 
@@ -245,10 +193,6 @@ The authentication system currently provides:
 
 When an authenticated user changes their password, the application also checks whether the submitted new password matches their current password. Django's `check_password()` method is used for this comparison rather than comparing passwords directly, because Django stores passwords as secure hashes.
 
-```python
-if request.user.check_password(request.POST.get('new_password1')):
-    messages.error(request, 'New password cannot be the same as the old password.')
-```
 The password policy is handled centrally through Django's validation system, while the additional current-password check is specific to the authenticated change-password process.
 
 Django handles the security-sensitive password hashing and authentication logic rather than implementing these systems manually.
@@ -277,13 +221,6 @@ The messaging system uses `Conversation` and `Message` models. Conversations sto
 
 Users can send messages, edit their own messages within a 15-minute window, and delete their own messages. Deleted messages remain in the database and are displayed as deleted rather than being removed completely.
 
-```python
-edit_window = timedelta(minutes=15)
-if timezone.now() > message.created_at + edit_window:
-    messages.error(request, "Messages can only be edited within 15 minutes of sending.")
-    return redirect('conversation', conversation_id=conversation_id)
-```
-
 Conversation access is restricted to its participants. Users can also archive conversations independently, while deleting a conversation removes it for both participants and its associated messages.
 
 User discovery is provided through a dedicated users page that excludes the currently logged-in user and allows users to open profiles or start a conversation.
@@ -295,21 +232,6 @@ User discovery is provided through a dedicated users page that excludes the curr
 NodeNexus includes a persistent notification system for new messages. Notifications are stored in the database and linked to the recipient and the message that triggered them.
 
 Django Channels and WebSockets provide real-time notification delivery. When a new message is sent, a notification is created and a WebSocket event is broadcast to the recipient.
-
-```python
-    Notification.objects.create(user=receiver, message=message)
-    
-    channel_layer = get_channel_layer()
-    async_to_sync(channel_layer.group_send)(
-        f'notifications_{receiver.id}',
-        {
-            'type': 'notification',
-            'message': f'New message from {request.user.username}',
-            'url': f'/messages/{conversation.id}/',
-            'created_at': message.created_at.isoformat(),
-        }
-    )
-```
 
 Notifications have an unread state and can be marked as read through the notification view.
 
@@ -327,14 +249,6 @@ The messaging pages use a shared `messaging_layout.html` component for the inbox
 
 The comment interface is kept in a reusable `comment.html` component, which recursively includes itself for replies. This allows the same template structure to render comments and nested replies at any depth without duplicating the markup. 
 
-```django
-{% for reply in comment.replies.all %}
-
-    {% include "comment.html" with comment=reply %}
-
-{% endfor %}
-```
-
 ---
 
 ## Styling
@@ -348,35 +262,6 @@ Bootstrap handles the responsive grid and base components. Custom CSS on top of 
 - A search bar with live autocomplete, calling a dedicated endpoint that returns matching article titles as JSON.
 - Input is debounced to avoid firing a request on every keystroke.
 - A stale-response guard tracks the most recent query and discards any autocomplete response that doesn't match it, so a slow earlier request can't overwrite a newer one on screen.
-
-```javascript
-let timeout;
-let latestQuery = "";
-
-searchInput.addEventListener("input", () => {
-    const query = searchInput.value.trim();
-    latestQuery = query;
-
-    clearTimeout(timeout);
-
-    if (query.length < 2) return;
-
-    timeout = setTimeout(async () => {
-        const response = await fetch(
-            `/auto-complete/?q=${encodeURIComponent(query)}`
-        );
-
-        const results = await response.json();
-
-        // Ignore outdated results
-        if (latestQuery !== query) return;
-
-        const limitedResults = results.slice(0, 8);
-    }, 250);
-}); 
-```
-
-The autocomplete uses a 250ms debounce so requests are not sent for every keystroke. `latestQuery` ensures that results from an earlier search are ignored if the user has already entered a newer query, preventing outdated suggestions from replacing the current results.
 
 ---
 
@@ -395,33 +280,9 @@ The same pagination component is used across the category pages and search resul
 
 The homepage article grid is a three-column layout on desktop. On tablet and mobile it switches to a horizontal scrolling carousel instead of stacking into a single column, so users can swipe through articles rather than scroll a long vertical list.
 
-The article detail page has a "related articles" section that uses the same horizontal carousel pattern on tablet and mobile, with related articles matched by comparing the first three words of each article title. This can sometimes return non-tech results, however this is expected when working with external APIs.
+The article detail page has a "related articles" section that uses the same horizontal carousel pattern on tablet and mobile, with related articles matched by comparing the first three words of each article title. This can sometimes return unrelated results because the articles come from an external API.
 
-```python
-        # Use the first three words of the title to find related articles
-        title_words = (article["title"] or "").split()
-        related_query = " ".join(title_words[:3])
-
-        related_articles, _ = search_articles(related_query)
-
-        # Remove the current article and limit results to 12 articles
-        related_articles = [
-            item for item in related_articles
-            if item.get("url") != article["url"]
-        ]
-        
-        # Broaden the search if no related articles are found
-        if not related_articles:
-            related_query = " ".join(title_words[:2])
-            related_articles, _ = search_articles(related_query)
-            
-            related_articles = [
-            item for item in related_articles
-            if item.get("url") != article["url"]
-        ]
-```
-
-The related articles system uses the current article's title to generate a simple search query rather than requiring a separate recommendation system. It first searches using the first three words of the title, removes the current article from the results, and falls back to the first two words if no results are found. This provides a lightweight way of finding potentially related content while working within the limitations of the external API.
+The related articles system uses the current article's title to generate a simple search query rather than requiring a separate recommendation system. It first searches using the first three words of the title, removes the current article from the results, and falls back to the first two words if no results are found. This provides a simple way of finding potentially related content while working within the limitations of the external API.
 
 ## Bookmarks
 
@@ -514,9 +375,9 @@ The `Notification` model stores persistent notifications for users and links eac
 
 - **Bookmarks:** Users can save articles to their profile, view their saved articles, and remove bookmarks. Articles are persisted in the database when bookmarked, and unused article records are removed when they no longer have relevant user interactions. Saved articles can also be commented on and replied to.
 
-- **Comments and replies:** Authenticated users can add comments to articles, reply to comments, create nested replies, edit their own comments, and delete their own comments. Adding a comment to an unsaved API article persists the article in the database before creating the associated *`Comment`* record. Comments are rendered recursively through a reusable template component. Comments are preserved after a user deletes their account and are displayed as belonging to a "Deleted User".
+- **Comments and replies:** Authenticated users can add comments, replies and nested replies, edit and delete their own comments, with comments preserved when an account is deleted.
 
-- **Article management:** Saved articles are stored using `Article` and `Bookmark` database models, allowing bookmarked content to be associated with individual users. Comments are associated with persisted articles through the `Comment` model, with support for nested replies.
+- **Article management:** Articles are persisted when bookmarked or commented on, with `Article`, `Bookmark` and `Comment` models handling their relationships.
 
 - **Responsive frontend:** desktop grid / mobile carousel layouts, mobile bottom nav, off-canvas menu, responsive messaging layout, notification interface, and fallback images.
 
@@ -556,7 +417,7 @@ The `Notification` model stores persistent notifications for users and links eac
 - Article detail pages currently receive the full article metadata through query parameters rather than looking the article up by a database ID. This is intentional for unsaved articles because API articles are not stored in the database until a user bookmarks or comments on them.
 - Article persistence: The application does not currently store every article returned by the API. An article receives a database ID when a user bookmarks it or adds a comment, rather than being stored automatically when retrieved from the API.
 - Bookmarking currently depends on the article data supplied by the API response. If the API changes or provides incomplete article data, this can affect the information stored when an article is bookmarked.
-- Messaging and real-time notifications: Messaging is database-backed, while real-time notification delivery depends on the WebSocket connection and current in-memory channel layer. The in-memory setup is suitable for development but would need a persistent channel layer such as Redis for reliable real-time communication across multiple production instances.
+- Messaging is database-backed, while real-time notification delivery currently uses an in-memory channel layer. This works for the current deployment, but a persistent channel layer such as Redis would be needed to support reliable WebSocket communication across multiple production instances.
 
 ---
 
@@ -568,7 +429,7 @@ The `Notification` model stores persistent notifications for users and links eac
 
 **Why PostgreSQL** — more production-realistic than SQLite, and better suited to the relational data used by users, articles, bookmarks, comments, conversations, messages, and notifications.
 
-**Why separate `backend/` and `frontend/`** — keeps Django logic and frontend templates/assets cleanly organised. React wasn't used for NodeNexus due to time constraints and added complexity; it's planned for the next project, where the frontend architecture will be designed around React from the beginning.
+**Why separate `backend/` and `frontend/`** — keeps Django logic and frontend templates/assets cleanly organised. React wasn't used for NodeNexus due to time constraints and added complexity.
 
 **Why previous/next pagination instead of numbered totals** — the Currents API doesn't report a total result count, so a traditional "page X of Y" approach wasn't possible. Since results are capped at five pages, a fixed five-button layout was used instead of calculating a page range.
 
@@ -665,7 +526,17 @@ A total of **69 automated tests** were created:
 
 The tests cover views, authentication, permissions, database operations, forms, helper functions, article and bookmark behaviour, comments, messaging, notifications and different valid and invalid application states.
 
+## Continuous Integration
+
+GitHub Actions was configured to automatically run the Django test suite on pushes and pull requests to the `main` branch. The workflow creates a temporary PostgreSQL database, installs the project dependencies, collects static files and runs the automated tests.
+
+This provides an additional check that the test suite passes in a clean CI environment rather than only on the local development setup.
+
 The complete test suite was run locally after the individual application test suites had been completed, with all **69 tests passing successfully**.
+
+## Lighthouse
+
+Lighthouse was used to assess performance, accessibility, best practices and SEO. Testing in an incognito window produced **green results across all Lighthouse categories**. Performance scores varied slightly between runs due to testing conditions.
 
 ---
 
@@ -916,6 +787,10 @@ The complete test suite was run locally after the individual application test su
 - [Python unittest](https://docs.python.org/3/library/unittest.html)
 
 - [Python unittest.mock](https://docs.python.org/3/library/unittest.mock.html)
+
+## Performance Testing
+
+- [Google Lighthouse Documentation](https://developer.chrome.com/docs/lighthouse/)
 
 ## Version Control
 
